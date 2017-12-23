@@ -1,0 +1,9 @@
+.main-container{
+	height: calc(50vh - 40px);
+	transition: height 0.3s ease-out;
+
+}
+.main-container.closed{
+	height: 40px;
+	overflow-y: hidden;
+}

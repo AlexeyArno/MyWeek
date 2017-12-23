@@ -1,0 +1,12 @@
+.up{
+	text-align: center;
+	font-size: 14px;
+	opacity: 0.9;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #efefef;
+	cursor:pointer;
+	user-select: none;
+}
+.up:hover{
+	color:#3e97f3;
+}

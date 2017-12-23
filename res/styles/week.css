@@ -1,0 +1,39 @@
+#header{
+	width: 100vw;
+	height: 40px;
+	padding-left: 45px;
+}
+.hour{
+	display: inline-block;
+	font-size: 12px;
+}
+#days{
+	float: left;
+	width: 40px;
+}
+.day{
+	height: 40px;
+	font-size: 12px;
+	line-height: 2;
+}
+#graph{
+	width:100vw;
+}
+.cell{
+	height: 41px;
+	display: inline-block;
+	border: 1px solid rgba(206, 206, 206,0.2);
+	border-left: none;
+	margin-top: -5px;
+	border-top: none;
+	cursor: pointer;
+}
+.collumn{
+	display: inline-block;
+}
+.container-week{
+	min-height: calc(100% - 50px);
+}
+#grid{
+	overflow-x: hidden ;
+}
