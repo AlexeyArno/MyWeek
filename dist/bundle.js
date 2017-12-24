@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,25 +68,48 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__week_task__ = __webpack_require__(3);
-
-
-var week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* default */]();
-var days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-week.loadDays(days);
-var daysEl = document.getElementById('days');
-var grapEl = document.getElementById('graph');
-var timeEl = document.getElementById('header');
-week.setupAll(daysEl, timeEl, grapEl);
-var plans = new Array();
-for (var o = 0; o < 5; o++) {
-    plans[o] = new __WEBPACK_IMPORTED_MODULE_1__week_task__["a" /* default */]();
-    plans[o].setup("green", 13 + o, 16 + o, 0 + o, 1 + o);
-}
-week.loadTasks(plans);
-week.draw();
+var Task = (function () {
+    function Task() {
+    }
+    Task.prototype.setup = function (color, start, stop, day, id) {
+        this.color = color;
+        this.start = start;
+        this.stop = stop;
+        this.day = day;
+        this.id = id;
+    };
+    Task.prototype.draw = function (parentElement, hour, day, week_number) {
+        var newInEl = document.createElement("div");
+        newInEl.className = "task";
+        newInEl.id = "task" + String(week_number) + ":" + String(hour) + ":" + String(day);
+        newInEl.setAttribute("data-id", String(this.id));
+        newInEl.style.background = this.color;
+        newInEl.onclick = function (e) { this.elementClick(e); }.bind(this);
+        parentElement.appendChild(newInEl);
+        this.element = newInEl;
+    };
+    Task.prototype.elementClick = function (event) {
+        var elementList = document.querySelectorAll('[data-id]');
+        for (var i = 0; i < elementList.length; i++) {
+            if (String(this.id) == elementList[i].getAttribute("data-id")) {
+                console.log('Click');
+            }
+        }
+    };
+    Task.prototype.setStyle = function (styleName, styleValue) {
+        if (this.element != null) {
+            this.element.style[styleName] = styleValue;
+        }
+    };
+    Task.prototype.clear = function () {
+        if (this.element != null) {
+            this.element.remove();
+            this.element = null;
+        }
+    };
+    return Task;
+}());
+/* harmony default export */ __webpack_exports__["a"] = (Task);
 
 
 /***/ }),
@@ -94,8 +117,37 @@ week.draw();
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__task__ = __webpack_require__(3);
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__week_task__ = __webpack_require__(0);
+
+
+var days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+var plans = new Array();
+for (var o = 0; o < 5; o++) {
+    plans[o] = new __WEBPACK_IMPORTED_MODULE_1__week_task__["a" /* default */]();
+    plans[o].setup("#ffdda9", 13 + o, 16 + o, 0 + o, 1 + o + Math.random());
+}
+var currentWeek = 2;
+var startHour = 11;
+var week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* default */](1);
+week.create(document.body, (1 == currentWeek));
+week.loadDays(days);
+function sec() {
+    startHour = (startHour > 23) ? startHour - 24 : startHour + 1;
+    week.setStartHour(startHour);
+    week.loadTasks(plans);
+    week.draw();
+}
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__task__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(5);
 
@@ -103,13 +155,60 @@ week.draw();
 
 
 var Week = (function () {
-    function Week() {
+    function Week(week_number) {
         this.hourWidth = 80;
         this.startHour = 13;
+        this.week_number = week_number;
         this.timePanel = new __WEBPACK_IMPORTED_MODULE_0__time__["a" /* default */]();
         this.graphPanel = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */]();
         this.daysPanel = new __WEBPACK_IMPORTED_MODULE_3__days__["a" /* default */]();
     }
+    Week.prototype.create = function (parent, currentWeek) {
+        var wrapp = document.createElement("div");
+        wrapp.className = "paper  main-container";
+        var up = document.createElement("div");
+        up.className = (currentWeek) ? "up active" : "up";
+        wrapp.appendChild(up);
+        up.innerHTML = "Week " + String(this.week_number);
+        up.onclick = function (e) {
+            wrapp.classList;
+            var clList = wrapp.classList;
+            for (var i = 0; i < clList.length; i++) {
+                if (clList[i] == "closed") {
+                    clList.remove("closed");
+                    days.style.display = "block";
+                    return;
+                }
+            }
+            clList.add("closed");
+            days.style.display = "none";
+        };
+        var grid = document.createElement("div");
+        grid.id = "grid" + String(this.week_number);
+        var header = document.createElement("div");
+        header.className = "header";
+        header.id = "header" + String(this.week_number);
+        var container = document.createElement("div");
+        container.className = "container-week";
+        container.id = "container-week" + String(this.week_number);
+        grid.appendChild(header);
+        grid.appendChild(container);
+        var days = document.createElement("div");
+        var graph = document.createElement("div");
+        days.id = "days" + String(this.week_number);
+        days.className = "days";
+        graph.id = "graph" + String(this.week_number);
+        graph.className = "graph";
+        container.appendChild(days);
+        container.appendChild(graph);
+        grid.className = "grid";
+        wrapp.appendChild(grid);
+        parent.appendChild(wrapp);
+        this.container = container;
+        this.daysPanel.setup(days);
+        this.graphPanel.setNativeElement(graph);
+        this.timePanel.setNativeElement(header);
+    };
     Week.prototype.loadTasks = function (plans) {
         var timePlans = new Array();
         for (var i = this.startHour; i < this.startHour + 24; i++) {
@@ -134,16 +233,14 @@ var Week = (function () {
     Week.prototype.loadDays = function (days) {
         this.daysPanel.loadDays(days);
     };
-    Week.prototype.setupAll = function (DaysElement, TimeElement, GraphElement) {
-        this.daysPanel.setup(DaysElement);
-        this.graphPanel.setNativeElement(GraphElement);
-        this.timePanel.setNativeElement(TimeElement);
+    Week.prototype.setStartHour = function (hour) {
+        this.startHour = hour;
     };
     Week.prototype.draw = function () {
-        document.getElementById('container-week1').style.width = String(24 * this.hourWidth) + 'px';
+        this.container.style.width = String(24 * this.hourWidth) + 'px';
         this.timePanel.setup(this.startHour, this.hourWidth);
         var count = this.timePanel.draw();
-        this.graphPanel.setup(this.startHour, count, this.hourWidth);
+        this.graphPanel.setup(this.startHour, count, this.hourWidth, this.week_number);
         this.graphPanel.draw(this.tasks);
         this.daysPanel.draw();
     };
@@ -153,7 +250,7 @@ var Week = (function () {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -193,55 +290,6 @@ var Time = (function () {
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var Task = (function () {
-    function Task() {
-    }
-    Task.prototype.setup = function (color, start, stop, day, id) {
-        this.color = color;
-        this.start = start;
-        this.stop = stop;
-        this.day = day;
-        this.id = id;
-    };
-    Task.prototype.draw = function (parentElement, hour, day) {
-        var newInEl = document.createElement("div");
-        newInEl.className = "task";
-        newInEl.id = "task" + String(hour) + String(day);
-        newInEl.setAttribute("data-id", String(this.id));
-        newInEl.style.background = this.color;
-        newInEl.onclick = function (e) { this.elementClick(e); }.bind(this);
-        parentElement.appendChild(newInEl);
-        this.element = newInEl;
-    };
-    Task.prototype.elementClick = function (event) {
-        var elementList = document.querySelectorAll('[data-id]');
-        for (var i = 0; i < elementList.length; i++) {
-            if (String(this.id) == elementList[i].getAttribute("data-id")) {
-                console.log('Click');
-            }
-        }
-    };
-    Task.prototype.setStyle = function (styleName, styleValue) {
-        if (this.element != null) {
-            this.element.style[styleName] = styleValue;
-        }
-    };
-    Task.prototype.clear = function () {
-        if (this.element != null) {
-            this.element.remove();
-            this.element = null;
-        }
-    };
-    return Task;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (Task);
-
-
-/***/ }),
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -254,10 +302,11 @@ var Graph = (function () {
     Graph.prototype.setNativeElement = function (element) {
         this.nativeElement = element;
     };
-    Graph.prototype.setup = function (start, count, hourWidth) {
+    Graph.prototype.setup = function (start, count, hourWidth, week_number) {
         this.start = start;
         this.count = count;
         this.hourWidth = hourWidth;
+        this.week_number = week_number;
     };
     Graph.prototype.draw = function (tasks) {
         this.nativeElement.innerHTML = "";
@@ -275,7 +324,7 @@ var Graph = (function () {
                     newCollum.style.width = 20 + "px";
                 }
                 if (tasks[i][j].id != -1) {
-                    tasks[i][j].draw(newEl, i, j);
+                    tasks[i][j].draw(newEl, i, j, this.week_number);
                     if (i != this.start + this.count) {
                         if (tasks[i][j].id == tasks[i + 1][j].id) {
                             tasks[i][j].setStyle('marginRight', '0px');

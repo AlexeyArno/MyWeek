@@ -14,10 +14,10 @@ class Task{
 		this.id = id;
 	}
 
-	draw(parentElement:HTMLElement, hour:number,day:number ){
+	draw(parentElement:HTMLElement, hour:number,day:number,week_number:number){
 		var newInEl:HTMLElement = document.createElement("div");
 		newInEl.className = "task";
-		newInEl.id = "task"+String(hour)+String(day);
+		newInEl.id = "task"+String(week_number)+":"+String(hour)+":"+String(day);
 		newInEl.setAttribute("data-id", String(this.id))
 		newInEl.style.background = this.color
 		newInEl.onclick = function(e:Event){this.elementClick(e)}.bind(this)

@@ -1,23 +1,30 @@
-#header{
-	height: 40px;
-	padding-left: 45px;
+.header{
+	padding-left: 5px;
+	margin: 5px 0px;
 }
 .hour{
 	display: inline-block;
 	font-size: 12px;
 }
-#days{
+.days{
 	float: left;
+	height: 280px;
+	margin-top: -20px;
+	padding-top: 16px;
+	background: #fff;
 	position: absolute;
-	left: 20px;
+	left: 15px;
 	width: 40px;
 }
 .day{
-	height: 40px;
+	height: 20px;
+	background: #fff;
 	font-size: 12px;
-	line-height: 2;
+	text-align: center;
+	margin-bottom: 20px;
+	line-height: 3;
 }
-#graph{
+.graph{
 	/*width:100vw;*/
 	overflow-x: hidden;
 }
@@ -41,9 +48,9 @@
 .container-week{
 	overflow-x: hidden;
 	word-wrap: break-word;
-	padding-left: 40px;
 	min-height: calc(100% - 50px);
 }
-#grid{
+.grid{
 	overflow-x: auto ;
+	padding-left: 35px;
 }

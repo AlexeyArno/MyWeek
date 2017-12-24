@@ -5,6 +5,7 @@ class Graph{
 	count:number;
 	hourWidth:number;
  	nativeElement:HTMLElement;
+ 	week_number:number;
  	elementClick = function(e:Event){
 
 	} 
@@ -13,11 +14,12 @@ class Graph{
 		this.nativeElement = element
 	}
 
-	setup(start: number, count:number, hourWidth:number){
+	setup(start: number, count:number, hourWidth:number, week_number:number){
 		// this.nativeElement = element;
 		this.start = start;
 		this.count = count;
 		this.hourWidth = hourWidth;
+		this.week_number = week_number;
 	}
 
 	draw(tasks:Array<Array<Task>>){
@@ -36,6 +38,8 @@ class Graph{
 					newEl.style.width = 20+"px";
 					newCollum.style.width =  20+"px";
 				}
+				// console.log(tasks)
+				// console.log(i,j)
 				if(tasks[i][j].id !=-1){
 					// var newInEl = document.createElement("div");
 					// newInEl.className = "task";
@@ -44,7 +48,7 @@ class Graph{
 					// newInEl.style.background = tasks[i][j].color
 					// newInEl.onclick = function(e){elementClick(e)}
 					// newInEl.addEventListener("onclick",)
-					tasks[i][j].draw(newEl,i,j);
+					tasks[i][j].draw(newEl,i,j, this.week_number);
 
 					if(i!=this.start+this.count){
 						if(tasks[i][j].id==tasks[i+1][j].id){
