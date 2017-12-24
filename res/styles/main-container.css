@@ -1,5 +1,5 @@
 .main-container{
-	height: calc(50vh - 40px);
+	height: 350.5px;
 	transition: height 0.3s ease-out;
 
 }

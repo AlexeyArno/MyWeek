@@ -1,5 +1,4 @@
 #header{
-	width: 100vw;
 	height: 40px;
 	padding-left: 45px;
 }
@@ -9,6 +8,8 @@
 }
 #days{
 	float: left;
+	position: absolute;
+	left: 20px;
 	width: 40px;
 }
 .day{
@@ -17,7 +18,8 @@
 	line-height: 2;
 }
 #graph{
-	width:100vw;
+	/*width:100vw;*/
+	overflow-x: hidden;
 }
 .cell{
 	height: 41px;
@@ -37,8 +39,11 @@
 	margin: 10px;
 }
 .container-week{
+	overflow-x: hidden;
+	word-wrap: break-word;
+	padding-left: 40px;
 	min-height: calc(100% - 50px);
 }
 #grid{
-	overflow-x: hidden ;
+	overflow-x: auto ;
 }
