@@ -120,6 +120,10 @@ var Task = (function () {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__week_task__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__menu_week__ = __webpack_require__(7);
+
+
 
 
 var days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -130,15 +134,21 @@ for (var o = 0; o < 5; o++) {
 }
 var currentWeek = 2;
 var startHour = 11;
+Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["c" /* dbInit */])();
 var week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* default */](1);
 week.create(document.body, (1 == currentWeek));
 week.loadDays(days);
-function sec() {
-    startHour = (startHour > 23) ? startHour - 24 : startHour + 1;
-    week.setStartHour(startHour);
-    week.loadTasks(plans);
-    week.draw();
-}
+week.setStartHour(startHour);
+week.loadTasks(plans);
+week.draw();
+var button = document.createElement("div");
+button.style.cursor = "pointer";
+button.style.padding = "15px";
+button.innerHTML = "CLICK";
+button.style.background = "#fff";
+button.style.borderBottom = "5px";
+document.body.appendChild(button);
+button.onclick = function () { Object(__WEBPACK_IMPORTED_MODULE_3__menu_week__["a" /* clickCreateTask */])(); };
 
 
 /***/ }),
@@ -389,6 +399,70 @@ var Days = (function () {
     return Days;
 }());
 /* harmony default export */ __webpack_exports__["a"] = (Days);
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return dbInit; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return createWeek; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createTask; });
+var db;
+function dbInit() {
+    db = openDatabase('mydb2', '1.0', 'Test DB', 2 * 1024 * 1024);
+    db.transaction(function (tx) {
+        tx.executeSql("CREATE TABLE IF NOT EXISTS tasks" +
+            " (text TEXT,start " +
+            "INTEGER, stop INTEGER, week_id INTEGER)", []);
+        tx.executeSql("CREATE TABLE IF NOT EXISTS weeks", []);
+    });
+}
+;
+function createWeek(resolve, reject) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("INSERT INTO weeks DEFAULT VALUES ");
+    });
+    resolve(true);
+}
+function createTask(resolve, reject, text, start, stop, week_id) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("INSERT INTO tasks (text,start,stop,week_id) VALUES(?,?,?,?)", [text, start, stop, week_id]);
+    });
+    resolve(true);
+}
+
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export clickCreateWeek */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return clickCreateTask; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__db_db_api__ = __webpack_require__(6);
+
+function clickCreateWeek() {
+    var promise = new Promise(function (resolve, reject) {
+        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["b" /* createWeek */])(resolve, reject);
+    });
+    console.log("Hello");
+    promise.then(function (result) { return console.log("Fulfilled: " + result); }, function (error) { return console.log("Rejected: " + error); });
+}
+function clickCreateTask() {
+    var promise = new Promise(function (resolve, reject) {
+        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["a" /* createTask */])(resolve, reject, "hello", 12, 14, 1);
+    });
+    console.log("Hello");
+    promise.then(function (result) { return console.log("Done: " + result); }, function (error) { return console.log("Stoped: " + error); });
+}
+
 
 
 /***/ })

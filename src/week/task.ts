@@ -15,7 +15,7 @@ class Task{
 	}
 
 	draw(parentElement:HTMLElement, hour:number,day:number,week_number:number){
-		var newInEl:HTMLElement = document.createElement("div");
+		let newInEl:HTMLElement = document.createElement("div");
 		newInEl.className = "task";
 		newInEl.id = "task"+String(week_number)+":"+String(hour)+":"+String(day);
 		newInEl.setAttribute("data-id", String(this.id))
@@ -26,8 +26,8 @@ class Task{
 	}
 
 	elementClick(event:Event){
-		var elementList = document.querySelectorAll('[data-id]')
-		for(var i =0;i<elementList.length;i++){
+		let elementList = document.querySelectorAll('[data-id]')
+		for(let i =0;i<elementList.length;i++){
 			if(String(this.id) == elementList[i].getAttribute("data-id")){
 				// elementList[i].style.background = "blue"
 				console.log('Click')

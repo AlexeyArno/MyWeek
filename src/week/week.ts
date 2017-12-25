@@ -5,7 +5,7 @@ import Days from './days'
 
 
 class Week{
-	week_number: number
+	week_number: number;
 	timePanel:Time;
 	tasks: Array<Array<Task>>;
 	graphPanel: Graph;
@@ -27,70 +27,70 @@ class Week{
 	}
 
 	create(parent:HTMLElement, currentWeek:boolean){
-		var wrapp:HTMLElement = document.createElement("div");
-		wrapp.className="paper  main-container"
+		let wrap:HTMLElement = document.createElement("div");
+		wrap.className="paper  main-container";
 
-		var up:HTMLElement = document.createElement("div");
+		let up:HTMLElement = document.createElement("div");
 		up.className = (currentWeek)?"up active":"up";
 
-		wrapp.appendChild(up)
-		up.innerHTML = "Week "+String(this.week_number)
+		wrap.appendChild(up);
+		up.innerHTML = "Week "+String(this.week_number);
 		up.onclick = function(e:Event){
-			// console.log(e.target)
-			wrapp.classList
-			var clList = wrapp.classList;
-			for(var i = 0;i<clList.length;i++){
+			console.log(e.target);
+			wrap.classList;
+			let clList = wrap.classList;
+			for(let i = 0;i<clList.length;i++){
 		 		if(clList[i] == "closed"){clList.remove("closed");days.style.display="block";return}
 		 	}
-		 	clList.add("closed")
+		 	clList.add("closed");
 		 	days.style.display = "none"
-		}
+		};
 
 
-		var grid:HTMLElement = document.createElement("div");
-		grid.id = "grid"+String(this.week_number)
-
-
-
-		var header:HTMLElement = document.createElement("div");
-		header.className = "header"
-		header.id = "header"+String(this.week_number)
-
-		var container:HTMLElement = document.createElement("div");
-		container.className = "container-week"
-		container.id = "container-week"+String(this.week_number)
-		grid.appendChild(header)
+		let grid:HTMLElement = document.createElement("div");
+		grid.id = "grid"+String(this.week_number);
 
 
 
-		grid.appendChild(container)
+		let header:HTMLElement = document.createElement("div");
+		header.className = "header";
+		header.id = "header"+String(this.week_number);
 
-		var days:HTMLElement = document.createElement("div");
-
-		var graph:HTMLElement = document.createElement("div");
-		days.id = "days"+String(this.week_number)
-		days.className = "days"
-		graph.id = "graph"+String(this.week_number)
-		graph.className = "graph"
-		container.appendChild(days)
-		container.appendChild(graph)
+		let container:HTMLElement = document.createElement("div");
+		container.className = "container-week";
+		container.id = "container-week"+String(this.week_number);
+		grid.appendChild(header);
 
 
-		grid.className = "grid"
-		wrapp.appendChild(grid)
-		parent.appendChild(wrapp)
+
+		grid.appendChild(container);
+
+		let days:HTMLElement = document.createElement("div");
+
+		let graph:HTMLElement = document.createElement("div");
+		days.id = "days"+String(this.week_number);
+		days.className = "days";
+		graph.id = "graph"+String(this.week_number);
+		graph.className = "graph";
+		container.appendChild(days);
+		container.appendChild(graph);
 
 
-		this.container = container
-		this.daysPanel.setup(days)
-		this.graphPanel.setNativeElement(graph)
-		this.timePanel.setNativeElement(header)
+		grid.className = "grid";
+		wrap.appendChild(grid);
+		parent.appendChild(wrap);
+
+
+		this.container = container;
+		this.daysPanel.setup(days);
+		this.graphPanel.setNativeElement(graph);
+		this.timePanel.setNativeElement(header);
 
 	}
 
 	loadTasks(plans: Array<Task>){
-		let timePlans:Array<Array<Task>> = new Array();
-		for(var i=this.startHour;i<this.startHour+24;i++){
+		let timePlans:Array<Array<Task>> = [];
+		for(let i=this.startHour;i<this.startHour+24;i++){
 			let now = (i>23)?i-23:i;
 
 			timePlans[i+1] = new Array(7);
@@ -120,25 +120,10 @@ class Week{
 		this.startHour = hour;
 	}
 
-	// setupAll(DaysElement:HTMLElement, TimeElement:HTMLElement,GraphElement:HTMLElement){
-	// 	this.daysPanel.setup(DaysElement);
-	// 	this.graphPanel.setNativeElement(GraphElement);
-	// 	this.timePanel.setNativeElement(TimeElement);
-	// }
-
 
 
 	draw(){
-		// window.removeEventListener("resize", this.draw.bind(this));
-		// let plans:Array<Task> = new Array();
-		// let timePlans:Array<Array<Task>> = new Array();
 
-		// for(let o =0;o<5;o++){
-		// 	plans[o] = new Task();
-		// 	plans[o].setup("green", 13+o,16+o,0+o,1+o);
-
-
-		
 		this.container.style.width = String(24*this.hourWidth)+'px';
 		this.timePanel.setup(this.startHour, this.hourWidth);
 		let count:number = this.timePanel.draw();
@@ -148,17 +133,7 @@ class Week{
 		this.graphPanel.draw(this.tasks);
 
 		this.daysPanel.draw();
-		// window.addEventListener("resize", this.draw.bind(this));
 	}
-
-	// redraw(){
-	// 	this.timePanel.setup(this.startHour, this.hourWidth);
-	// 	let count:number = this.timePanel.draw();
-		
-	// 	this.graphPanel.setup(this.startHour,count, this.hourWidth);
-	// 	this.graphPanel.draw(this.tasks);
-	// }
-
 
 
 

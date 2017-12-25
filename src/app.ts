@@ -1,5 +1,7 @@
 import Week from './week/week'
 import Task from './week/task'
+import {dbInit} from './db/db_api'
+import {clickCreateTask} from './menu/week'
 
 let days:Array<string> = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 let plans:Array<Task> = new Array();
@@ -12,41 +14,24 @@ let startHour: number = 11;
 
 
 
+dbInit();
 
-	let week:Week = new Week(1);
-	week.create(document.body, (1==currentWeek));
-	week.loadDays(days);
-	
+let week:Week = new Week(1);
+week.create(document.body, (1==currentWeek));
+week.loadDays(days);
+week.setStartHour(startHour)
+week.loadTasks(plans);
+week.draw();
 
-
-// (1)
-
-// (2)
-function sec() { 
-	startHour = (startHour>23)?startHour-24:startHour+1;
-  	week.setStartHour(startHour)
-	week.loadTasks(plans);
-	week.draw();
-}
-
-// setInterval(sec, 2000) // использовать функцию
+let button = document.createElement("div");
+button.style.cursor = "pointer";
+button.style.padding = "15px";
+button.innerHTML = "CLICK"
+button.style.background = "#fff"
+button.style.borderBottom = "5px"
 
 
+document.body.appendChild(button);
 
-
-
-
-// let daysEl:HTMLElement = document.getElementById('days');
-
-// let grapEl:HTMLElement = document.getElementById('graph');
-
-// let timeEl:HTMLElement = document.getElementById('header');
-
-// week.setupAll(daysEl,timeEl,grapEl);
-
-
-
-
-
-
+button.onclick = function(){clickCreateTask()};
 

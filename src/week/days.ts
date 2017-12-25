@@ -8,8 +8,8 @@ class Days{
 
 	draw(){
 		this.nativeElement.innerHTML = "";
-		for(var i= 0;i<this.days.length;i++){
-			var newEl = document.createElement("div");
+		for(let i= 0;i<this.days.length;i++){
+			let newEl = document.createElement("div");
 			newEl.innerHTML = this.days[i];
 			newEl.className = "day";
 			this.nativeElement.appendChild(newEl);

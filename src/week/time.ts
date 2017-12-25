@@ -15,17 +15,17 @@ class Time{
 	draw():number{
 		this.nativeElement.innerHTML = "";
 		this.nativeElement.style.width = String(24 * this.hourWidth)+"px";
-		var count:number = 24
-		var final:number = this.start+count;
-		var begin:number = this.start
-		for(var i:number= begin;i<final;i++){
+		let count:number = 24;
+		let final:number = this.start+count;
+		let begin:number = this.start;
+		for(let i:number= begin;i<final;i++){
 			if(i>=24){
 				i=i-24;
 				final = final-24;
 			}
-			var newEl:HTMLElement = document.createElement("div");
+			let newEl:HTMLElement = document.createElement("div");
 
-			var time:string = (i<10)?'0'+String(i): String(i);
+			let time:string = (i<10)?'0'+String(i): String(i);
 
 			newEl.innerHTML = time+":00";
 			newEl.className = "hour";
