@@ -1,0 +1,31 @@
+.taskTooltip{
+    position: absolute;
+    height: 0;
+    width:0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    font-family: Helvetica-Light;
+    padding: 5px;
+}
+.taskTooltip.active{
+    height: 40px;
+    opacity: 1;
+    z-index: 999;
+    width: 150px;
+    background: #ffffff;
+    border-radius: 5px;
+    /*border: #3e97f3 1px solid;*/
+    box-shadow: 0px 0px 15px -1px rgba(0,0,0,0.17);
+}
+.tooltipText{
+    display: inline-block;
+}
+.tooltipTime{
+
+}
+.tooltipColor{
+    width:10px;
+    height:10px;
+    display: inline-block;
+}

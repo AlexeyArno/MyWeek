@@ -40,10 +40,10 @@ class Week{
 			wrap.classList;
 			let clList = wrap.classList;
 			for(let i = 0;i<clList.length;i++){
-		 		if(clList[i] == "closed"){clList.remove("closed");days.style.display="block";return}
+		 		if(clList[i] == "closed"){clList.remove("closed");days.className="days";return}
 		 	}
 		 	clList.add("closed");
-		 	days.style.display = "none"
+            days.className="days close"
 		};
 
 

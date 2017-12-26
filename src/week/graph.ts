@@ -45,6 +45,8 @@ class Graph{
 						}else{
 							tasks[i][j].setStyle('borderTopRightRadius','5px');
 							tasks[i][j].setStyle('borderBottomRightRadius','5px');
+							//if this part - last task part, because non create more useless tooltips
+							tasks[i][j].setTooltip();
 						}
 					}
 					if(i!=this.start){

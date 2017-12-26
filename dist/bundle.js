@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,47 +68,75 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var Task = (function () {
-    function Task() {
-    }
-    Task.prototype.setup = function (color, start, stop, day, id) {
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__tooltip__ = __webpack_require__(8);
+
+class Task {
+    constructor(text, color, start, stop, day, id, week_id) {
         this.color = color;
         this.start = start;
         this.stop = stop;
         this.day = day;
         this.id = id;
-    };
-    Task.prototype.draw = function (parentElement, hour, day, week_number) {
-        var newInEl = document.createElement("div");
+        this.text = text;
+        this.week_id = week_id;
+    }
+    draw(parentElement, hour, day, week_number) {
+        let newInEl = document.createElement("div");
         newInEl.className = "task";
         newInEl.id = "task" + String(week_number) + ":" + String(hour) + ":" + String(day);
         newInEl.setAttribute("data-id", String(this.id));
         newInEl.style.background = this.color;
         newInEl.onclick = function (e) { this.elementClick(e); }.bind(this);
+        newInEl.onmouseover = function (e) { this.elementHover(e); }.bind(this);
+        newInEl.onmouseleave = function (e) { this.elementLeave(e); }.bind(this);
         parentElement.appendChild(newInEl);
         this.element = newInEl;
-    };
-    Task.prototype.elementClick = function (event) {
-        var elementList = document.querySelectorAll('[data-id]');
-        for (var i = 0; i < elementList.length; i++) {
+    }
+    setTooltip() {
+        this.tooltipElement = new __WEBPACK_IMPORTED_MODULE_0__tooltip__["a" /* default */](this.text, this.color, this.start, this.stop);
+    }
+    elementClick(event) {
+        let elementList = document.querySelectorAll('[data-id]');
+        for (let i = 0; i < elementList.length; i++) {
             if (String(this.id) == elementList[i].getAttribute("data-id")) {
                 console.log('Click');
             }
         }
-    };
-    Task.prototype.setStyle = function (styleName, styleValue) {
+    }
+    elementHover(event) {
+        let elementList = document.querySelectorAll('[data-id]');
+        let tasksElements = [];
+        for (let i = 0; i < elementList.length; i++) {
+            if (String(this.id) == elementList[i].getAttribute("data-id")) {
+                tasksElements.push(i);
+            }
+        }
+        if (tasksElements.length != 0) {
+            let begin = elementList[tasksElements[0]].getBoundingClientRect().left;
+            let top = elementList[tasksElements[0]].getBoundingClientRect().top - 10;
+            let done = elementList[tasksElements[tasksElements.length - 1]].getBoundingClientRect().left +
+                elementList[tasksElements[tasksElements.length - 1]].getBoundingClientRect().width;
+            console.log("Begin: " + String(begin) + " Done: " + String(done));
+            let middle = begin + Math.floor((done - begin) / 2);
+            console.log("Middle: " + String(middle));
+            this.tooltipElement.draw(top, middle);
+        }
+    }
+    elementLeave() {
+        this.tooltipElement.hidden();
+    }
+    setStyle(styleName, styleValue) {
         if (this.element != null) {
             this.element.style[styleName] = styleValue;
         }
-    };
-    Task.prototype.clear = function () {
+    }
+    clear() {
         if (this.element != null) {
             this.element.remove();
             this.element = null;
         }
-    };
-    return Task;
-}());
+    }
+}
 /* harmony default export */ __webpack_exports__["a"] = (Task);
 
 
@@ -117,38 +145,95 @@ var Task = (function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__week_task__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__menu_week__ = __webpack_require__(7);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return dbInit; });
+/* unused harmony export createWeek */
+/* unused harmony export createTask */
+/* unused harmony export getTasks */
+/* unused harmony export getWeeks */
+/* unused harmony export deleteTask */
+/* unused harmony export changeTask */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_task__ = __webpack_require__(0);
 
-
-
-
-var days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-var plans = new Array();
-for (var o = 0; o < 5; o++) {
-    plans[o] = new __WEBPACK_IMPORTED_MODULE_1__week_task__["a" /* default */]();
-    plans[o].setup("#ffdda9", 13 + o, 16 + o, 0 + o, 1 + o + Math.random());
+let db;
+function dbInit() {
+    db = openDatabase('main_db', '1.1', 'Main DB', 2 * 1024 * 1024);
+    if (!db) {
+        throw new Error("Fail open db");
+    }
+    db.transaction(function (tx) {
+        tx.executeSql("CREATE TABLE IF NOT EXISTS tasks" +
+            " (ID INTEGER PRIMARY KEY ASC,text TEXT,start " +
+            "INTEGER, stop INTEGER, day INTEGER, color TEXT, week_id INTEGER)", []);
+        tx.executeSql("CREATE TABLE IF NOT EXISTS weeks (ID INTEGER PRIMARY KEY ASC)", []);
+    });
 }
-var currentWeek = 2;
-var startHour = 11;
-Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["c" /* dbInit */])();
-var week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* default */](1);
-week.create(document.body, (1 == currentWeek));
-week.loadDays(days);
-week.setStartHour(startHour);
-week.loadTasks(plans);
-week.draw();
-var button = document.createElement("div");
-button.style.cursor = "pointer";
-button.style.padding = "15px";
-button.innerHTML = "CLICK";
-button.style.background = "#fff";
-button.style.borderBottom = "5px";
-document.body.appendChild(button);
-button.onclick = function () { Object(__WEBPACK_IMPORTED_MODULE_3__menu_week__["a" /* clickCreateTask */])(); };
+function createWeek(resolve, reject) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("INSERT INTO weeks DEFAULT VALUES ");
+    });
+    resolve(true);
+}
+function createTask(resolve, reject, text, start, stop, week_id) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("INSERT INTO tasks (text,start,stop,week_id) VALUES(?,?,?,?)", [text, start, stop, week_id]);
+    });
+    resolve(true);
+}
+function getTasks(resolve, reject, week_id) {
+    let result = [];
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT * FROM tasks WHERE week_id = ?", [week_id], function (tx, result) {
+            for (let i = 0; i < result.rows.length; i++) {
+                let now_task = new __WEBPACK_IMPORTED_MODULE_0__week_task__["a" /* default */](result.rows.item(i).text, result.rows.item(i).color, result.rows.item(i).start, result.rows.item(i).stop, result.rows.item(i).day, result.rows.item(i).ID, result.rows.item(i).week_id);
+                result.push(now_task);
+            }
+        });
+    });
+    resolve(result);
+}
+function getWeeks(resolve, reject) {
+    let result = [];
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT * FROM weeks", [], function (tx, result) {
+            for (let i = 0; i < result.rows.length; i++) {
+                result.push(result.rows.item(i).ID);
+            }
+        });
+    });
+    resolve(result);
+}
+function deleteTask(resolve, reject, task_id) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("DELETE FROM tasks WHERE ID=?", [task_id]);
+    });
+    resolve(true);
+}
+function changeTask(resolve, reject, up_task) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("UPDATE tasks SET (text,start,stop,day,color,week_id)" +
+            "VALUES(?,?,?,?,?,?) WHERE ID=?", [up_task.text,
+            up_task.start,
+            up_task.stop,
+            up_task.day,
+            up_task.color,
+            up_task.week_id,
+            up_task.id]);
+    });
+    resolve(true);
+}
+
 
 
 /***/ }),
@@ -156,16 +241,44 @@ button.onclick = function () { Object(__WEBPACK_IMPORTED_MODULE_3__menu_week__["
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(3);
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__week_task__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(1);
+
+
+
+let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+let plans = [];
+for (let o = 0; o < 5; o++) {
+    plans[o] = new __WEBPACK_IMPORTED_MODULE_1__week_task__["a" /* default */]("hello", "#ffdda9", 13 + o, 16 + o, o, 1 + o + Math.random(), 1);
+}
+let currentWeek = 2;
+let startHour = 11;
+Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["a" /* dbInit */])();
+let week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* default */](1);
+week.create(document.body, (1 == currentWeek));
+week.loadDays(days);
+week.setStartHour(startHour);
+week.loadTasks(plans);
+week.draw();
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__task__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(6);
 
 
 
 
-var Week = (function () {
-    function Week(week_number) {
+class Week {
+    constructor(week_number) {
         this.hourWidth = 80;
         this.startHour = 13;
         this.week_number = week_number;
@@ -173,38 +286,39 @@ var Week = (function () {
         this.graphPanel = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */]();
         this.daysPanel = new __WEBPACK_IMPORTED_MODULE_3__days__["a" /* default */]();
     }
-    Week.prototype.create = function (parent, currentWeek) {
-        var wrapp = document.createElement("div");
-        wrapp.className = "paper  main-container";
-        var up = document.createElement("div");
+    create(parent, currentWeek) {
+        let wrap = document.createElement("div");
+        wrap.className = "paper  main-container";
+        let up = document.createElement("div");
         up.className = (currentWeek) ? "up active" : "up";
-        wrapp.appendChild(up);
+        wrap.appendChild(up);
         up.innerHTML = "Week " + String(this.week_number);
         up.onclick = function (e) {
-            wrapp.classList;
-            var clList = wrapp.classList;
-            for (var i = 0; i < clList.length; i++) {
+            console.log(e.target);
+            wrap.classList;
+            let clList = wrap.classList;
+            for (let i = 0; i < clList.length; i++) {
                 if (clList[i] == "closed") {
                     clList.remove("closed");
-                    days.style.display = "block";
+                    days.className = "days";
                     return;
                 }
             }
             clList.add("closed");
-            days.style.display = "none";
+            days.className = "days close";
         };
-        var grid = document.createElement("div");
+        let grid = document.createElement("div");
         grid.id = "grid" + String(this.week_number);
-        var header = document.createElement("div");
+        let header = document.createElement("div");
         header.className = "header";
         header.id = "header" + String(this.week_number);
-        var container = document.createElement("div");
+        let container = document.createElement("div");
         container.className = "container-week";
         container.id = "container-week" + String(this.week_number);
         grid.appendChild(header);
         grid.appendChild(container);
-        var days = document.createElement("div");
-        var graph = document.createElement("div");
+        let days = document.createElement("div");
+        let graph = document.createElement("div");
         days.id = "days" + String(this.week_number);
         days.className = "days";
         graph.id = "graph" + String(this.week_number);
@@ -212,23 +326,23 @@ var Week = (function () {
         container.appendChild(days);
         container.appendChild(graph);
         grid.className = "grid";
-        wrapp.appendChild(grid);
-        parent.appendChild(wrapp);
+        wrap.appendChild(grid);
+        parent.appendChild(wrap);
         this.container = container;
         this.daysPanel.setup(days);
         this.graphPanel.setNativeElement(graph);
         this.timePanel.setNativeElement(header);
-    };
-    Week.prototype.loadTasks = function (plans) {
-        var timePlans = new Array();
-        for (var i = this.startHour; i < this.startHour + 24; i++) {
-            var now = (i > 23) ? i - 23 : i;
+    }
+    loadTasks(plans) {
+        let timePlans = [];
+        for (let i = this.startHour; i < this.startHour + 24; i++) {
+            let now = (i > 23) ? i - 23 : i;
             timePlans[i + 1] = new Array(7);
-            for (var j = 0; j < 7; j++) {
+            for (let j = 0; j < 7; j++) {
                 timePlans[i + 1][j] = new __WEBPACK_IMPORTED_MODULE_1__task__["a" /* default */]();
                 timePlans[i + 1][j].id = -1;
             }
-            for (var j = 0; j < plans.length; j++) {
+            for (let j = 0; j < plans.length; j++) {
                 if (now >= plans[j].start && now <= plans[j].stop) {
                     if (plans[j].stop == i) {
                         continue;
@@ -239,64 +353,23 @@ var Week = (function () {
         }
         timePlans[this.startHour] = timePlans[this.startHour + 1];
         this.tasks = timePlans;
-    };
-    Week.prototype.loadDays = function (days) {
+    }
+    loadDays(days) {
         this.daysPanel.loadDays(days);
-    };
-    Week.prototype.setStartHour = function (hour) {
+    }
+    setStartHour(hour) {
         this.startHour = hour;
-    };
-    Week.prototype.draw = function () {
+    }
+    draw() {
         this.container.style.width = String(24 * this.hourWidth) + 'px';
         this.timePanel.setup(this.startHour, this.hourWidth);
-        var count = this.timePanel.draw();
+        let count = this.timePanel.draw();
         this.graphPanel.setup(this.startHour, count, this.hourWidth, this.week_number);
         this.graphPanel.draw(this.tasks);
         this.daysPanel.draw();
-    };
-    return Week;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (Week);
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var Time = (function () {
-    function Time() {
     }
-    Time.prototype.setup = function (start, hourWidth) {
-        this.start = start;
-        this.hourWidth = hourWidth;
-    };
-    Time.prototype.setNativeElement = function (element) {
-        this.nativeElement = element;
-    };
-    Time.prototype.draw = function () {
-        this.nativeElement.innerHTML = "";
-        this.nativeElement.style.width = String(24 * this.hourWidth) + "px";
-        var count = 24;
-        var final = this.start + count;
-        var begin = this.start;
-        for (var i = begin; i < final; i++) {
-            if (i >= 24) {
-                i = i - 24;
-                final = final - 24;
-            }
-            var newEl = document.createElement("div");
-            var time = (i < 10) ? '0' + String(i) : String(i);
-            newEl.innerHTML = time + ":00";
-            newEl.className = "hour";
-            newEl.style.width = this.hourWidth + "px";
-            this.nativeElement.appendChild(newEl);
-        }
-        return count;
-    };
-    return Time;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (Time);
+}
+/* harmony default export */ __webpack_exports__["a"] = (Week);
 
 
 /***/ }),
@@ -304,34 +377,71 @@ var Time = (function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var Graph = (function () {
-    function Graph() {
+class Time {
+    setup(start, hourWidth) {
+        this.start = start;
+        this.hourWidth = hourWidth;
+    }
+    setNativeElement(element) {
+        this.nativeElement = element;
+    }
+    draw() {
+        this.nativeElement.innerHTML = "";
+        this.nativeElement.style.width = String(24 * this.hourWidth) + "px";
+        let count = 24;
+        let final = this.start + count;
+        let begin = this.start;
+        for (let i = begin; i < final; i++) {
+            if (i >= 24) {
+                i = i - 24;
+                final = final - 24;
+            }
+            let newEl = document.createElement("div");
+            let time = (i < 10) ? '0' + String(i) : String(i);
+            newEl.innerHTML = time + ":00";
+            newEl.className = "hour";
+            newEl.style.width = this.hourWidth + "px";
+            this.nativeElement.appendChild(newEl);
+        }
+        return count;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Time);
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Graph {
+    constructor() {
         this.elementClick = function (e) {
         };
     }
-    Graph.prototype.setNativeElement = function (element) {
+    setNativeElement(element) {
         this.nativeElement = element;
-    };
-    Graph.prototype.setup = function (start, count, hourWidth, week_number) {
+    }
+    setup(start, count, hourWidth, week_number) {
         this.start = start;
         this.count = count;
         this.hourWidth = hourWidth;
         this.week_number = week_number;
-    };
-    Graph.prototype.draw = function (tasks) {
+    }
+    draw(tasks) {
         this.nativeElement.innerHTML = "";
-        for (var i = this.start; i < this.start + this.count + 1; i++) {
-            var newCollum = document.createElement("div");
-            newCollum.className = "collumn";
-            newCollum.style.width = this.hourWidth + "px";
-            newCollum.style.height = 40 * 7 + "px";
-            for (var j = 0; j < 7; j++) {
-                var newEl = document.createElement("div");
+        for (let i = this.start; i < this.start + this.count + 1; i++) {
+            let newColumn = document.createElement("div");
+            newColumn.className = "column";
+            newColumn.style.width = this.hourWidth + "px";
+            newColumn.style.height = 40 * 7 + "px";
+            for (let j = 0; j < 7; j++) {
+                let newEl = document.createElement("div");
                 newEl.className = "cell";
                 newEl.style.width = this.hourWidth + "px";
                 if (i == this.start || i == this.start + this.count) {
                     newEl.style.width = 20 + "px";
-                    newCollum.style.width = 20 + "px";
+                    newColumn.style.width = 20 + "px";
                 }
                 if (tasks[i][j].id != -1) {
                     tasks[i][j].draw(newEl, i, j, this.week_number);
@@ -342,6 +452,7 @@ var Graph = (function () {
                         else {
                             tasks[i][j].setStyle('borderTopRightRadius', '5px');
                             tasks[i][j].setStyle('borderBottomRightRadius', '5px');
+                            tasks[i][j].setTooltip();
                         }
                     }
                     if (i != this.start) {
@@ -363,42 +474,13 @@ var Graph = (function () {
                 if (j == 6) {
                     newEl.style.borderBottom = "none";
                 }
-                newCollum.appendChild(newEl);
+                newColumn.appendChild(newEl);
             }
-            this.nativeElement.appendChild(newCollum);
+            this.nativeElement.appendChild(newColumn);
         }
-    };
-    return Graph;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (Graph);
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var Days = (function () {
-    function Days() {
     }
-    Days.prototype.setup = function (element) {
-        this.nativeElement = element;
-    };
-    Days.prototype.draw = function () {
-        this.nativeElement.innerHTML = "";
-        for (var i = 0; i < this.days.length; i++) {
-            var newEl = document.createElement("div");
-            newEl.innerHTML = this.days[i];
-            newEl.className = "day";
-            this.nativeElement.appendChild(newEl);
-        }
-    };
-    Days.prototype.loadDays = function (days) {
-        this.days = days;
-    };
-    return Days;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (Days);
+}
+/* harmony default export */ __webpack_exports__["a"] = (Graph);
 
 
 /***/ }),
@@ -406,63 +488,76 @@ var Days = (function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return dbInit; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return createWeek; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createTask; });
-var db;
-function dbInit() {
-    db = openDatabase('mydb2', '1.0', 'Test DB', 2 * 1024 * 1024);
-    db.transaction(function (tx) {
-        tx.executeSql("CREATE TABLE IF NOT EXISTS tasks" +
-            " (text TEXT,start " +
-            "INTEGER, stop INTEGER, week_id INTEGER)", []);
-        tx.executeSql("CREATE TABLE IF NOT EXISTS weeks", []);
-    });
+class Days {
+    setup(element) {
+        this.nativeElement = element;
+    }
+    draw() {
+        this.nativeElement.innerHTML = "";
+        for (let i = 0; i < this.days.length; i++) {
+            let newEl = document.createElement("div");
+            newEl.innerHTML = this.days[i];
+            newEl.className = "day";
+            this.nativeElement.appendChild(newEl);
+        }
+    }
+    loadDays(days) {
+        this.days = days;
+    }
 }
-;
-function createWeek(resolve, reject) {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("INSERT INTO weeks DEFAULT VALUES ");
-    });
-    resolve(true);
-}
-function createTask(resolve, reject, text, start, stop, week_id) {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("INSERT INTO tasks (text,start,stop,week_id) VALUES(?,?,?,?)", [text, start, stop, week_id]);
-    });
-    resolve(true);
-}
-
+/* harmony default export */ __webpack_exports__["a"] = (Days);
 
 
 /***/ }),
-/* 7 */
+/* 7 */,
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export clickCreateWeek */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return clickCreateTask; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__db_db_api__ = __webpack_require__(6);
-
-function clickCreateWeek() {
-    var promise = new Promise(function (resolve, reject) {
-        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["b" /* createWeek */])(resolve, reject);
-    });
-    console.log("Hello");
-    promise.then(function (result) { return console.log("Fulfilled: " + result); }, function (error) { return console.log("Rejected: " + error); });
+class Tooltip {
+    constructor(text, color, start, stop) {
+        this.open = false;
+        this.color = color;
+        this.start = start;
+        this.stop = stop;
+        this.text = text;
+        let tooltip = document.createElement("div");
+        tooltip.className = "taskTooltip";
+        document.body.appendChild(tooltip);
+        this.element = tooltip;
+        this.drawInner();
+    }
+    drawInner() {
+        if (!this.element)
+            throw new Error("tooltip yet not created");
+        let text = document.createElement("div");
+        let color = document.createElement("div");
+        let time = document.createElement("div");
+        text.className = "tooltipText";
+        color.className = "tooltipColor";
+        time.className = "tooltipTime";
+        text.innerText = this.text;
+        color.style.background = this.color;
+        time.innerText = String(this.start) +
+            ":00 - " + String(this.stop) + ":00";
+        this.element.appendChild(text);
+        this.element.appendChild(color);
+        this.element.appendChild(time);
+    }
+    draw(top, left) {
+        this.element.className = "taskTooltip active";
+        let nTop = top - this.element.getBoundingClientRect().height;
+        let nLeft = left - (this.element.getBoundingClientRect().width / 2);
+        this.element.style.top = String(nTop) + "px";
+        this.element.style.left = String(nLeft) + "px";
+        this.open = true;
+    }
+    hidden() {
+        this.element.className = "taskTooltip";
+        this.open = false;
+    }
 }
-function clickCreateTask() {
-    var promise = new Promise(function (resolve, reject) {
-        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["a" /* createTask */])(resolve, reject, "hello", 12, 14, 1);
-    });
-    console.log("Hello");
-    promise.then(function (result) { return console.log("Done: " + result); }, function (error) { return console.log("Stoped: " + error); });
-}
-
+/* harmony default export */ __webpack_exports__["a"] = (Tooltip);
 
 
 /***/ })

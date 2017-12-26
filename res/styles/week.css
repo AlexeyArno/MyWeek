@@ -15,6 +15,11 @@
 	position: absolute;
 	left: 15px;
 	width: 40px;
+	transition: height 0.3s ease-out;
+	overflow-y: hidden;
+}
+.days.close{
+	height: 0;
 }
 .day{
 	height: 20px;

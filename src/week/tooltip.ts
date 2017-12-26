@@ -1,0 +1,64 @@
+class Tooltip{
+    element:HTMLElement;
+    open:boolean = false;
+    color:string;
+    text:string;
+    start:number;
+    stop: number;
+
+
+    constructor(text:string,color:string,start:number,stop:number){
+        this.color = color;
+        this.start = start;
+        this.stop = stop;
+        this.text = text;
+        let tooltip:HTMLElement = document.createElement("div");
+        tooltip.className = "taskTooltip";
+        // tooltip.innerText = "hello";
+
+
+
+        document.body.appendChild(tooltip);
+        this.element = tooltip;
+
+        this.drawInner();
+    }
+
+    drawInner(){
+        if(!this.element) throw new Error("tooltip yet not created");
+        let text:HTMLElement = document.createElement("div");
+        let color:HTMLElement = document.createElement("div");
+        let time:HTMLElement = document.createElement("div");
+
+        text.className = "tooltipText";
+        color.className = "tooltipColor";
+        time.className = "tooltipTime";
+
+        text.innerText = this.text;
+        color.style.background = this.color;
+        time.innerText = String(this.start)+
+            ":00 - "+String(this.stop)+":00";
+
+        this.element.appendChild(text);
+        this.element.appendChild(color);
+        this.element.appendChild(time);
+    }
+
+    draw(top:number,left:number){
+        this.element.className = "taskTooltip active";
+        let nTop:number = top-this.element.getBoundingClientRect().height;
+        let nLeft:number = left-(this.element.getBoundingClientRect().width/2);
+        this.element.style.top = String(nTop)+"px";
+        this.element.style.left = String(nLeft)+"px";
+
+        this.open = true;
+    }
+
+    hidden(){
+        this.element.className = "taskTooltip";
+        this.open = false;
+    }
+
+}
+
+export default Tooltip;
