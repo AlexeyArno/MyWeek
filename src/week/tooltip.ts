@@ -46,8 +46,20 @@ class Tooltip{
 
     draw(top:number,left:number){
         this.element.className = "taskTooltip active";
-        let nTop:number = top-this.element.getBoundingClientRect().height;
-        let nLeft:number = left-(this.element.getBoundingClientRect().width/2);
+        let borderRight:number = window.innerWidth;
+        let borderBottom:number = window.innerHeight;
+
+        let elementHeight:number = this.element.getBoundingClientRect().height;
+        let elementWidth:number = this.element.getBoundingClientRect().width;
+
+
+        let nTop:number = top-elementHeight;
+        let nLeft:number = left-(elementWidth/2);
+
+        if(nLeft+elementWidth>borderRight){
+            nLeft = borderRight - elementWidth;
+        }
+
         this.element.style.top = String(nTop)+"px";
         this.element.style.left = String(nLeft)+"px";
 

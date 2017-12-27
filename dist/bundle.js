@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,7 +68,9 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__tooltip__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__tooltip__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__window_task_settings_task_settings_window__ = __webpack_require__(9);
+
 
 class Task {
     constructor(text, color, start, stop, day, id, week_id) {
@@ -96,12 +98,9 @@ class Task {
         this.tooltipElement = new __WEBPACK_IMPORTED_MODULE_0__tooltip__["a" /* default */](this.text, this.color, this.start, this.stop);
     }
     elementClick(event) {
-        let elementList = document.querySelectorAll('[data-id]');
-        for (let i = 0; i < elementList.length; i++) {
-            if (String(this.id) == elementList[i].getAttribute("data-id")) {
-                console.log('Click');
-            }
-        }
+        let modalSettings = Object(__WEBPACK_IMPORTED_MODULE_1__window_task_settings_task_settings_window__["a" /* getWindowTaskSettings */])();
+        this.tooltipElement.hidden();
+        modalSettings.draw(this);
     }
     elementHover(event) {
         let elementList = document.querySelectorAll('[data-id]');
@@ -145,106 +144,10 @@ class Task {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return dbInit; });
-/* unused harmony export createWeek */
-/* unused harmony export createTask */
-/* unused harmony export getTasks */
-/* unused harmony export getWeeks */
-/* unused harmony export deleteTask */
-/* unused harmony export changeTask */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_task__ = __webpack_require__(0);
-
-let db;
-function dbInit() {
-    db = openDatabase('main_db', '1.1', 'Main DB', 2 * 1024 * 1024);
-    if (!db) {
-        throw new Error("Fail open db");
-    }
-    db.transaction(function (tx) {
-        tx.executeSql("CREATE TABLE IF NOT EXISTS tasks" +
-            " (ID INTEGER PRIMARY KEY ASC,text TEXT,start " +
-            "INTEGER, stop INTEGER, day INTEGER, color TEXT, week_id INTEGER)", []);
-        tx.executeSql("CREATE TABLE IF NOT EXISTS weeks (ID INTEGER PRIMARY KEY ASC)", []);
-    });
-}
-function createWeek(resolve, reject) {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("INSERT INTO weeks DEFAULT VALUES ");
-    });
-    resolve(true);
-}
-function createTask(resolve, reject, text, start, stop, week_id) {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("INSERT INTO tasks (text,start,stop,week_id) VALUES(?,?,?,?)", [text, start, stop, week_id]);
-    });
-    resolve(true);
-}
-function getTasks(resolve, reject, week_id) {
-    let result = [];
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("SELECT * FROM tasks WHERE week_id = ?", [week_id], function (tx, result) {
-            for (let i = 0; i < result.rows.length; i++) {
-                let now_task = new __WEBPACK_IMPORTED_MODULE_0__week_task__["a" /* default */](result.rows.item(i).text, result.rows.item(i).color, result.rows.item(i).start, result.rows.item(i).stop, result.rows.item(i).day, result.rows.item(i).ID, result.rows.item(i).week_id);
-                result.push(now_task);
-            }
-        });
-    });
-    resolve(result);
-}
-function getWeeks(resolve, reject) {
-    let result = [];
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("SELECT * FROM weeks", [], function (tx, result) {
-            for (let i = 0; i < result.rows.length; i++) {
-                result.push(result.rows.item(i).ID);
-            }
-        });
-    });
-    resolve(result);
-}
-function deleteTask(resolve, reject, task_id) {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("DELETE FROM tasks WHERE ID=?", [task_id]);
-    });
-    resolve(true);
-}
-function changeTask(resolve, reject, up_task) {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("UPDATE tasks SET (text,start,stop,day,color,week_id)" +
-            "VALUES(?,?,?,?,?,?) WHERE ID=?", [up_task.text,
-            up_task.start,
-            up_task.stop,
-            up_task.day,
-            up_task.color,
-            up_task.week_id,
-            up_task.id]);
-    });
-    resolve(true);
-}
-
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__week_task__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(7);
 
 
 
@@ -265,11 +168,11 @@ week.draw();
 
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__task__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(6);
@@ -373,7 +276,7 @@ class Week {
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -407,6 +310,64 @@ class Time {
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Time);
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Tooltip {
+    constructor(text, color, start, stop) {
+        this.open = false;
+        this.color = color;
+        this.start = start;
+        this.stop = stop;
+        this.text = text;
+        let tooltip = document.createElement("div");
+        tooltip.className = "taskTooltip";
+        document.body.appendChild(tooltip);
+        this.element = tooltip;
+        this.drawInner();
+    }
+    drawInner() {
+        if (!this.element)
+            throw new Error("tooltip yet not created");
+        let text = document.createElement("div");
+        let color = document.createElement("div");
+        let time = document.createElement("div");
+        text.className = "tooltipText";
+        color.className = "tooltipColor";
+        time.className = "tooltipTime";
+        text.innerText = this.text;
+        color.style.background = this.color;
+        time.innerText = String(this.start) +
+            ":00 - " + String(this.stop) + ":00";
+        this.element.appendChild(text);
+        this.element.appendChild(color);
+        this.element.appendChild(time);
+    }
+    draw(top, left) {
+        this.element.className = "taskTooltip active";
+        let borderRight = window.innerWidth;
+        let borderBottom = window.innerHeight;
+        let elementHeight = this.element.getBoundingClientRect().height;
+        let elementWidth = this.element.getBoundingClientRect().width;
+        let nTop = top - elementHeight;
+        let nLeft = left - (elementWidth / 2);
+        if (nLeft + elementWidth > borderRight) {
+            nLeft = borderRight - elementWidth;
+        }
+        this.element.style.top = String(nTop) + "px";
+        this.element.style.left = String(nLeft) + "px";
+        this.open = true;
+    }
+    hidden() {
+        this.element.className = "taskTooltip";
+        this.open = false;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Tooltip);
 
 
 /***/ }),
@@ -509,55 +470,191 @@ class Days {
 
 
 /***/ }),
-/* 7 */,
-/* 8 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-class Tooltip {
-    constructor(text, color, start, stop) {
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return dbInit; });
+/* unused harmony export createWeek */
+/* unused harmony export createTask */
+/* unused harmony export getTasks */
+/* unused harmony export getWeeks */
+/* unused harmony export deleteTask */
+/* unused harmony export changeTask */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_task__ = __webpack_require__(0);
+
+let db;
+function dbInit() {
+    db = openDatabase('main_db', '1.1', 'Main DB', 2 * 1024 * 1024);
+    if (!db) {
+        throw new Error("Fail open db");
+    }
+    db.transaction(function (tx) {
+        tx.executeSql("CREATE TABLE IF NOT EXISTS tasks" +
+            " (ID INTEGER PRIMARY KEY ASC,text TEXT,start " +
+            "INTEGER, stop INTEGER, day INTEGER, color TEXT, week_id INTEGER)", []);
+        tx.executeSql("CREATE TABLE IF NOT EXISTS weeks (ID INTEGER PRIMARY KEY ASC)", []);
+    });
+}
+function createWeek(resolve, reject) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("INSERT INTO weeks DEFAULT VALUES ");
+    });
+    resolve(true);
+}
+function createTask(resolve, reject, text, start, stop, week_id) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("INSERT INTO tasks (text,start,stop,week_id) VALUES(?,?,?,?)", [text, start, stop, week_id]);
+    });
+    resolve(true);
+}
+function getTasks(resolve, reject, week_id) {
+    let result = [];
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT * FROM tasks WHERE week_id = ?", [week_id], function (tx, result) {
+            for (let i = 0; i < result.rows.length; i++) {
+                let now_task = new __WEBPACK_IMPORTED_MODULE_0__week_task__["a" /* default */](result.rows.item(i).text, result.rows.item(i).color, result.rows.item(i).start, result.rows.item(i).stop, result.rows.item(i).day, result.rows.item(i).ID, result.rows.item(i).week_id);
+                result.push(now_task);
+            }
+        });
+    });
+    resolve(result);
+}
+function getWeeks(resolve, reject) {
+    let result = [];
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT * FROM weeks", [], function (tx, result) {
+            for (let i = 0; i < result.rows.length; i++) {
+                result.push(result.rows.item(i).ID);
+            }
+        });
+    });
+    resolve(result);
+}
+function deleteTask(resolve, reject, task_id) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("DELETE FROM tasks WHERE ID=?", [task_id]);
+    });
+    resolve(true);
+}
+function changeTask(resolve, reject, up_task) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("UPDATE tasks SET (text,start,stop,day,color,week_id)" +
+            "VALUES(?,?,?,?,?,?) WHERE ID=?", [up_task.text,
+            up_task.start,
+            up_task.stop,
+            up_task.day,
+            up_task.color,
+            up_task.week_id,
+            up_task.id]);
+    });
+    resolve(true);
+}
+
+
+
+/***/ }),
+/* 8 */,
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getWindowTaskSettings; });
+/* unused harmony export TaskSettingsWindow */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__task_settings_content__ = __webpack_require__(10);
+
+let taskSettings;
+function getWindowTaskSettings() {
+    if (!taskSettings) {
+        taskSettings = new TaskSettingsWindow();
+    }
+    return taskSettings;
+}
+class TaskSettingsWindow {
+    constructor() {
         this.open = false;
-        this.color = color;
-        this.start = start;
-        this.stop = stop;
-        this.text = text;
-        let tooltip = document.createElement("div");
-        tooltip.className = "taskTooltip";
-        document.body.appendChild(tooltip);
-        this.element = tooltip;
-        this.drawInner();
+        let newBackground = document.createElement("div");
+        newBackground.className = "modalBackground";
+        this.background = newBackground;
+        document.body.appendChild(newBackground);
+        this.content = new __WEBPACK_IMPORTED_MODULE_0__task_settings_content__["a" /* TaskSettingsContent */](this.background);
     }
-    drawInner() {
-        if (!this.element)
-            throw new Error("tooltip yet not created");
-        let text = document.createElement("div");
-        let color = document.createElement("div");
-        let time = document.createElement("div");
-        text.className = "tooltipText";
-        color.className = "tooltipColor";
-        time.className = "tooltipTime";
-        text.innerText = this.text;
-        color.style.background = this.color;
-        time.innerText = String(this.start) +
-            ":00 - " + String(this.stop) + ":00";
-        this.element.appendChild(text);
-        this.element.appendChild(color);
-        this.element.appendChild(time);
+    draw(task) {
+        this.background.className = "modalBackground colored";
+        this.background.onclick = function (e) {
+            if (e.srcElement.className != this.background.className)
+                return;
+            this.close();
+        }.bind(this);
+        this.content.draw(task);
     }
-    draw(top, left) {
-        this.element.className = "taskTooltip active";
-        let nTop = top - this.element.getBoundingClientRect().height;
-        let nLeft = left - (this.element.getBoundingClientRect().width / 2);
-        this.element.style.top = String(nTop) + "px";
-        this.element.style.left = String(nLeft) + "px";
-        this.open = true;
-    }
-    hidden() {
-        this.element.className = "taskTooltip";
-        this.open = false;
+    close() {
+        this.background.className = "modalBackground close";
+        this.content.clear();
     }
 }
-/* harmony default export */ __webpack_exports__["a"] = (Tooltip);
+
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TaskSettingsContent; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(11);
+
+class TaskSettingsContent {
+    constructor(parent) {
+        this.colors = [];
+        this.element = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "modalContent", parent);
+        this.name = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("input", "modalContentInput", this.element);
+        this.timeStart = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("input", "modalContentInput", this.element);
+        this.timeStop = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("input", "modalContentInput", this.element);
+        ["#fff", "#000"].map(function (item) {
+            this.colors.push(Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "modalContentColor", this.element));
+            this.colors[this.colors.length - 1].style.background = item;
+        }.bind(this));
+    }
+    draw(task) {
+        this.element.className = "modalContent active";
+        this.currentColor = task.color;
+        this.name.setAttribute("value", task.text);
+        this.timeStart.setAttribute("value", String(task.start));
+        this.timeStop.setAttribute("value", String(task.stop));
+    }
+    clear() {
+        this.element.className = "modalContent close";
+    }
+}
+
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createElement; });
+function createElement(type, className, parent) {
+    let element = document.createElement(type);
+    element.className = className;
+    parent.appendChild(element);
+    return element;
+}
+
 
 
 /***/ })

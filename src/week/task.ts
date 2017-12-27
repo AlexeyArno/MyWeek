@@ -1,4 +1,5 @@
 import Tooltip from './tooltip'
+import {getWindowTaskSettings,TaskSettingsWindow} from '../window/task_settings/task_settings_window'
 
 class Task{
 	color: string;
@@ -42,13 +43,20 @@ class Task{
     }
 
 	elementClick(event:Event){
-		let elementList = document.querySelectorAll('[data-id]')
-		for(let i =0;i<elementList.length;i++){
-			if(String(this.id) == elementList[i].getAttribute("data-id")){
-				// elementList[i].style.background = "blue"
-				console.log('Click')
-			}
-		}
+        let modalSettings:TaskSettingsWindow = getWindowTaskSettings();
+        this.tooltipElement.hidden();
+        modalSettings.draw(this);
+        // console.log("click")
+		// let elementList = document.querySelectorAll('[data-id]');
+		// for(let i =0;i<elementList.length;i++){
+		// 	if(String(this.id) == elementList[i].getAttribute("data-id")){
+		// 		// elementList[i].style.background = "blue"
+		// 		// console.log('Click')
+        //
+		// 		//Because singleton
+         //
+		// 	}
+		// }
 	}
 
     elementHover(event:Event){
