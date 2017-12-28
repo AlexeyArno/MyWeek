@@ -14,3 +14,28 @@
 body{
 	background: #fbfbfb;
 }
+
+.button{
+    background-color: #fff;
+    border:1px solid rgba(0,0,0,0.2);
+    font-family: Helvetica-Light;
+    display: inline-block;
+    padding: 5px;
+    border-radius: 5px;
+    margin:auto;
+    margin-top: 50px;
+    cursor: pointer;
+    box-shadow: 0px 0px 15px -1px rgba(0,0,0,0.2);
+    transition: box-shadow 0.3s ease-in-out;
+    user-select: none;
+}
+.button:hover{
+    box-shadow: 0px 0px 15px -1px rgba(0,0,0,0.1);
+}
+.button:active{
+    box-shadow: 0px 0px 15px -1px rgba(0,0,0,0);
+}
+.buttonShell{
+    text-align: center;
+}
+

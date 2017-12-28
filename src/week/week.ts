@@ -96,7 +96,7 @@ class Week{
 			timePlans[i+1] = new Array(7);
 
 			for(let j=0;j<7;j++){
-				timePlans[i+1][j] = new Task();
+				timePlans[i+1][j] = new Task("","",0,0,0,0,0);
 				timePlans[i+1][j].id = -1;
 			}
 			for(let j=0;j<plans.length;j++){

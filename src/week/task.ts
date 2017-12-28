@@ -45,7 +45,7 @@ class Task{
 	elementClick(event:Event){
         let modalSettings:TaskSettingsWindow = getWindowTaskSettings();
         this.tooltipElement.hidden();
-        modalSettings.draw(this);
+        modalSettings.draw(this, true);
         // console.log("click")
 		// let elementList = document.querySelectorAll('[data-id]');
 		// for(let i =0;i<elementList.length;i++){

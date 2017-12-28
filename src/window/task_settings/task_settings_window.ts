@@ -1,6 +1,7 @@
 import Task from './../../week/task'
 
 import {TaskSettingsContent} from './task_settings_content'
+import{Draw} from '../../app'
 
 let taskSettings:TaskSettingsWindow;
 
@@ -20,23 +21,26 @@ class TaskSettingsWindow{
 
 	constructor(){
         let newBackground:HTMLElement = document.createElement("div");
-        newBackground.className = "modalBackground";
+        newBackground.className = "modalBackground close";
         this.background = newBackground;
-        document.body.appendChild(newBackground)
-
-
-        this.content = new TaskSettingsContent(this.background);
-    }
-
-    draw(task:Task){
-        this.background.className = "modalBackground colored";
         this.background.onclick = function(e:Event){
             if(e.srcElement.className != this.background.className) return;
             this.close()
         }.bind(this);
-        this.content.draw(task);
+        document.body.appendChild(newBackground);
+
+
+        this.content = new TaskSettingsContent(this.background, function(){this.close();}.bind(this), Draw);
+    }
+
+    draw(task:Task,  saveOrCreate:boolean){
+	    this.open = !this.open;
+        this.background.className = "modalBackground colored";
+
+        this.content.draw(task, saveOrCreate);
     }
     close(){
+        this.open = !this.open;
         this.background.className = "modalBackground close";
         this.content.clear();
     }

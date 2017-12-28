@@ -1,4 +1,5 @@
 import Task from './task'
+import {getWindowTaskSettings} from "../window/task_settings/task_settings_window";
 
 class Graph{
 	start: number;
@@ -37,28 +38,41 @@ class Graph{
 					newEl.style.width = 20+"px";
 					newColumn.style.width =  20+"px";
 				}
-				if(tasks[i][j].id !=-1){
-					tasks[i][j].draw(newEl,i,j, this.week_number);
-					if(i!=this.start+this.count){
-						if(tasks[i][j].id==tasks[i+1][j].id){
-							tasks[i][j].setStyle('marginRight','0px');
-						}else{
-							tasks[i][j].setStyle('borderTopRightRadius','5px');
-							tasks[i][j].setStyle('borderBottomRightRadius','5px');
-							//if this part - last task part, because non create more useless tooltips
-							tasks[i][j].setTooltip();
-						}
-					}
-					if(i!=this.start){
-						if(tasks[i-1][j].id==tasks[i][j].id && i-1!= this.start){
-							tasks[i][j].setStyle('marginLeft','0px');
-						}else{
-							tasks[i][j].setStyle('borderTopLeftRadius','5px');
-							tasks[i][j].setStyle('borderBottomLeftRadius','5px');
-						}
-					}else{
-						tasks[i][j].clear();
-					}
+				if(tasks[i][j].id !=-1) {
+                    console.log(tasks[i][j].day);
+                    tasks[i][j].draw(newEl, i, j, this.week_number);
+                    if (i != this.start + this.count) {
+                        if (tasks[i][j].id == tasks[i + 1][j].id) {
+                            tasks[i][j].setStyle('marginRight', '0px');
+                        } else {
+                            tasks[i][j].setStyle('borderTopRightRadius', '5px');
+                            tasks[i][j].setStyle('borderBottomRightRadius', '5px');
+                            //if this part - last task part, because non create more useless tooltips
+                            tasks[i][j].setTooltip();
+                        }
+                    }
+                    if (i != this.start) {
+                        if (tasks[i - 1][j].id == tasks[i][j].id && i - 1 != this.start) {
+                            tasks[i][j].setStyle('marginLeft', '0px');
+                        } else {
+                            tasks[i][j].setStyle('borderTopLeftRadius', '5px');
+                            tasks[i][j].setStyle('borderBottomLeftRadius', '5px');
+                        }
+                    } else {
+                        tasks[i][j].clear();
+                    }
+                }else if(i!=this.start){
+                    let newInEl:HTMLElement = document.createElement("div");
+                    newInEl.className = "empty_cell";
+                    newInEl.onclick = function(e:Event){
+                    	let taskCreateWindow = getWindowTaskSettings();
+                        let startTask =(i>=24)?i-24:i;
+
+                    	taskCreateWindow.draw(new Task("","#fff",startTask-1,startTask,j,0,this.week_number),false)
+
+
+					}.bind(this);
+                    newEl.appendChild(newInEl);
 				}
 				if(i==this.start+this.count){newEl.style.borderRight = "none";}
 				if(j==6){newEl.style.borderBottom = "none";}
