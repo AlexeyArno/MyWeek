@@ -8,7 +8,7 @@ class TaskSettingsContent{
     name:HTMLElement;
     timeStart:HTMLElement;
     timeStop:HTMLElement;
-    colorsList:Array<string> =  ["#fff", "#000", "#ffdda9"];
+    colorsList:Array<string> =  ["#f5a978", "#000", "#ffdda9"];
     colorsElements:Array<HTMLElement> = [];
     currentColor:string;
     currentTask:Task;
@@ -45,20 +45,25 @@ class TaskSettingsContent{
         let save = createElement("div","saveContentWindow", this.element);
         save.onclick= function(){
             this.saveFunc();
-            this.closeBackground();
-            this.redraw();
+
         }.bind(this);
         save.innerText = "Save";
     }
 
     save(){
         // console.log('HElo')
-        this.currentTask.text = this.name.getAttribute("value");
-        this.currentTask.start = Number(this.timeStart.getAttribute("value"));
-        this.currentTask.stop = Number(this.timeStop.getAttribute("value"));
+        this.currentTask.text = this.name.value;
+        this.currentTask.start = Number(this.timeStart.value);
+        this.currentTask.stop = Number(this.timeStop.value);
         this.currentTask.color = this.currentColor;
-        changeTask(this.currentTask);
-        this.clearData()
+        changeTask(this.currentTask,function(result:boolean){
+            if(result){
+                this.clearData();
+                this.closeBackground();
+                this.redraw();
+            }
+        }.bind(this));
+
     }
 
     create(){
@@ -66,10 +71,13 @@ class TaskSettingsContent{
         this.currentTask.start = Number(this.timeStart.value);
         this.currentTask.stop =  Number(this.timeStop.value);
         this.currentTask.text = this.name.value;
-        createTask(this.currentTask);
-        this.clearData()
-
-
+        createTask(this.currentTask,function(result:boolean){
+            if(result){
+                this.clearData();
+                this.closeBackground();
+                this.redraw();
+            }
+        }.bind(this));
     }
 
 

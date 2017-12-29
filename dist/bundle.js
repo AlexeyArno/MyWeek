@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,12 +68,13 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__tooltip__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__window_task_settings_task_settings_window__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__tooltip__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__window_task_settings_task_settings_window__ = __webpack_require__(3);
 
 
 class Task {
     constructor(text, color, start, stop, day, id, week_id) {
+        this.currentGroup = 0;
         this.color = color;
         this.start = start;
         this.stop = stop;
@@ -94,6 +95,9 @@ class Task {
         parentElement.appendChild(newInEl);
         this.element = newInEl;
     }
+    setAtrib(name, value) {
+        this.element.setAttribute(name, value);
+    }
     setTooltip() {
         this.tooltipElement = new __WEBPACK_IMPORTED_MODULE_0__tooltip__["a" /* default */](this.text, this.color, this.start, this.stop);
     }
@@ -103,10 +107,11 @@ class Task {
         modalSettings.draw(this, true);
     }
     elementHover(event) {
-        let elementList = document.querySelectorAll('[data-id]');
+        let elementList = document.querySelectorAll('[data-group]');
         let tasksElements = [];
+        let currentDataGroupEl = event.srcElement.getAttribute("data-group");
         for (let i = 0; i < elementList.length; i++) {
-            if (String(this.id) == elementList[i].getAttribute("data-id")) {
+            if (currentDataGroupEl == elementList[i].getAttribute("data-group")) {
                 tasksElements.push(i);
             }
         }
@@ -115,9 +120,14 @@ class Task {
             let top = elementList[tasksElements[0]].getBoundingClientRect().top - 10;
             let done = elementList[tasksElements[tasksElements.length - 1]].getBoundingClientRect().left +
                 elementList[tasksElements[tasksElements.length - 1]].getBoundingClientRect().width;
-            console.log("Begin: " + String(begin) + " Done: " + String(done));
+            if (begin < 0) {
+                done -= begin;
+                begin -= begin;
+            }
             let middle = begin + Math.floor((done - begin) / 2);
-            console.log("Middle: " + String(middle));
+            if (Math.abs(Math.floor((begin - done) / 80)) != tasksElements.length) {
+                middle = event.srcElement.getBoundingClientRect().left + (event.srcElement.getBoundingClientRect().width / 2);
+            }
             this.tooltipElement.draw(top, middle);
         }
     }
@@ -144,35 +154,161 @@ class Task {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return dbInit; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return createWeek; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return createTask; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return getTasks; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return getWeeks; });
+/* unused harmony export deleteTask */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return changeTask; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_task__ = __webpack_require__(0);
+
+let db;
+function dbInit() {
+    db = openDatabase('main_db', '1.1', 'Main DB', 2 * 1024 * 1024);
+    if (!db) {
+        throw new Error("Fail open db");
+    }
+    db.transaction(function (tx) {
+        tx.executeSql("CREATE TABLE IF NOT EXISTS tasks" +
+            " (ID INTEGER PRIMARY KEY ASC,text TEXT,start " +
+            "INTEGER, stop INTEGER, day INTEGER, color TEXT, week_id INTEGER)", []);
+        tx.executeSql("CREATE TABLE IF NOT EXISTS weeks (ID INTEGER PRIMARY KEY ASC)", []);
+    });
+}
+function createWeek() {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("INSERT INTO weeks DEFAULT VALUES ");
+    });
+    return true;
+}
+function createTask(task, callback) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("INSERT INTO tasks (text,start,stop,day,color,week_id) VALUES(?,?,?,?,?,?)", [task.text, task.start, task.stop, task.day, task.color, task.week_id], function (transaction, result) {
+            console.log(result);
+            callback(true);
+        }, function (transaction, error) {
+            console.log(error);
+            callback(false);
+        });
+    });
+    return true;
+}
+function getTasks(week_id, res) {
+    let final = [];
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT * FROM tasks WHERE week_id = ?", [week_id], function (tx, result) {
+            for (let i = 0; i < result.rows.length; i++) {
+                let now_task = new __WEBPACK_IMPORTED_MODULE_0__week_task__["a" /* default */](result.rows.item(i).text, result.rows.item(i).color, result.rows.item(i).start, result.rows.item(i).stop, result.rows.item(i).day, result.rows.item(i).ID, result.rows.item(i).week_id);
+                final.push(now_task);
+            }
+            console.log(final);
+            res(final);
+        });
+    });
+}
+function getWeeks(ret) {
+    let final = [];
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT * FROM weeks", [], function (tx, result) {
+            for (let i = 0; i < result.rows.length; i++) {
+                final.push(Number(result.rows.item(i).ID));
+            }
+            ret(final);
+        });
+    });
+}
+function deleteTask(task_id, callback) {
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("DELETE FROM tasks WHERE ID=?", [task_id], function (transaction, result) {
+            console.log(result);
+            callback(true);
+        }, function (transaction, error) {
+            console.log(error);
+            callback(false);
+        });
+    });
+    return true;
+}
+function changeTask(up_task, callback) {
+    console.log(up_task.text, up_task.id);
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        tx.executeSql("update tasks set text=?, start=?, stop=?, day=?, color=?, week_id=? " +
+            " where ID=? ", [up_task.text, up_task.start, up_task.stop,
+            up_task.day, up_task.color, up_task.week_id,
+            up_task.id], function (transaction, result) {
+            console.log(result);
+            callback(true);
+        }, function (transaction, error) {
+            console.log(error);
+            callback(false);
+        });
+    });
+    return true;
+}
+
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Draw", function() { return Draw; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__db_db_api__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions_functions__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(1);
+
 
 
 
 let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 let currentWeek = 2;
 let startHour = 11;
-Object(__WEBPACK_IMPORTED_MODULE_1__db_db_api__["c" /* dbInit */])();
+Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["d" /* dbInit */])();
 function clear(classType) {
     let elements = document.getElementsByClassName(classType);
     for (let i = elements.length; i--;) {
         elements[i].remove();
     }
 }
+function drawButton() {
+    let buttonShell = Object(__WEBPACK_IMPORTED_MODULE_1__functions_functions__["a" /* createElement */])("div", "buttonShell", document.body);
+    let button = Object(__WEBPACK_IMPORTED_MODULE_1__functions_functions__["a" /* createElement */])("div", "button", buttonShell);
+    button.innerText = "Create week";
+    button.onclick = function () {
+        Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["c" /* createWeek */])();
+        Draw();
+    };
+}
 function Draw() {
     clear("paper  main-container");
     clear("buttonShell");
-    Object(__WEBPACK_IMPORTED_MODULE_1__db_db_api__["e" /* getWeeks */])(function (weeks) {
-        weeks.map(function (item) {
-            Object(__WEBPACK_IMPORTED_MODULE_1__db_db_api__["d" /* getTasks */])(item, function (tasks) {
+    Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["f" /* getWeeks */])(function (weeks) {
+        weeks.map(function (item, index) {
+            Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["e" /* getTasks */])(item, function (tasks) {
                 let week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* default */](item);
                 week.create(document.body, (item == currentWeek));
                 week.loadDays(days);
                 week.setStartHour(startHour);
                 week.loadTasks(tasks);
                 week.draw();
+                if (index == weeks.length - 1) {
+                    drawButton();
+                }
             });
         });
     });
@@ -182,14 +318,60 @@ Draw();
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(3);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getWindowTaskSettings; });
+/* unused harmony export TaskSettingsWindow */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__task_settings_content__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app__ = __webpack_require__(2);
+
+
+let taskSettings;
+function getWindowTaskSettings() {
+    if (!taskSettings) {
+        taskSettings = new TaskSettingsWindow();
+    }
+    return taskSettings;
+}
+class TaskSettingsWindow {
+    constructor() {
+        this.open = false;
+        let newBackground = document.createElement("div");
+        newBackground.className = "modalBackground close";
+        this.background = newBackground;
+        this.background.onclick = function (e) {
+            if (e.srcElement.className != this.background.className)
+                return;
+            this.close();
+        }.bind(this);
+        document.body.appendChild(newBackground);
+        this.content = new __WEBPACK_IMPORTED_MODULE_0__task_settings_content__["a" /* TaskSettingsContent */](this.background, function () { this.close(); }.bind(this), __WEBPACK_IMPORTED_MODULE_1__app__["Draw"]);
+    }
+    draw(task, saveOrCreate) {
+        this.open = !this.open;
+        this.background.className = "modalBackground colored";
+        this.content.draw(task, saveOrCreate);
+    }
+    close() {
+        this.open = !this.open;
+        this.background.className = "modalBackground close";
+        this.content.clear();
+    }
+}
+
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__task__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(10);
 
 
 
@@ -278,7 +460,7 @@ class Week {
         this.startHour = hour;
     }
     draw() {
-        this.container.style.width = String(24 * this.hourWidth) + 'px';
+        this.container.style.width = String(24.5 * this.hourWidth) + 'px';
         this.timePanel.setup(this.startHour, this.hourWidth);
         let count = this.timePanel.draw();
         this.graphPanel.setup(this.startHour, count, this.hourWidth, this.week_number);
@@ -290,7 +472,7 @@ class Week {
 
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -327,7 +509,7 @@ class Time {
 
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -385,64 +567,18 @@ class Tooltip {
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getWindowTaskSettings; });
-/* unused harmony export TaskSettingsWindow */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__task_settings_content__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app__ = __webpack_require__(1);
-
-
-let taskSettings;
-function getWindowTaskSettings() {
-    if (!taskSettings) {
-        taskSettings = new TaskSettingsWindow();
-    }
-    return taskSettings;
-}
-class TaskSettingsWindow {
-    constructor() {
-        this.open = false;
-        let newBackground = document.createElement("div");
-        newBackground.className = "modalBackground close";
-        this.background = newBackground;
-        this.background.onclick = function (e) {
-            if (e.srcElement.className != this.background.className)
-                return;
-            this.close();
-        }.bind(this);
-        document.body.appendChild(newBackground);
-        this.content = new __WEBPACK_IMPORTED_MODULE_0__task_settings_content__["a" /* TaskSettingsContent */](this.background, function () { this.close(); }.bind(this), __WEBPACK_IMPORTED_MODULE_1__app__["Draw"]);
-    }
-    draw(task, saveOrCreate) {
-        this.open = !this.open;
-        this.background.className = "modalBackground colored";
-        this.content.draw(task, saveOrCreate);
-    }
-    close() {
-        this.open = !this.open;
-        this.background.className = "modalBackground close";
-        this.content.clear();
-    }
-}
-
-
-
-/***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TaskSettingsContent; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__db_db_api__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__db_db_api__ = __webpack_require__(1);
 
 
 class TaskSettingsContent {
     constructor(parent, closeBackground, redrawFun) {
-        this.colorsList = ["#fff", "#000", "#ffdda9"];
+        this.colorsList = ["#f5a978", "#000", "#ffdda9"];
         this.colorsElements = [];
         this.saveFunc = this.save;
         this.closeBackground = closeBackground;
@@ -468,26 +604,34 @@ class TaskSettingsContent {
         let save = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "saveContentWindow", this.element);
         save.onclick = function () {
             this.saveFunc();
-            this.closeBackground();
-            this.redraw();
         }.bind(this);
         save.innerText = "Save";
     }
     save() {
-        this.currentTask.text = this.name.getAttribute("value");
-        this.currentTask.start = Number(this.timeStart.getAttribute("value"));
-        this.currentTask.stop = Number(this.timeStop.getAttribute("value"));
+        this.currentTask.text = this.name.value;
+        this.currentTask.start = Number(this.timeStart.value);
+        this.currentTask.stop = Number(this.timeStop.value);
         this.currentTask.color = this.currentColor;
-        Object(__WEBPACK_IMPORTED_MODULE_1__db_db_api__["a" /* changeTask */])(this.currentTask);
-        this.clearData();
+        Object(__WEBPACK_IMPORTED_MODULE_1__db_db_api__["a" /* changeTask */])(this.currentTask, function (result) {
+            if (result) {
+                this.clearData();
+                this.closeBackground();
+                this.redraw();
+            }
+        }.bind(this));
     }
     create() {
         this.currentTask.color = this.currentColor;
         this.currentTask.start = Number(this.timeStart.value);
         this.currentTask.stop = Number(this.timeStop.value);
         this.currentTask.text = this.name.value;
-        Object(__WEBPACK_IMPORTED_MODULE_1__db_db_api__["b" /* createTask */])(this.currentTask);
-        this.clearData();
+        Object(__WEBPACK_IMPORTED_MODULE_1__db_db_api__["b" /* createTask */])(this.currentTask, function (result) {
+            if (result) {
+                this.clearData();
+                this.closeBackground();
+                this.redraw();
+            }
+        }.bind(this));
     }
     draw(task, saveOrCreate) {
         if (!saveOrCreate) {
@@ -526,7 +670,7 @@ class TaskSettingsContent {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -541,12 +685,12 @@ function createElement(type, className, parent) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__task__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__window_task_settings_task_settings_window__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__window_task_settings_task_settings_window__ = __webpack_require__(3);
 
 
 class Graph {
@@ -564,6 +708,8 @@ class Graph {
         this.week_number = week_number;
     }
     draw(tasks) {
+        let currentGroupDrawedTasks = 0;
+        let lastJ = 0;
         this.nativeElement.innerHTML = "";
         for (let i = this.start; i < this.start + this.count + 1; i++) {
             let newColumn = document.createElement("div");
@@ -574,13 +720,13 @@ class Graph {
                 let newEl = document.createElement("div");
                 newEl.className = "cell";
                 newEl.style.width = this.hourWidth + "px";
-                if (i == this.start || i == this.start + this.count) {
+                if (i == this.start) {
                     newEl.style.width = 20 + "px";
                     newColumn.style.width = 20 + "px";
                 }
                 if (tasks[i][j].id != -1) {
-                    console.log(tasks[i][j].day);
                     tasks[i][j].draw(newEl, i, j, this.week_number);
+                    tasks[i][j].setAtrib("data-group", String(tasks[i][j].currentGroup) + ":" + String(tasks[i][j].id));
                     if (i != this.start + this.count) {
                         if (tasks[i][j].id == tasks[i + 1][j].id) {
                             tasks[i][j].setStyle('marginRight', '0px');
@@ -589,7 +735,18 @@ class Graph {
                             tasks[i][j].setStyle('borderTopRightRadius', '5px');
                             tasks[i][j].setStyle('borderBottomRightRadius', '5px');
                             tasks[i][j].setTooltip();
+                            if (j != lastJ)
+                                tasks[i][j].currentGroup++;
+                            lastJ = j;
                         }
+                    }
+                    else {
+                        tasks[i][j].setStyle('borderTopRightRadius', '5px');
+                        tasks[i][j].setStyle('borderBottomRightRadius', '5px');
+                        tasks[i][j].setTooltip();
+                        if (j != lastJ)
+                            tasks[i][j].currentGroup++;
+                        lastJ = j;
                     }
                     if (i != this.start) {
                         if (tasks[i - 1][j].id == tasks[i][j].id && i - 1 != this.start) {
@@ -609,7 +766,7 @@ class Graph {
                     newInEl.className = "empty_cell";
                     newInEl.onclick = function (e) {
                         let taskCreateWindow = Object(__WEBPACK_IMPORTED_MODULE_1__window_task_settings_task_settings_window__["a" /* getWindowTaskSettings */])();
-                        let startTask = (i >= 24) ? i - 24 : i;
+                        let startTask = (i > 24) ? i - 24 : i;
                         taskCreateWindow.draw(new __WEBPACK_IMPORTED_MODULE_0__task__["a" /* default */]("", "#fff", startTask - 1, startTask, j, 0, this.week_number), false);
                     }.bind(this);
                     newEl.appendChild(newInEl);
@@ -630,7 +787,7 @@ class Graph {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -652,103 +809,6 @@ class Days {
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Days);
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return dbInit; });
-/* unused harmony export createWeek */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return createTask; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return getTasks; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return getWeeks; });
-/* unused harmony export deleteTask */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return changeTask; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_task__ = __webpack_require__(0);
-
-let db;
-function dbInit() {
-    db = openDatabase('main_db', '1.1', 'Main DB', 2 * 1024 * 1024);
-    if (!db) {
-        throw new Error("Fail open db");
-    }
-    db.transaction(function (tx) {
-        tx.executeSql("CREATE TABLE IF NOT EXISTS tasks" +
-            " (ID INTEGER PRIMARY KEY ASC,text TEXT,start " +
-            "INTEGER, stop INTEGER, day INTEGER, color TEXT, week_id INTEGER)", []);
-        tx.executeSql("CREATE TABLE IF NOT EXISTS weeks (ID INTEGER PRIMARY KEY ASC)", []);
-    });
-}
-function createWeek() {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("INSERT INTO weeks DEFAULT VALUES ");
-    });
-    return true;
-}
-function createTask(task) {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("INSERT INTO tasks (text,start,stop,day,color,week_id) VALUES(?,?,?,?,?,?)", [task.text, task.start, task.stop, task.day, task.color, task.week_id]);
-    });
-    return true;
-}
-function getTasks(week_id, res) {
-    let final = [];
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("SELECT * FROM tasks WHERE week_id = ?", [week_id], function (tx, result) {
-            for (let i = 0; i < result.rows.length; i++) {
-                let now_task = new __WEBPACK_IMPORTED_MODULE_0__week_task__["a" /* default */](result.rows.item(i).text, result.rows.item(i).color, result.rows.item(i).start, result.rows.item(i).stop, result.rows.item(i).day, result.rows.item(i).ID, result.rows.item(i).week_id);
-                final.push(now_task);
-            }
-            console.log(final);
-            res(final);
-        });
-    });
-}
-function getWeeks(ret) {
-    let final = [];
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("SELECT * FROM weeks", [], function (tx, result) {
-            for (let i = 0; i < result.rows.length; i++) {
-                final.push(Number(result.rows.item(i).ID));
-            }
-            ret(final);
-        });
-    });
-}
-function deleteTask(task_id) {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("DELETE FROM tasks WHERE ID=?", [task_id]);
-    });
-    return true;
-}
-function changeTask(up_task) {
-    if (!db)
-        throw new Error("DB is not init, use dbInit()");
-    db.transaction(function (tx) {
-        tx.executeSql("UPDATE tasks SET (text,start,stop,day,color,week_id)" +
-            "VALUES(?,?,?,?,?,?) WHERE ID=?", [up_task.text,
-            up_task.start,
-            up_task.stop,
-            up_task.day,
-            up_task.color,
-            up_task.week_id,
-            up_task.id]);
-    });
-    return true;
-}
-
 
 
 /***/ })

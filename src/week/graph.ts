@@ -24,6 +24,8 @@ class Graph{
 	}
 
 	draw(tasks:Array<Array<Task>>){
+		let currentGroupDrawedTasks = 0;
+		let lastJ = 0;
 		this.nativeElement.innerHTML = "";
 		for(let i=this.start;i<this.start+this.count+1;i++){
 			let newColumn = document.createElement("div");
@@ -34,13 +36,13 @@ class Graph{
 				let newEl = document.createElement("div");
 				newEl.className = "cell";
 				newEl.style.width = this.hourWidth+"px";
-				if(i==this.start || i==this.start+this.count){
+				if(i==this.start){
 					newEl.style.width = 20+"px";
 					newColumn.style.width =  20+"px";
 				}
 				if(tasks[i][j].id !=-1) {
-                    console.log(tasks[i][j].day);
                     tasks[i][j].draw(newEl, i, j, this.week_number);
+                    tasks[i][j].setAtrib("data-group", String(tasks[i][j].currentGroup)+":"+String(tasks[i][j].id));
                     if (i != this.start + this.count) {
                         if (tasks[i][j].id == tasks[i + 1][j].id) {
                             tasks[i][j].setStyle('marginRight', '0px');
@@ -49,8 +51,17 @@ class Graph{
                             tasks[i][j].setStyle('borderBottomRightRadius', '5px');
                             //if this part - last task part, because non create more useless tooltips
                             tasks[i][j].setTooltip();
+                            if(j!=lastJ) tasks[i][j].currentGroup++;
+                            lastJ = j;
                         }
-                    }
+                    }else{
+                        tasks[i][j].setStyle('borderTopRightRadius', '5px');
+                        tasks[i][j].setStyle('borderBottomRightRadius', '5px');
+                        //if this part - last task part, because non create more useless tooltips
+                        tasks[i][j].setTooltip();
+                        if(j!=lastJ) tasks[i][j].currentGroup++;
+                        lastJ = j;
+					}
                     if (i != this.start) {
                         if (tasks[i - 1][j].id == tasks[i][j].id && i - 1 != this.start) {
                             tasks[i][j].setStyle('marginLeft', '0px');
@@ -66,7 +77,7 @@ class Graph{
                     newInEl.className = "empty_cell";
                     newInEl.onclick = function(e:Event){
                     	let taskCreateWindow = getWindowTaskSettings();
-                        let startTask =(i>=24)?i-24:i;
+                        let startTask =(i>24)?i-24:i;
 
                     	taskCreateWindow.draw(new Task("","#fff",startTask-1,startTask,j,0,this.week_number),false)
 

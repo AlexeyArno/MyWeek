@@ -124,7 +124,7 @@ class Week{
 
 	draw(){
 
-		this.container.style.width = String(24*this.hourWidth)+'px';
+		this.container.style.width = String(24.5*this.hourWidth)+'px';
 		this.timePanel.setup(this.startHour, this.hourWidth);
 		let count:number = this.timePanel.draw();
 

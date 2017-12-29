@@ -11,6 +11,7 @@ class Task{
 	week_id:number;
 	element: HTMLElement;
 	tooltipElement: Tooltip;
+	currentGroup:number = 0;
 
 	constructor(text:string,color:string,start:number,stop:number,day:number,id:number,week_id:number){
 		this.color = color;
@@ -38,6 +39,10 @@ class Task{
 		this.element = newInEl;
 	}
 
+	setAtrib(name:string, value:string){
+		this.element.setAttribute(name,value);
+	}
+
 	setTooltip(){
         this.tooltipElement = new Tooltip(this.text,this.color,this.start,this.stop)
     }
@@ -60,22 +65,32 @@ class Task{
 	}
 
     elementHover(event:Event){
-        let elementList = document.querySelectorAll('[data-id]');
+        let elementList = document.querySelectorAll('[data-group]');
         let tasksElements: Array<number> = [];
+        let currentDataGroupEl:string = event.srcElement.getAttribute("data-group")
         for(let i =0;i<elementList.length;i++){
-            if(String(this.id) == elementList[i].getAttribute("data-id")){
+            if(currentDataGroupEl == elementList[i].getAttribute("data-group")){
                 tasksElements.push(i);
             }
         }
         if(tasksElements.length!=0){
             let begin:number = elementList[tasksElements[0]].getBoundingClientRect().left;
+
             let top:number = elementList[tasksElements[0]].getBoundingClientRect().top-10;
             let done:number = elementList[tasksElements[tasksElements.length-1]].getBoundingClientRect().left+
                 elementList[tasksElements[tasksElements.length-1]].getBoundingClientRect().width;
-            console.log("Begin: "+String(begin)+" Done: "+String(done));
+            if(begin<0){
+            	done-=begin;
+            	begin-=begin;
+			}
 
+            // console.log("Begin: "+String(begin)+" Done: "+String(done));
+            // console.log("Count: "+ String(Math.abs(Math.floor((begin-done)/80))));
             let middle:number = begin+Math.floor((done-begin)/2);
-            console.log("Middle: "+String(middle));
+            if(Math.abs(Math.floor((begin-done)/80)) != tasksElements.length){
+				middle = event.srcElement.getBoundingClientRect().left+(event.srcElement.getBoundingClientRect().width/2);
+			}
+            // console.log("Middle: "+String(middle));
             this.tooltipElement.draw(top, middle);
         }
     }

@@ -30,12 +30,23 @@ function clear(classType:string){
 }
 
 
+function drawButton(){
+        let buttonShell = createElement("div","buttonShell",document.body);
+        let button = createElement("div","button", buttonShell);
+        button.innerText = "Create week";
+        button.onclick = function () {
+            createWeek();
+            Draw();
+        }
+}
+
 function Draw(){
     clear("paper  main-container");
     clear("buttonShell");
 
+
     getWeeks(function(weeks:Array<number>){
-        weeks.map(function(item){
+        weeks.map(function(item,index){
             getTasks(item,function(tasks:Array<Task>){
                 let week:Week = new Week(item);
                 week.create(document.body, (item==currentWeek));
@@ -43,9 +54,16 @@ function Draw(){
                 week.setStartHour(startHour);
                 week.loadTasks(tasks);
                 week.draw();
+                if(index == weeks.length-1){
+                    drawButton();
+                }
             })
         });
     });
+    // let buttonShell = document.createElement("div");
+    // buttonShell.className = "buttonShell";
+
+    // document.body.insertBefore(buttonShell, document.body.children[document.body.children.length-1]);
 
 
 }
