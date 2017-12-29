@@ -1,5 +1,6 @@
 import Task from './task'
-import {getWindowTaskSettings} from "../window/task_settings/task_settings_window";
+import {getPopup} from "../features/popup/popup";
+import TaskCreate from "../features/popup_contents/task_create"
 
 class Graph{
 	start: number;
@@ -24,7 +25,6 @@ class Graph{
 	}
 
 	draw(tasks:Array<Array<Task>>){
-		let currentGroupDrawedTasks = 0;
 		let lastJ = 0;
 		this.nativeElement.innerHTML = "";
 		for(let i=this.start;i<this.start+this.count+1;i++){
@@ -76,11 +76,13 @@ class Graph{
                     let newInEl:HTMLElement = document.createElement("div");
                     newInEl.className = "empty_cell";
                     newInEl.onclick = function(e:Event){
-                    	let taskCreateWindow = getWindowTaskSettings();
                         let startTask =(i>24)?i-24:i;
 
-                    	taskCreateWindow.draw(new Task("","#fff",startTask-1,startTask,j,0,this.week_number),false)
-
+                    	// taskCreateWindow.draw(,false)
+						let content:TaskCreate = new TaskCreate();
+						content.setCurrentTask(new Task("","#fff",startTask-1,startTask,j,0,this.week_number));
+						let popup:any = getPopup();
+						popup.open(content);
 
 					}.bind(this);
                     newEl.appendChild(newInEl);

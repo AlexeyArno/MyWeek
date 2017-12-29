@@ -39,6 +39,7 @@ class TaskSettingsWindow{
 
         this.content.draw(task, saveOrCreate);
     }
+
     close(){
         this.open = !this.open;
         this.background.className = "modalBackground close";

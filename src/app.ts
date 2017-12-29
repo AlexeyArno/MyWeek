@@ -43,6 +43,7 @@ function drawButton(){
 function Draw(){
     clear("paper  main-container");
     clear("buttonShell");
+    clear("taskTooltip");
 
 
     getWeeks(function(weeks:Array<number>){

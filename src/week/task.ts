@@ -87,9 +87,9 @@ class Task{
             // console.log("Begin: "+String(begin)+" Done: "+String(done));
             // console.log("Count: "+ String(Math.abs(Math.floor((begin-done)/80))));
             let middle:number = begin+Math.floor((done-begin)/2);
-            if(Math.abs(Math.floor((begin-done)/80)) != tasksElements.length){
-				middle = event.srcElement.getBoundingClientRect().left+(event.srcElement.getBoundingClientRect().width/2);
-			}
+            // if(Math.abs(Math.floor((begin-done)/80)) != tasksElements.length){
+			// 	middle = event.srcElement.getBoundingClientRect().left+(event.srcElement.getBoundingClientRect().width/2);
+			// }
             // console.log("Middle: "+String(middle));
             this.tooltipElement.draw(top, middle);
         }
