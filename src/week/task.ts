@@ -1,5 +1,6 @@
 import Tooltip from './tooltip'
-import {getWindowTaskSettings,TaskSettingsWindow} from '../window/task_settings/task_settings_window'
+import TaskChange from "../features/popup_contents/task_change/task_change"
+import {getPopup} from "../features/popup/popup";
 
 class Task{
 	color: string;
@@ -48,20 +49,10 @@ class Task{
     }
 
 	elementClick(event:Event){
-        let modalSettings:TaskSettingsWindow = getWindowTaskSettings();
-        this.tooltipElement.hidden();
-        modalSettings.draw(this, true);
-        // console.log("click")
-		// let elementList = document.querySelectorAll('[data-id]');
-		// for(let i =0;i<elementList.length;i++){
-		// 	if(String(this.id) == elementList[i].getAttribute("data-id")){
-		// 		// elementList[i].style.background = "blue"
-		// 		// console.log('Click')
-        //
-		// 		//Because singleton
-         //
-		// 	}
-		// }
+        let content:TaskChange = new TaskChange();
+        content.setCurrentTask(this);
+        let popup:any = getPopup();
+        popup.open(content);
 	}
 
     elementHover(event:Event){

@@ -90,24 +90,21 @@ class Week{
 
 	loadTasks(plans: Array<Task>){
 		let timePlans:Array<Array<Task>> = [];
-		for(let i=this.startHour;i<this.startHour+24;i++){
-			let now = (i>23)?i-23:i;
-
-			timePlans[i+1] = new Array(7);
-
-			for(let j=0;j<7;j++){
-				timePlans[i+1][j] = new Task("","",0,0,0,0,0);
-				timePlans[i+1][j].id = -1;
-			}
-			for(let j=0;j<plans.length;j++){
-				if(now>=plans[j].start&&now<=plans[j].stop){
-					if(plans[j].stop==i){
-						continue
-					}
-					timePlans[i+1][plans[j].day] = plans[j]
-				}
-			}
-		}
+		for(let i=this.startHour;i<this.startHour+24;i++) {
+            let now = (i > 24) ? i - 24 : i;
+            timePlans[i + 1] = new Array(7);
+            for (let j = 0; j < 7; j++) {
+                timePlans[i + 1][j] = new Task("", "", 0, 0, 0, 0, 0);
+                timePlans[i + 1][j].id = -1;
+            }
+            for (let j = 0; j < plans.length; j++) {
+                if (now >= plans[j].start && now < plans[j].stop) {
+                    timePlans[i + 1][plans[j].day] = plans[j]
+                } else if (plans[j].start == 0 && now==24) { // some bug here
+                    timePlans[i + 1][plans[j].day] = plans[j]
+                }
+            }
+        }
 		timePlans[this.startHour] = timePlans[this.startHour+1];
 		this.tasks = timePlans
 	}

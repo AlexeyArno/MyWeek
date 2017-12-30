@@ -16,10 +16,21 @@ let days:Array<string> = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 // }
 let currentWeek: number = 2;
 let startHour: number = 11;
-
+let currentWeeks:Array<Week> = [];
 
 dbInit();
 
+function redrawWeek(id:number){
+    console.log("RedrawWeek");
+    currentWeeks.map(function(item){
+        if(item.week_number == id){
+            getTasks(item.week_number,function(tasks:Array<Task>){
+                item.loadTasks(tasks);
+                item.draw();
+            })
+        }
+    })
+}
 
 function clear(classType:string){
     let elements = document.getElementsByClassName(classType);
@@ -29,10 +40,9 @@ function clear(classType:string){
 
 }
 
-
 function drawButton(){
         let buttonShell = createElement("div","buttonShell",document.body);
-        let button = createElement("div","button", buttonShell);
+        let button = createElement("div","button createWeek", buttonShell);
         button.innerText = "Create week";
         button.onclick = function () {
             createWeek();
@@ -47,7 +57,11 @@ function Draw(){
 
 
     getWeeks(function(weeks:Array<number>){
+        if(weeks.length == 0){
+            drawButton();
+        }
         weeks.map(function(item,index){
+
             getTasks(item,function(tasks:Array<Task>){
                 let week:Week = new Week(item);
                 week.create(document.body, (item==currentWeek));
@@ -55,21 +69,18 @@ function Draw(){
                 week.setStartHour(startHour);
                 week.loadTasks(tasks);
                 week.draw();
+                currentWeeks.push(week);
                 if(index == weeks.length-1){
                     drawButton();
                 }
             })
         });
     });
-    // let buttonShell = document.createElement("div");
-    // buttonShell.className = "buttonShell";
-
-    // document.body.insertBefore(buttonShell, document.body.children[document.body.children.length-1]);
 
 
 }
 
 Draw();
 
-export {Draw}
+export {Draw, redrawWeek}
 

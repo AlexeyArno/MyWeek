@@ -1,0 +1,49 @@
+.task_create{
+    width: 300px;
+    height: 180px;
+    left: calc(50vw - 150px);
+    top: calc(50vh - 90px);
+}
+.task_create div{
+    font-size: 14px;
+
+}
+.task_create input{
+    background: #efefef;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 5px;
+}
+.task_create input:focus{
+    outline: none;
+}
+#startTimePopup,
+#stopTimePopup{
+    width: 30px;
+}
+.timeChoosePopup{
+    margin-top: 10px;
+}
+.colorPopup{
+    height: 20px;
+    cursor: pointer;
+    width: 20px;
+    border-radius: 2px;
+    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.39);
+    display: inline-block;
+    margin-right: 10px;
+}
+.colorPopup:hover{
+    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.25);
+}
+.colorPopup.current{
+    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0);
+}
+.colorWrapper{
+    display: inline-block;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+.timeChoosePopup{
+    display: inline-block;
+    float:left;
+}

@@ -1,6 +1,6 @@
 import Task from './task'
 import {getPopup} from "../features/popup/popup";
-import TaskCreate from "../features/popup_contents/task_create"
+import TaskCreate from '../features/popup_contents/task_create/task_create'
 
 class Graph{
 	start: number;
@@ -69,9 +69,11 @@ class Graph{
                             tasks[i][j].setStyle('borderTopLeftRadius', '5px');
                             tasks[i][j].setStyle('borderBottomLeftRadius', '5px');
                         }
-                    } else {
+                    }else {
                         tasks[i][j].clear();
                     }
+
+
                 }else if(i!=this.start){
                     let newInEl:HTMLElement = document.createElement("div");
                     newInEl.className = "empty_cell";

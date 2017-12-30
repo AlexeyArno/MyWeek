@@ -1,6 +1,5 @@
 import {Draw} from "../../app";
 import {TaskSettingsContent} from "../../window/task_settings/task_settings_content";
-// require( "./popup.css");
 require('./popup.css');
 
 interface PopupContent {
@@ -27,7 +26,7 @@ class Popup{
         this.now_open = true;
         this.background.className = "popupBack open";
         document.body.style.overflow = 'hidden';
-        content.draw(this.background, this.close);
+        content.draw(this.background, function(){this.close()}.bind(this));
     }
 
     close(){

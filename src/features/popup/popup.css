@@ -20,12 +20,27 @@
     overflow: hidden;
     font-family: Helvetica-Light;
     padding: 10px;
-    width: 400px;
-    height: 150px;
     background: #fff;
     position: fixed;
-    left: calc(50vw - 200px);
-    top: calc(50vh - 75px);
     border-radius: 5px;
     opacity: 1;
+}
+.buttonWrapper{
+    margin-top: 30px;
+}
+.button{
+    padding: 5px 20px;
+    width: max-content;
+    border-radius: 2px;
+    cursor: pointer;
+    display: inline-block;
+    user-select: none;
+    font-family: Helvetica-Regular;
+    font-size: 12px !important;
+    margin: 0px 5px;
+}
+
+.button:active{
+    border: none !important;
+    padding: 6px 21px;
 }

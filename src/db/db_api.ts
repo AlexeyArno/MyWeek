@@ -55,7 +55,6 @@ function getTasks(week_id:number, res:any){
                     result.rows.item(i).week_id);
                 final.push(now_task);
             }
-            console.log(final);
             res(final)
 		});
 	});
@@ -78,7 +77,6 @@ function deleteTask(task_id:number,  callback:any){
     if (!db) throw new Error("DB is not init, use dbInit()");
     db.transaction(function(tx){
         tx.executeSql("DELETE FROM tasks WHERE ID=?",[task_id],function(transaction:any, result:any){
-            console.log(result);
             callback(true);
         },function(transaction, error){
             console.log(error);
