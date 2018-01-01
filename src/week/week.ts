@@ -3,6 +3,8 @@ import Task from './task'
 import Graph from './graph'
 import Days from './days'
 
+require("./style/week.css");
+
 
 class Week{
 	week_number: number;

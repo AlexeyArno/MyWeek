@@ -1,0 +1,23 @@
+.days{
+    float: left;
+    height: 280px;
+    margin-top: -20px;
+    padding-top: 16px;
+    background: #fff;
+    position: absolute;
+    left: 15px;
+    width: 40px;
+    transition: height 0.3s ease-out;
+    overflow-y: hidden;
+}
+.days.close{
+    height: 0;
+}
+.day{
+    height: 20px;
+    background: #fff;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 20px;
+    line-height: 3;
+}

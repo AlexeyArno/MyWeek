@@ -1,5 +1,4 @@
 import {Draw} from "../../app";
-import {TaskSettingsContent} from "../../window/task_settings/task_settings_content";
 require('./popup.css');
 
 interface PopupContent {

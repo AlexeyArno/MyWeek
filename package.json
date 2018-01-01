@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron . & webpack --watch",
+    "start": "electron .",
     "watch": "webpack --watch"
   },
   "repository": "https://github.com/AlexeyArno/MyWeek",
@@ -14,9 +14,11 @@
     "css-loader": "^0.28.7",
     "electron": "~1.7.8",
     "ts-loader": "^3.2.0",
-    "typescript": "^2.6.2"
+    "typescript": "^2.6.2",
+    "webpack": "^3.10.0"
   },
   "dependencies": {
+    "electron-reload": "^1.2.2",
     "style-loader": "^0.19.1"
   }
 }

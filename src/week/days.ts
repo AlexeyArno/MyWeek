@@ -1,3 +1,5 @@
+require("./style/days.css");
+
 class Days{
  	nativeElement:HTMLElement;
  	days: Array<string>;

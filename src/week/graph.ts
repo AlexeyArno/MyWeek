@@ -1,6 +1,7 @@
 import Task from './task'
 import {getPopup} from "../features/popup/popup";
 import TaskCreate from '../features/popup_contents/task_create/task_create'
+require("./style/graph.css");
 
 class Graph{
 	start: number;

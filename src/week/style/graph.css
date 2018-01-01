@@ -1,0 +1,44 @@
+.graph{
+    /*width:100vw;*/
+    overflow: hidden;
+}
+.cell{
+    height: 41px !important;
+    display: inline-block;
+    border: 1px solid rgba(206, 206, 206,0.2);
+    border-left: none;
+    margin-top: -5px;
+    border-top: none;
+    cursor: pointer;
+}
+.empty_cell{
+    width: 100%;
+    /*height: 99%;*/
+    height: 41px;
+
+    /*overflow-y: hidden;*/
+
+}
+.empty_cell:hover{
+    background: #9dd3ff;
+    opacity: 0.3;
+
+
+}
+.column{
+    display: inline-block;
+}
+.task{
+    /*padding: 10px;*/
+    height: 20px;
+    margin: 10px;
+}
+.container-week{
+    overflow-x: hidden;
+    word-wrap: break-word;
+    min-height: calc(100% - 50px);
+}
+.grid{
+    overflow-x: auto ;
+    padding-left: 35px;
+}

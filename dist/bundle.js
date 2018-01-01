@@ -60,97 +60,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__tooltip__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__features_popup_contents_task_change_task_change__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__features_popup_popup__ = __webpack_require__(10);
-
-
-
-class Task {
-    constructor(text, color, start, stop, day, id, week_id) {
-        this.currentGroup = 0;
-        this.color = color;
-        this.start = start;
-        this.stop = stop;
-        this.day = day;
-        this.id = id;
-        this.text = text;
-        this.week_id = week_id;
-    }
-    draw(parentElement, hour, day, week_number) {
-        let newInEl = document.createElement("div");
-        newInEl.className = "task";
-        newInEl.id = "task" + String(week_number) + ":" + String(hour) + ":" + String(day);
-        newInEl.setAttribute("data-id", String(this.id));
-        newInEl.style.background = this.color;
-        newInEl.onclick = function (e) { this.elementClick(e); }.bind(this);
-        newInEl.onmouseover = function (e) { this.elementHover(e); }.bind(this);
-        newInEl.onmouseleave = function (e) { this.elementLeave(e); }.bind(this);
-        parentElement.appendChild(newInEl);
-        this.element = newInEl;
-    }
-    setAtrib(name, value) {
-        this.element.setAttribute(name, value);
-    }
-    setTooltip() {
-        this.tooltipElement = new __WEBPACK_IMPORTED_MODULE_0__tooltip__["a" /* default */](this.text, this.color, this.start, this.stop);
-    }
-    elementClick(event) {
-        let content = new __WEBPACK_IMPORTED_MODULE_1__features_popup_contents_task_change_task_change__["a" /* default */]();
-        content.setCurrentTask(this);
-        let popup = Object(__WEBPACK_IMPORTED_MODULE_2__features_popup_popup__["a" /* getPopup */])();
-        popup.open(content);
-    }
-    elementHover(event) {
-        let elementList = document.querySelectorAll('[data-group]');
-        let tasksElements = [];
-        let currentDataGroupEl = event.srcElement.getAttribute("data-group");
-        for (let i = 0; i < elementList.length; i++) {
-            if (currentDataGroupEl == elementList[i].getAttribute("data-group")) {
-                tasksElements.push(i);
-            }
-        }
-        if (tasksElements.length != 0) {
-            let begin = elementList[tasksElements[0]].getBoundingClientRect().left;
-            let top = elementList[tasksElements[0]].getBoundingClientRect().top - 10;
-            let done = elementList[tasksElements[tasksElements.length - 1]].getBoundingClientRect().left +
-                elementList[tasksElements[tasksElements.length - 1]].getBoundingClientRect().width;
-            if (begin < 0) {
-                done -= begin;
-                begin -= begin;
-            }
-            let middle = begin + Math.floor((done - begin) / 2);
-            this.tooltipElement.draw(top, middle);
-        }
-    }
-    elementLeave() {
-        this.tooltipElement.hidden();
-    }
-    setStyle(styleName, styleValue) {
-        if (this.element != null) {
-            this.element.style[styleName] = styleValue;
-        }
-    }
-    clear() {
-        if (this.element != null) {
-            this.element.remove();
-            this.element = null;
-        }
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Task);
-
-
-/***/ }),
-/* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -165,7 +79,7 @@ function createElement(type, className, parent) {
 
 
 /***/ }),
-/* 2 */
+/* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -176,7 +90,7 @@ function createElement(type, className, parent) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return getWeeks; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return deleteTask; });
 /* unused harmony export changeTask */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_task__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_task__ = __webpack_require__(3);
 
 let db;
 function dbInit() {
@@ -275,16 +189,16 @@ function changeTask(up_task, callback) {
 
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Draw", function() { return Draw; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "redrawWeek", function() { return redrawWeek; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions_functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions_functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(1);
 
 
 
@@ -349,408 +263,93 @@ Draw();
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__task__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__tooltip__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__features_popup_contents_task_change_task_change__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__features_popup_popup__ = __webpack_require__(8);
 
 
 
-
-class Week {
-    constructor(week_number) {
-        this.hourWidth = 80;
-        this.startHour = 13;
-        this.week_number = week_number;
-        this.timePanel = new __WEBPACK_IMPORTED_MODULE_0__time__["a" /* default */]();
-        this.graphPanel = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */]();
-        this.daysPanel = new __WEBPACK_IMPORTED_MODULE_3__days__["a" /* default */]();
-    }
-    create(parent, currentWeek) {
-        let wrap = document.createElement("div");
-        wrap.className = "paper  main-container";
-        let up = document.createElement("div");
-        up.className = (currentWeek) ? "up active" : "up";
-        wrap.appendChild(up);
-        up.innerHTML = "Week " + String(this.week_number);
-        up.onclick = function (e) {
-            console.log(e.target);
-            wrap.classList;
-            let clList = wrap.classList;
-            for (let i = 0; i < clList.length; i++) {
-                if (clList[i] == "closed") {
-                    clList.remove("closed");
-                    days.className = "days";
-                    return;
-                }
-            }
-            clList.add("closed");
-            days.className = "days close";
-        };
-        let grid = document.createElement("div");
-        grid.id = "grid" + String(this.week_number);
-        let header = document.createElement("div");
-        header.className = "header";
-        header.id = "header" + String(this.week_number);
-        let container = document.createElement("div");
-        container.className = "container-week";
-        container.id = "container-week" + String(this.week_number);
-        grid.appendChild(header);
-        grid.appendChild(container);
-        let days = document.createElement("div");
-        let graph = document.createElement("div");
-        days.id = "days" + String(this.week_number);
-        days.className = "days";
-        graph.id = "graph" + String(this.week_number);
-        graph.className = "graph";
-        container.appendChild(days);
-        container.appendChild(graph);
-        grid.className = "grid";
-        wrap.appendChild(grid);
-        parent.appendChild(wrap);
-        this.container = container;
-        this.daysPanel.setup(days);
-        this.graphPanel.setNativeElement(graph);
-        this.timePanel.setNativeElement(header);
-    }
-    loadTasks(plans) {
-        let timePlans = [];
-        for (let i = this.startHour; i < this.startHour + 24; i++) {
-            let now = (i > 24) ? i - 24 : i;
-            timePlans[i + 1] = new Array(7);
-            for (let j = 0; j < 7; j++) {
-                timePlans[i + 1][j] = new __WEBPACK_IMPORTED_MODULE_1__task__["a" /* default */]("", "", 0, 0, 0, 0, 0);
-                timePlans[i + 1][j].id = -1;
-            }
-            for (let j = 0; j < plans.length; j++) {
-                if (now >= plans[j].start && now < plans[j].stop) {
-                    timePlans[i + 1][plans[j].day] = plans[j];
-                }
-                else if (plans[j].start == 0 && now == 24) {
-                    timePlans[i + 1][plans[j].day] = plans[j];
-                }
-            }
-        }
-        timePlans[this.startHour] = timePlans[this.startHour + 1];
-        this.tasks = timePlans;
-    }
-    loadDays(days) {
-        this.daysPanel.loadDays(days);
-    }
-    setStartHour(hour) {
-        this.startHour = hour;
-    }
-    draw() {
-        this.container.style.width = String(24.5 * this.hourWidth) + 'px';
-        this.timePanel.setup(this.startHour, this.hourWidth);
-        let count = this.timePanel.draw();
-        this.graphPanel.setup(this.startHour, count, this.hourWidth, this.week_number);
-        this.graphPanel.draw(this.tasks);
-        this.daysPanel.draw();
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Week);
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-class Time {
-    setup(start, hourWidth) {
-        this.start = start;
-        this.hourWidth = hourWidth;
-    }
-    setNativeElement(element) {
-        this.nativeElement = element;
-    }
-    draw() {
-        this.nativeElement.innerHTML = "";
-        this.nativeElement.style.width = String(24 * this.hourWidth) + "px";
-        let count = 24;
-        let final = this.start + count;
-        let begin = this.start;
-        for (let i = begin; i < final; i++) {
-            if (i >= 24) {
-                i = i - 24;
-                final = final - 24;
-            }
-            let newEl = document.createElement("div");
-            let time = (i < 10) ? '0' + String(i) : String(i);
-            newEl.innerHTML = time + ":00";
-            newEl.className = "hour";
-            newEl.style.width = this.hourWidth + "px";
-            this.nativeElement.appendChild(newEl);
-        }
-        return count;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Time);
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-class Tooltip {
-    constructor(text, color, start, stop) {
-        this.open = false;
+class Task {
+    constructor(text, color, start, stop, day, id, week_id) {
+        this.currentGroup = 0;
         this.color = color;
         this.start = start;
         this.stop = stop;
+        this.day = day;
+        this.id = id;
         this.text = text;
-        let tooltip = document.createElement("div");
-        tooltip.className = "taskTooltip";
-        document.body.appendChild(tooltip);
-        this.element = tooltip;
-        this.drawInner();
+        this.week_id = week_id;
     }
-    drawInner() {
-        if (!this.element)
-            throw new Error("tooltip yet not created");
-        let text = document.createElement("div");
-        let color = document.createElement("div");
-        let time = document.createElement("div");
-        text.className = "tooltipText";
-        color.className = "tooltipColor";
-        time.className = "tooltipTime";
-        text.innerText = this.text;
-        color.style.background = this.color;
-        time.innerText = String(this.start) +
-            ":00 - " + String(this.stop) + ":00";
-        this.element.appendChild(text);
-        this.element.appendChild(color);
-        this.element.appendChild(time);
+    draw(parentElement, hour, day, week_number) {
+        let newInEl = document.createElement("div");
+        newInEl.className = "task";
+        newInEl.id = "task" + String(week_number) + ":" + String(hour) + ":" + String(day);
+        newInEl.setAttribute("data-id", String(this.id));
+        newInEl.style.background = this.color;
+        newInEl.onclick = function (e) { this.elementClick(e); }.bind(this);
+        newInEl.onmouseover = function (e) { this.elementHover(e); }.bind(this);
+        newInEl.onmouseleave = function (e) { this.elementLeave(e); }.bind(this);
+        parentElement.appendChild(newInEl);
+        this.element = newInEl;
     }
-    draw(top, left) {
-        this.element.className = "taskTooltip active";
-        let borderRight = window.innerWidth;
-        let borderBottom = window.innerHeight;
-        let elementHeight = this.element.getBoundingClientRect().height;
-        let elementWidth = this.element.getBoundingClientRect().width;
-        let nTop = top - elementHeight;
-        let nLeft = left - (elementWidth / 2);
-        if (nLeft + elementWidth > borderRight) {
-            nLeft = borderRight - elementWidth;
-        }
-        this.element.style.top = String(nTop) + "px";
-        this.element.style.left = String(nLeft) + "px";
-        this.open = true;
+    setAtrib(name, value) {
+        this.element.setAttribute(name, value);
     }
-    hidden() {
-        this.element.className = "taskTooltip";
-        this.open = false;
+    setTooltip() {
+        this.tooltipElement = new __WEBPACK_IMPORTED_MODULE_0__tooltip__["a" /* default */](this.text, this.color, this.start, this.stop);
     }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Tooltip);
-
-
-/***/ }),
-/* 7 */,
-/* 8 */,
-/* 9 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__task__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__features_popup_popup__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__features_popup_contents_task_create_task_create__ = __webpack_require__(24);
-
-
-
-class Graph {
-    constructor() {
-        this.elementClick = function (e) {
-        };
+    elementClick(event) {
+        let content = new __WEBPACK_IMPORTED_MODULE_1__features_popup_contents_task_change_task_change__["a" /* default */]();
+        content.setCurrentTask(this);
+        let popup = Object(__WEBPACK_IMPORTED_MODULE_2__features_popup_popup__["a" /* getPopup */])();
+        popup.open(content);
     }
-    setNativeElement(element) {
-        this.nativeElement = element;
-    }
-    setup(start, count, hourWidth, week_number) {
-        this.start = start;
-        this.count = count;
-        this.hourWidth = hourWidth;
-        this.week_number = week_number;
-    }
-    draw(tasks) {
-        let lastJ = 0;
-        this.nativeElement.innerHTML = "";
-        for (let i = this.start; i < this.start + this.count + 1; i++) {
-            let newColumn = document.createElement("div");
-            newColumn.className = "column";
-            newColumn.style.width = this.hourWidth + "px";
-            newColumn.style.height = 40 * 7 + "px";
-            for (let j = 0; j < 7; j++) {
-                let newEl = document.createElement("div");
-                newEl.className = "cell";
-                newEl.style.width = this.hourWidth + "px";
-                if (i == this.start) {
-                    newEl.style.width = 20 + "px";
-                    newColumn.style.width = 20 + "px";
-                }
-                if (tasks[i][j].id != -1) {
-                    tasks[i][j].draw(newEl, i, j, this.week_number);
-                    tasks[i][j].setAtrib("data-group", String(tasks[i][j].currentGroup) + ":" + String(tasks[i][j].id));
-                    if (i != this.start + this.count) {
-                        if (tasks[i][j].id == tasks[i + 1][j].id) {
-                            tasks[i][j].setStyle('marginRight', '0px');
-                        }
-                        else {
-                            tasks[i][j].setStyle('borderTopRightRadius', '5px');
-                            tasks[i][j].setStyle('borderBottomRightRadius', '5px');
-                            tasks[i][j].setTooltip();
-                            if (j != lastJ)
-                                tasks[i][j].currentGroup++;
-                            lastJ = j;
-                        }
-                    }
-                    else {
-                        tasks[i][j].setStyle('borderTopRightRadius', '5px');
-                        tasks[i][j].setStyle('borderBottomRightRadius', '5px');
-                        tasks[i][j].setTooltip();
-                        if (j != lastJ)
-                            tasks[i][j].currentGroup++;
-                        lastJ = j;
-                    }
-                    if (i != this.start) {
-                        if (tasks[i - 1][j].id == tasks[i][j].id && i - 1 != this.start) {
-                            tasks[i][j].setStyle('marginLeft', '0px');
-                        }
-                        else {
-                            tasks[i][j].setStyle('borderTopLeftRadius', '5px');
-                            tasks[i][j].setStyle('borderBottomLeftRadius', '5px');
-                        }
-                    }
-                    else {
-                        tasks[i][j].clear();
-                    }
-                }
-                else if (i != this.start) {
-                    let newInEl = document.createElement("div");
-                    newInEl.className = "empty_cell";
-                    newInEl.onclick = function (e) {
-                        let startTask = (i > 24) ? i - 24 : i;
-                        let content = new __WEBPACK_IMPORTED_MODULE_2__features_popup_contents_task_create_task_create__["a" /* default */]();
-                        content.setCurrentTask(new __WEBPACK_IMPORTED_MODULE_0__task__["a" /* default */]("", "#fff", startTask - 1, startTask, j, 0, this.week_number));
-                        let popup = Object(__WEBPACK_IMPORTED_MODULE_1__features_popup_popup__["a" /* getPopup */])();
-                        popup.open(content);
-                    }.bind(this);
-                    newEl.appendChild(newInEl);
-                }
-                if (i == this.start + this.count) {
-                    newEl.style.borderRight = "none";
-                }
-                if (j == 6) {
-                    newEl.style.borderBottom = "none";
-                }
-                newColumn.appendChild(newEl);
+    elementHover(event) {
+        let elementList = document.querySelectorAll('[data-group]');
+        let tasksElements = [];
+        let currentDataGroupEl = event.srcElement.getAttribute("data-group");
+        for (let i = 0; i < elementList.length; i++) {
+            if (currentDataGroupEl == elementList[i].getAttribute("data-group")) {
+                tasksElements.push(i);
             }
-            this.nativeElement.appendChild(newColumn);
+        }
+        if (tasksElements.length != 0) {
+            let begin = elementList[tasksElements[0]].getBoundingClientRect().left;
+            let top = elementList[tasksElements[0]].getBoundingClientRect().top - 10;
+            let done = elementList[tasksElements[tasksElements.length - 1]].getBoundingClientRect().left +
+                elementList[tasksElements[tasksElements.length - 1]].getBoundingClientRect().width;
+            if (begin < 0) {
+                done -= begin;
+                begin -= begin;
+            }
+            let middle = begin + Math.floor((done - begin) / 2);
+            this.tooltipElement.draw(top, middle);
+        }
+    }
+    elementLeave() {
+        this.tooltipElement.hidden();
+    }
+    setStyle(styleName, styleValue) {
+        if (this.element != null) {
+            this.element.style[styleName] = styleValue;
+        }
+    }
+    clear() {
+        if (this.element != null) {
+            this.element.remove();
+            this.element = null;
         }
     }
 }
-/* harmony default export */ __webpack_exports__["a"] = (Graph);
+/* harmony default export */ __webpack_exports__["a"] = (Task);
 
 
 /***/ }),
-/* 10 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getPopup; });
-__webpack_require__(11);
-class Popup {
-    constructor() {
-        this.now_open = false;
-        let newBackground = document.createElement("div");
-        newBackground.className = "popupBack close";
-        this.background = newBackground;
-        this.background.onclick = function (e) {
-            if (e.srcElement.className != this.background.className)
-                return;
-            this.close();
-        }.bind(this);
-        document.body.appendChild(newBackground);
-    }
-    open(content) {
-        if (this.now_open) {
-            this.close();
-        }
-        this.now_open = true;
-        this.background.className = "popupBack open";
-        document.body.style.overflow = 'hidden';
-        content.draw(this.background, function () { this.close(); }.bind(this));
-    }
-    close() {
-        this.now_open = false;
-        this.background.className = "popupBack close";
-        document.body.style.overflow = 'auto';
-        this.background.innerHTML = null;
-    }
-}
-let currentPopup;
-function getPopup() {
-    if (!currentPopup) {
-        currentPopup = new Popup();
-    }
-    return currentPopup;
-}
-
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(12);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// Prepare cssTransformation
-var transform;
-
-var options = {"hmr":true}
-options.transform = transform
-// add the styles to the DOM
-var update = __webpack_require__(14)(content, options);
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../../../node_modules/css-loader/index.js!./popup.css", function() {
-			var newContent = require("!!../../../node_modules/css-loader/index.js!./popup.css");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
-		});
-	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(13)(undefined);
-// imports
-
-
-// module
-exports.push([module.i, ".popupBack{\r\n    position: fixed;\r\n    z-index: 9999;\r\n    top: 0;\r\n    left: 0;\r\n}\r\n.popupBack.close{\r\n    width: 0;\r\n    height: 0;\r\n    background-color: rgba(0,0,0,0);\r\n}\r\n\r\n.popupBack.open{\r\n    width: 100vw;\r\n    height: 100vh;\r\n    background-color: rgba(0,0,0,0.7);\r\n}\r\n.popupContent{\r\n    background: #fff;\r\n    overflow: hidden;\r\n    font-family: Helvetica-Light;\r\n    padding: 10px;\r\n    background: #fff;\r\n    position: fixed;\r\n    border-radius: 5px;\r\n    opacity: 1;\r\n}\r\n.buttonWrapper{\r\n    margin-top: 30px;\r\n}\r\n.button{\r\n    padding: 5px 20px;\r\n    width: max-content;\r\n    border-radius: 2px;\r\n    cursor: pointer;\r\n    display: inline-block;\r\n    user-select: none;\r\n    font-family: Helvetica-Regular;\r\n    font-size: 12px !important;\r\n    margin: 0px 5px;\r\n}\r\n\r\n.button:active{\r\n    border: none !important;\r\n    padding: 6px 21px;\r\n}", ""]);
-
-// exports
-
-
-/***/ }),
-/* 13 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /*
@@ -832,7 +431,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 14 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1204,6 +803,445 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return drawButtons; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(0);
+
+function drawButtons(buttons, parent) {
+    let wrapper = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "buttonWrapper", parent);
+    buttons.map(function (item) {
+        let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "button", wrapper);
+        now.innerText = item.name;
+        now.style.background = item.bg;
+        now.style.color = item.color;
+        now.style['float'] = item.float;
+        now.style.border = "1px solid " + item.border;
+        now.onclick = function () { item.click(); };
+    });
+}
+
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return drawColor; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(0);
+
+function drawColor(colors, callback, parent) {
+    let final = [];
+    let wrapper = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "colorWrapper", parent);
+    wrapper.innerHTML = "<div>Colors</div>";
+    colors.map(function (item) {
+        let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "colorPopup", wrapper);
+        now.style.background = item;
+        now.onclick = function () { callback(item); };
+        final.push(now);
+    });
+    return final;
+}
+
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getPopup; });
+__webpack_require__(16);
+class Popup {
+    constructor() {
+        this.now_open = false;
+        let newBackground = document.createElement("div");
+        newBackground.className = "popupBack close";
+        this.background = newBackground;
+        this.background.onclick = function (e) {
+            if (e.srcElement.className != this.background.className)
+                return;
+            this.close();
+        }.bind(this);
+        document.body.appendChild(newBackground);
+    }
+    open(content) {
+        if (this.now_open) {
+            this.close();
+        }
+        this.now_open = true;
+        this.background.className = "popupBack open";
+        document.body.style.overflow = 'hidden';
+        content.draw(this.background, function () { this.close(); }.bind(this));
+    }
+    close() {
+        this.now_open = false;
+        this.background.className = "popupBack close";
+        document.body.style.overflow = 'auto';
+        this.background.innerHTML = null;
+    }
+}
+let currentPopup;
+function getPopup() {
+    if (!currentPopup) {
+        currentPopup = new Popup();
+    }
+    return currentPopup;
+}
+
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__task__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(22);
+
+
+
+
+__webpack_require__(27);
+class Week {
+    constructor(week_number) {
+        this.hourWidth = 80;
+        this.startHour = 13;
+        this.week_number = week_number;
+        this.timePanel = new __WEBPACK_IMPORTED_MODULE_0__time__["a" /* default */]();
+        this.graphPanel = new __WEBPACK_IMPORTED_MODULE_2__graph__["a" /* default */]();
+        this.daysPanel = new __WEBPACK_IMPORTED_MODULE_3__days__["a" /* default */]();
+    }
+    create(parent, currentWeek) {
+        let wrap = document.createElement("div");
+        wrap.className = "paper  main-container";
+        let up = document.createElement("div");
+        up.className = (currentWeek) ? "up active" : "up";
+        wrap.appendChild(up);
+        up.innerHTML = "Week " + String(this.week_number);
+        up.onclick = function (e) {
+            console.log(e.target);
+            wrap.classList;
+            let clList = wrap.classList;
+            for (let i = 0; i < clList.length; i++) {
+                if (clList[i] == "closed") {
+                    clList.remove("closed");
+                    days.className = "days";
+                    return;
+                }
+            }
+            clList.add("closed");
+            days.className = "days close";
+        };
+        let grid = document.createElement("div");
+        grid.id = "grid" + String(this.week_number);
+        let header = document.createElement("div");
+        header.className = "header";
+        header.id = "header" + String(this.week_number);
+        let container = document.createElement("div");
+        container.className = "container-week";
+        container.id = "container-week" + String(this.week_number);
+        grid.appendChild(header);
+        grid.appendChild(container);
+        let days = document.createElement("div");
+        let graph = document.createElement("div");
+        days.id = "days" + String(this.week_number);
+        days.className = "days";
+        graph.id = "graph" + String(this.week_number);
+        graph.className = "graph";
+        container.appendChild(days);
+        container.appendChild(graph);
+        grid.className = "grid";
+        wrap.appendChild(grid);
+        parent.appendChild(wrap);
+        this.container = container;
+        this.daysPanel.setup(days);
+        this.graphPanel.setNativeElement(graph);
+        this.timePanel.setNativeElement(header);
+    }
+    loadTasks(plans) {
+        let timePlans = [];
+        for (let i = this.startHour; i < this.startHour + 24; i++) {
+            let now = (i > 24) ? i - 24 : i;
+            timePlans[i + 1] = new Array(7);
+            for (let j = 0; j < 7; j++) {
+                timePlans[i + 1][j] = new __WEBPACK_IMPORTED_MODULE_1__task__["a" /* default */]("", "", 0, 0, 0, 0, 0);
+                timePlans[i + 1][j].id = -1;
+            }
+            for (let j = 0; j < plans.length; j++) {
+                if (now >= plans[j].start && now < plans[j].stop) {
+                    timePlans[i + 1][plans[j].day] = plans[j];
+                }
+                else if (plans[j].start == 0 && now == 24) {
+                    timePlans[i + 1][plans[j].day] = plans[j];
+                }
+            }
+        }
+        timePlans[this.startHour] = timePlans[this.startHour + 1];
+        this.tasks = timePlans;
+    }
+    loadDays(days) {
+        this.daysPanel.loadDays(days);
+    }
+    setStartHour(hour) {
+        this.startHour = hour;
+    }
+    draw() {
+        this.container.style.width = String(24.5 * this.hourWidth) + 'px';
+        this.timePanel.setup(this.startHour, this.hourWidth);
+        let count = this.timePanel.draw();
+        this.graphPanel.setup(this.startHour, count, this.hourWidth, this.week_number);
+        this.graphPanel.draw(this.tasks);
+        this.daysPanel.draw();
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Week);
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Time {
+    setup(start, hourWidth) {
+        this.start = start;
+        this.hourWidth = hourWidth;
+    }
+    setNativeElement(element) {
+        this.nativeElement = element;
+    }
+    draw() {
+        this.nativeElement.innerHTML = "";
+        this.nativeElement.style.width = String(24 * this.hourWidth) + "px";
+        let count = 24;
+        let final = this.start + count;
+        let begin = this.start;
+        for (let i = begin; i < final; i++) {
+            if (i >= 24) {
+                i = i - 24;
+                final = final - 24;
+            }
+            let newEl = document.createElement("div");
+            let time = (i < 10) ? '0' + String(i) : String(i);
+            newEl.innerHTML = time + ":00";
+            newEl.className = "hour";
+            newEl.style.width = this.hourWidth + "px";
+            this.nativeElement.appendChild(newEl);
+        }
+        return count;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Time);
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__(29);
+class Tooltip {
+    constructor(text, color, start, stop) {
+        this.open = false;
+        this.color = color;
+        this.start = start;
+        this.stop = stop;
+        this.text = text;
+        let tooltip = document.createElement("div");
+        tooltip.className = "taskTooltip";
+        document.body.appendChild(tooltip);
+        this.element = tooltip;
+        this.drawInner();
+    }
+    drawInner() {
+        if (!this.element)
+            throw new Error("tooltip yet not created");
+        let text = document.createElement("div");
+        let color = document.createElement("div");
+        let time = document.createElement("div");
+        text.className = "tooltipText";
+        color.className = "tooltipColor";
+        time.className = "tooltipTime";
+        text.innerText = this.text;
+        color.style.background = this.color;
+        time.innerText = String(this.start) +
+            ":00 - " + String(this.stop) + ":00";
+        this.element.appendChild(text);
+        this.element.appendChild(color);
+        this.element.appendChild(time);
+    }
+    draw(top, left) {
+        this.element.className = "taskTooltip active";
+        let borderRight = window.innerWidth;
+        let borderBottom = window.innerHeight;
+        let elementHeight = this.element.getBoundingClientRect().height;
+        let elementWidth = this.element.getBoundingClientRect().width;
+        let nTop = top - elementHeight;
+        let nLeft = left - (elementWidth / 2);
+        if (nLeft + elementWidth > borderRight) {
+            nLeft = borderRight - elementWidth;
+        }
+        this.element.style.top = String(nTop) + "px";
+        this.element.style.left = String(nLeft) + "px";
+        this.open = true;
+    }
+    hidden() {
+        this.element.className = "taskTooltip";
+        this.open = false;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Tooltip);
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__task_basic_functions__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app__ = __webpack_require__(2);
+
+
+
+
+
+__webpack_require__(13);
+class TaskChange {
+    constructor() {
+        this.colorsList = ["#cbf0e8", "#ffd9a5", "#dae8f5"];
+        this.colorsElements = [];
+        this.currentColor = this.colorsList[0];
+        this.buttons = [{ name: "Exit", click: function () { }, bg: "#f4f4f4",
+                color: "#59606a", border: "#f4f4f4", float: "left" },
+            { name: "Save", click: function () { this.save(); }.bind(this), bg: "#3b9fff",
+                color: "#fff", border: "#177bf3", float: "right" },
+            { name: "Delete", click: function () { this.delete(); }.bind(this), bg: "#f4f4f4",
+                color: "#59606a", border: "#f4f4f4", float: "right" },];
+    }
+    draw(background, closePopup) {
+        this.currentColor = this.currentTask.color;
+        this.closePopup = closePopup;
+        this.buttons[0].click = function () { closePopup(); };
+        if (!this.currentTask)
+            return;
+        this.element = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "", background);
+        this.element.innerHTML =
+            "<div class='popupContent task_create'>" +
+                "<div>Change task</div>" +
+                "<hr/>" +
+                "<div>" +
+                "<div>Name</div>" +
+                `<input id='namePopup' value=${this.currentTask.text}>` +
+                "</div>" +
+                "<div class='timeChoosePopup'>" +
+                "<div>Time</div>" +
+                `<input value=${this.currentTask.start} id='startTimePopup'>` +
+                " - " +
+                `<input value=${this.currentTask.stop} id='stopTimePopup'>` +
+                "</div>" +
+                "</div>";
+        this.colorsElements =
+            Object(__WEBPACK_IMPORTED_MODULE_2__task_basic_functions__["a" /* drawColor */])(this.colorsList, function (click_color) {
+                this.currentColor = click_color;
+                this.drawColors();
+            }.bind(this), this.element.children[0]);
+        this.drawColors();
+        Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
+    }
+    setCurrentTask(task) {
+        this.currentTask = task;
+    }
+    drawColors() {
+        console.log(this.currentTask);
+        this.colorsList.map(function (item, index) {
+            if (item == this.currentColor) {
+                this.colorsElements[index].className = "colorPopup current";
+            }
+            else {
+                this.colorsElements[index].className = "colorPopup";
+            }
+        }.bind(this));
+    }
+    save() {
+        console.log(this.currentTask);
+        this.currentTask.text = document.getElementById("namePopup")['value'];
+        this.currentTask.start = Number(document.getElementById("startTimePopup")['value']);
+        this.currentTask.stop = Number(document.getElementById("stopTimePopup")['value']);
+        this.currentTask.color = this.currentColor;
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["a" /* createTask */])(this.currentTask, function (result) {
+            if (result) {
+                this.closePopup();
+                Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
+            }
+        }.bind(this));
+    }
+    delete() {
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["d" /* deleteTask */])(this.currentTask.id, function (result) {
+            if (result) {
+                this.closePopup();
+                Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
+            }
+        }.bind(this));
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (TaskChange);
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(14);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(5)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../../../node_modules/css-loader/index.js!./task_change.css", function() {
+			var newContent = require("!!../../../../node_modules/css-loader/index.js!./task_change.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "", ""]);
+
+// exports
+
+
+/***/ }),
 /* 15 */
 /***/ (function(module, exports) {
 
@@ -1299,75 +1337,172 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 16 */,
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(17);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(5)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../../node_modules/css-loader/index.js!./popup.css", function() {
+			var newContent = require("!!../../../node_modules/css-loader/index.js!./popup.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
 /* 17 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-class Days {
-    setup(element) {
-        this.nativeElement = element;
-    }
-    draw() {
-        this.nativeElement.innerHTML = "";
-        for (let i = 0; i < this.days.length; i++) {
-            let newEl = document.createElement("div");
-            newEl.innerHTML = this.days[i];
-            newEl.className = "day";
-            this.nativeElement.appendChild(newEl);
-        }
-    }
-    loadDays(days) {
-        this.days = days;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Days);
+exports = module.exports = __webpack_require__(4)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, ".popupBack{\r\n    position: fixed;\r\n    z-index: 9999;\r\n    top: 0;\r\n    left: 0;\r\n}\r\n.popupBack.close{\r\n    width: 0;\r\n    height: 0;\r\n    background-color: rgba(0,0,0,0);\r\n}\r\n\r\n.popupBack.open{\r\n    width: 100vw;\r\n    height: 100vh;\r\n    background-color: rgba(0,0,0,0.7);\r\n}\r\n.popupContent{\r\n    background: #fff;\r\n    overflow: hidden;\r\n    font-family: Helvetica-Light;\r\n    padding: 10px;\r\n    background: #fff;\r\n    position: fixed;\r\n    border-radius: 5px;\r\n    opacity: 1;\r\n}\r\n.buttonWrapper{\r\n    margin-top: 30px;\r\n}\r\n.button{\r\n    padding: 5px 20px;\r\n    width: max-content;\r\n    border-radius: 2px;\r\n    cursor: pointer;\r\n    display: inline-block;\r\n    user-select: none;\r\n    font-family: Helvetica-Regular;\r\n    font-size: 12px !important;\r\n    margin: 0px 5px;\r\n}\r\n\r\n.button:active{\r\n    border: none !important;\r\n    padding: 6px 21px;\r\n}", ""]);
+
+// exports
 
 
 /***/ }),
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return drawButtons; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(1);
-
-function drawButtons(buttons, parent) {
-    let wrapper = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "buttonWrapper", parent);
-    buttons.map(function (item) {
-        let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "button", wrapper);
-        now.innerText = item.name;
-        now.style.background = item.bg;
-        now.style.color = item.color;
-        now.style['float'] = item.float;
-        now.style.border = "1px solid " + item.border;
-        now.onclick = function () { item.click(); };
-    });
-}
-
-
-
-/***/ }),
-/* 22 */,
-/* 23 */,
-/* 24 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__task_basic_functions__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app__ = __webpack_require__(3);
-
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__task__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__features_popup_popup__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__features_popup_contents_task_create_task_create__ = __webpack_require__(19);
 
 
 
 __webpack_require__(25);
+class Graph {
+    constructor() {
+        this.elementClick = function (e) {
+        };
+    }
+    setNativeElement(element) {
+        this.nativeElement = element;
+    }
+    setup(start, count, hourWidth, week_number) {
+        this.start = start;
+        this.count = count;
+        this.hourWidth = hourWidth;
+        this.week_number = week_number;
+    }
+    draw(tasks) {
+        let lastJ = 0;
+        this.nativeElement.innerHTML = "";
+        for (let i = this.start; i < this.start + this.count + 1; i++) {
+            let newColumn = document.createElement("div");
+            newColumn.className = "column";
+            newColumn.style.width = this.hourWidth + "px";
+            newColumn.style.height = 40 * 7 + "px";
+            for (let j = 0; j < 7; j++) {
+                let newEl = document.createElement("div");
+                newEl.className = "cell";
+                newEl.style.width = this.hourWidth + "px";
+                if (i == this.start) {
+                    newEl.style.width = 20 + "px";
+                    newColumn.style.width = 20 + "px";
+                }
+                if (tasks[i][j].id != -1) {
+                    tasks[i][j].draw(newEl, i, j, this.week_number);
+                    tasks[i][j].setAtrib("data-group", String(tasks[i][j].currentGroup) + ":" + String(tasks[i][j].id));
+                    if (i != this.start + this.count) {
+                        if (tasks[i][j].id == tasks[i + 1][j].id) {
+                            tasks[i][j].setStyle('marginRight', '0px');
+                        }
+                        else {
+                            tasks[i][j].setStyle('borderTopRightRadius', '5px');
+                            tasks[i][j].setStyle('borderBottomRightRadius', '5px');
+                            tasks[i][j].setTooltip();
+                            if (j != lastJ)
+                                tasks[i][j].currentGroup++;
+                            lastJ = j;
+                        }
+                    }
+                    else {
+                        tasks[i][j].setStyle('borderTopRightRadius', '5px');
+                        tasks[i][j].setStyle('borderBottomRightRadius', '5px');
+                        tasks[i][j].setTooltip();
+                        if (j != lastJ)
+                            tasks[i][j].currentGroup++;
+                        lastJ = j;
+                    }
+                    if (i != this.start) {
+                        if (tasks[i - 1][j].id == tasks[i][j].id && i - 1 != this.start) {
+                            tasks[i][j].setStyle('marginLeft', '0px');
+                        }
+                        else {
+                            tasks[i][j].setStyle('borderTopLeftRadius', '5px');
+                            tasks[i][j].setStyle('borderBottomLeftRadius', '5px');
+                        }
+                    }
+                    else {
+                        tasks[i][j].clear();
+                    }
+                }
+                else if (i != this.start) {
+                    let newInEl = document.createElement("div");
+                    newInEl.className = "empty_cell";
+                    newInEl.onclick = function (e) {
+                        let startTask = (i > 24) ? i - 24 : i;
+                        let content = new __WEBPACK_IMPORTED_MODULE_2__features_popup_contents_task_create_task_create__["a" /* default */]();
+                        content.setCurrentTask(new __WEBPACK_IMPORTED_MODULE_0__task__["a" /* default */]("", "#fff", startTask - 1, startTask, j, 0, this.week_number));
+                        let popup = Object(__WEBPACK_IMPORTED_MODULE_1__features_popup_popup__["a" /* getPopup */])();
+                        popup.open(content);
+                    }.bind(this);
+                    newEl.appendChild(newInEl);
+                }
+                if (i == this.start + this.count) {
+                    newEl.style.borderRight = "none";
+                }
+                if (j == 6) {
+                    newEl.style.borderBottom = "none";
+                }
+                newColumn.appendChild(newEl);
+            }
+            this.nativeElement.appendChild(newColumn);
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Graph);
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__task_basic_functions__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app__ = __webpack_require__(2);
+
+
+
+
+
+__webpack_require__(20);
 class TaskCreate {
     constructor() {
         this.colorsList = ["#cbf0e8", "#ffd9a5", "#dae8f5"];
@@ -1440,13 +1575,13 @@ class TaskCreate {
 
 
 /***/ }),
-/* 25 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(26);
+var content = __webpack_require__(21);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -1454,7 +1589,7 @@ var transform;
 var options = {"hmr":true}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(14)(content, options);
+var update = __webpack_require__(5)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -1471,10 +1606,10 @@ if(false) {
 }
 
 /***/ }),
-/* 26 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(13)(undefined);
+exports = module.exports = __webpack_require__(4)(undefined);
 // imports
 
 
@@ -1485,123 +1620,164 @@ exports.push([module.i, ".task_create{\r\n    width: 300px;\r\n    height: 180px
 
 
 /***/ }),
-/* 27 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return drawColor; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(1);
-
-function drawColor(colors, callback, parent) {
-    let final = [];
-    let wrapper = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "colorWrapper", parent);
-    wrapper.innerHTML = "<div>Colors</div>";
-    colors.map(function (item) {
-        let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "colorPopup", wrapper);
-        now.style.background = item;
-        now.onclick = function () { callback(item); };
-        final.push(now);
-    });
-    return final;
+__webpack_require__(23);
+class Days {
+    setup(element) {
+        this.nativeElement = element;
+    }
+    draw() {
+        this.nativeElement.innerHTML = "";
+        for (let i = 0; i < this.days.length; i++) {
+            let newEl = document.createElement("div");
+            newEl.innerHTML = this.days[i];
+            newEl.className = "day";
+            this.nativeElement.appendChild(newEl);
+        }
+    }
+    loadDays(days) {
+        this.days = days;
+    }
 }
-
+/* harmony default export */ __webpack_exports__["a"] = (Days);
 
 
 /***/ }),
-/* 28 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__task_basic_functions__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app__ = __webpack_require__(3);
+// style-loader: Adds some css to the DOM by adding a <style> tag
 
+// load the styles
+var content = __webpack_require__(24);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
 
-
-
-
-__webpack_require__(29);
-class TaskChange {
-    constructor() {
-        this.colorsList = ["#cbf0e8", "#ffd9a5", "#dae8f5"];
-        this.colorsElements = [];
-        this.currentColor = this.colorsList[0];
-        this.buttons = [{ name: "Exit", click: function () { }, bg: "#f4f4f4",
-                color: "#59606a", border: "#f4f4f4", float: "left" },
-            { name: "Save", click: function () { this.save(); }.bind(this), bg: "#3b9fff",
-                color: "#fff", border: "#177bf3", float: "right" },
-            { name: "Delete", click: function () { this.delete(); }.bind(this), bg: "#f4f4f4",
-                color: "#59606a", border: "#f4f4f4", float: "right" },];
-    }
-    draw(background, closePopup) {
-        this.currentColor = this.currentTask.color;
-        this.closePopup = closePopup;
-        this.buttons[0].click = function () { closePopup(); };
-        if (!this.currentTask)
-            return;
-        this.element = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "", background);
-        this.element.innerHTML =
-            "<div class='popupContent task_create'>" +
-                "<div>Change task</div>" +
-                "<hr/>" +
-                "<div>" +
-                "<div>Name</div>" +
-                `<input id='namePopup' value=${this.currentTask.text}>` +
-                "</div>" +
-                "<div class='timeChoosePopup'>" +
-                "<div>Time</div>" +
-                `<input value=${this.currentTask.start} id='startTimePopup'>` +
-                " - " +
-                `<input value=${this.currentTask.stop} id='stopTimePopup'>` +
-                "</div>" +
-                "</div>";
-        this.colorsElements =
-            Object(__WEBPACK_IMPORTED_MODULE_2__task_basic_functions__["a" /* drawColor */])(this.colorsList, function (click_color) {
-                this.currentColor = click_color;
-                this.drawColors();
-            }.bind(this), this.element.children[0]);
-        this.drawColors();
-        Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
-    }
-    setCurrentTask(task) {
-        this.currentTask = task;
-    }
-    drawColors() {
-        console.log(this.currentTask);
-        this.colorsList.map(function (item, index) {
-            if (item == this.currentColor) {
-                this.colorsElements[index].className = "colorPopup current";
-            }
-            else {
-                this.colorsElements[index].className = "colorPopup";
-            }
-        }.bind(this));
-    }
-    save() {
-        console.log(this.currentTask);
-        this.currentTask.text = document.getElementById("namePopup")['value'];
-        this.currentTask.start = Number(document.getElementById("startTimePopup")['value']);
-        this.currentTask.stop = Number(document.getElementById("stopTimePopup")['value']);
-        this.currentTask.color = this.currentColor;
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["a" /* createTask */])(this.currentTask, function (result) {
-            if (result) {
-                this.closePopup();
-                Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
-            }
-        }.bind(this));
-    }
-    delete() {
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["d" /* deleteTask */])(this.currentTask.id, function (result) {
-            if (result) {
-                this.closePopup();
-                Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
-            }
-        }.bind(this));
-    }
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(5)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../../node_modules/css-loader/index.js!./days.css", function() {
+			var newContent = require("!!../../../node_modules/css-loader/index.js!./days.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
 }
-/* harmony default export */ __webpack_exports__["a"] = (TaskChange);
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, ".days{\r\n    float: left;\r\n    height: 280px;\r\n    margin-top: -20px;\r\n    padding-top: 16px;\r\n    background: #fff;\r\n    position: absolute;\r\n    left: 15px;\r\n    width: 40px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n}\r\n.days.close{\r\n    height: 0;\r\n}\r\n.day{\r\n    height: 20px;\r\n    background: #fff;\r\n    font-size: 12px;\r\n    text-align: center;\r\n    margin-bottom: 20px;\r\n    line-height: 3;\r\n}", ""]);
+
+// exports
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(26);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(5)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../../node_modules/css-loader/index.js!./graph.css", function() {
+			var newContent = require("!!../../../node_modules/css-loader/index.js!./graph.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, ".graph{\r\n    /*width:100vw;*/\r\n    overflow: hidden;\r\n}\r\n.cell{\r\n    height: 41px !important;\r\n    display: inline-block;\r\n    border: 1px solid rgba(206, 206, 206,0.2);\r\n    border-left: none;\r\n    margin-top: -5px;\r\n    border-top: none;\r\n    cursor: pointer;\r\n}\r\n.empty_cell{\r\n    width: 100%;\r\n    /*height: 99%;*/\r\n    height: 41px;\r\n\r\n    /*overflow-y: hidden;*/\r\n\r\n}\r\n.empty_cell:hover{\r\n    background: #9dd3ff;\r\n    opacity: 0.3;\r\n\r\n\r\n}\r\n.column{\r\n    display: inline-block;\r\n}\r\n.task{\r\n    /*padding: 10px;*/\r\n    height: 20px;\r\n    margin: 10px;\r\n}\r\n.container-week{\r\n    overflow-x: hidden;\r\n    word-wrap: break-word;\r\n    min-height: calc(100% - 50px);\r\n}\r\n.grid{\r\n    overflow-x: auto ;\r\n    padding-left: 35px;\r\n}", ""]);
+
+// exports
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(28);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(5)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../../node_modules/css-loader/index.js!./week.css", function() {
+			var newContent = require("!!../../../node_modules/css-loader/index.js!./week.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, ".header{\r\n    padding-left: 5px;\r\n    margin: 5px 0;\r\n}\r\n.hour{\r\n    display: inline-block;\r\n    font-size: 12px;\r\n}\r\n.up{\r\n    text-align: center;\r\n    font-size: 14px;\r\n    opacity: 0.9;\r\n    padding-bottom: 5px;\r\n    border-bottom: 1px solid #efefef;\r\n    cursor:pointer;\r\n    user-select: none;\r\n}\r\n.up:hover{\r\n    color:#3e97f3;\r\n}\r\n.up.active{\r\n    color:#3e97f3;\r\n}\r\n.paper{\r\n    background: #fff;\r\n    color:#707070;\r\n    font-family: Helvetica-Light;\r\n    padding: 10px;\r\n    border-radius: 5px;\r\n    margin-top: 10px;\r\n    border:0.1px solid #efefef;\r\n}\r\n.main-container{\r\n    height: 351px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n}\r\n.main-container.closed{\r\n    height: 40px;\r\n}", ""]);
+
+// exports
 
 
 /***/ }),
@@ -1619,14 +1795,14 @@ var transform;
 var options = {"hmr":true}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(14)(content, options);
+var update = __webpack_require__(5)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!../../../../node_modules/css-loader/index.js!./task_change.css", function() {
-			var newContent = require("!!../../../../node_modules/css-loader/index.js!./task_change.css");
+		module.hot.accept("!!../../../node_modules/css-loader/index.js!./tooltip.css", function() {
+			var newContent = require("!!../../../node_modules/css-loader/index.js!./tooltip.css");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -1639,12 +1815,12 @@ if(false) {
 /* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(13)(undefined);
+exports = module.exports = __webpack_require__(4)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "", ""]);
+exports.push([module.i, ".taskTooltip{\r\n    position: absolute;\r\n    height: 0;\r\n    width:0;\r\n    overflow: hidden;\r\n    opacity: 0;\r\n    transition: opacity 0.3s ease-in-out;\r\n    font-family: Helvetica-Light;\r\n    padding: 5px;\r\n}\r\n.taskTooltip.active{\r\n    height: 40px;\r\n    opacity: 1;\r\n    z-index: 999;\r\n    width: 150px;\r\n    background: #ffffff;\r\n    border-radius: 5px;\r\n    /*border: #3e97f3 1px solid;*/\r\n    box-shadow: 0px 0px 15px -1px rgba(0,0,0,0.17);\r\n}\r\n.tooltipText{\r\n    display: inline-block;\r\n}\r\n.tooltipTime{\r\n\r\n}\r\n.tooltipColor{\r\n    width:10px;\r\n    height:10px;\r\n    display: inline-block;\r\n}", ""]);
 
 // exports
 

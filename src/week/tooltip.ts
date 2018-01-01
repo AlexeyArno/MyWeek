@@ -1,3 +1,5 @@
+require("./style/tooltip.css");
+
 class Tooltip{
     element:HTMLElement;
     open:boolean = false;
