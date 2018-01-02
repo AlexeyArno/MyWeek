@@ -51,8 +51,6 @@ class TaskCreate{
                     <HTMLElement>this.element.children[0]);
         this.drawColors();
         drawButtons(this.buttons, <HTMLElement>this.element.children[0])
-
-
     }
 
     setCurrentTask(task:Task){

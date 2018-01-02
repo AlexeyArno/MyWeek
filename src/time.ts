@@ -1,5 +1,6 @@
 import {getTasksByDay, getWeeks} from "./db/db_api";
 import Task from "./week/task";
+import {weekData} from "./week/week";
 
 Date.prototype['getWeekNumber'] = function(){
     let d:Date = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
@@ -43,15 +44,15 @@ function getTimeDataFirst(callBack:Function){
     });
 }
 
-function getTimeDataSecond(weeks:Array<number>):timeData{
+function getTimeDataSecond(weeks:Array<weekData>):timeData{
     let final:timeData = {currentDay:0,currentWeek:0, currentHour:0};
-
+    let weeksNumbers:Array<number> = weeks.map((i)=>i.week_number);
     let now:Date = new Date();
     final.currentWeek = now['getWeekNumber']();
     final.currentDay = now.getDay();
     final.currentHour = now.getHours();
 
-    let maxWeekNumber:number = Math.max.apply(Math,weeks);
+    let maxWeekNumber:number = Math.max.apply(Math,weeksNumbers);
     let processDate:number = final.currentWeek % maxWeekNumber;
     if(processDate==0){
         final.currentWeek = maxWeekNumber;
@@ -65,18 +66,21 @@ function getTimeDataSecond(weeks:Array<number>):timeData{
     return final
 }
 
-function notificationManager(){
+function notificationManager(lastTask:Task){
     clearTimeout(nowTimeout);
     getTimeDataFirst(function(data:timeData){
         getTasksByDay(data.currentWeek, data.currentDay-1,function(tasks:Array<Task>){
             tasks.map(function(item){
                 console.log(data.currentDay);
                 if(data.currentHour>=item.start && data.currentHour<item.stop){
-                    window['createNotification'](item.text,String(item.start)+":00 - "+String(item.stop)+":00")
+                    if(lastTask.id!=item.id){
+                        // window['createNotification'](item.text,String(item.start)+":00 - "+String(item.stop)+":00");
+                        lastTask = item
+                    }
                 }
             });
             nowTimeout = setTimeout(function(){
-                notificationManager();
+                notificationManager(lastTask);
             },(60 - new Date().getMinutes())*60000)
         })
     })

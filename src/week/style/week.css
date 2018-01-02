@@ -12,8 +12,8 @@
     opacity: 0.9;
     padding-bottom: 5px;
     border-bottom: 1px solid #efefef;
-    cursor:pointer;
     user-select: none;
+    height: 15px;
 }
 .up:hover{
     color:#3e97f3;
@@ -37,4 +37,25 @@
 }
 .main-container.closed{
     height: 40px;
+}
+.settingsButtonWeek{
+    width:15px;
+    display: inline-block;
+    float:right;
+    margin-right: 10px;
+}
+.settingsButtonWeek svg{
+    width:25px;
+    height:15px;
+    cursor: pointer;
+}
+.settingsButtonWeek:hover{
+    opacity: 0.6;
+}
+.settingsButtonWeek:active{
+    opacity: 0.3;
+}
+.weekUpText{
+   float:left;
+   cursor: pointer;
 }

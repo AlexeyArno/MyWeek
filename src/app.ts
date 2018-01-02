@@ -1,4 +1,5 @@
-import Week from './week/week'
+import {Week,weekData} from "./week/week";
+
 import Task from './week/task'
 import {createElement} from "./functions/functions"
 import {createWeek, dbInit} from './db/db_api'
@@ -24,8 +25,8 @@ dbInit();
 
 function redrawWeek(id:number){
     currentWeeks.map(function(item){
-        if(item.week_number == id){
-            getTasks(item.week_number,function(tasks:Array<Task>){
+        if(item.data.week_id == id){
+            getTasks(item.data.week_id,function(tasks:Array<Task>){
                 item.loadTasks(tasks);
                 item.draw();
             })
@@ -46,10 +47,16 @@ function drawButton(){
         let button = createElement("div","button createWeek", buttonShell);
         button.innerText = "Create week";
         button.onclick = function () {
-            createWeek();
-            Draw();
+            buttonShell.style.display = "none";
+            createWeek(function(res:boolean){
+                if(!res) return;
+                Draw();
+                buttonShell.style.display = "block"
+            });
+
         }
 }
+
 
 
 function Draw(){
@@ -59,7 +66,7 @@ function Draw(){
 
 
 
-    getWeeks(function(weeks:Array<number>){
+    getWeeks(function(weeks:Array<weekData>){
         if(weeks.length == 0){
             drawButton();
         }
@@ -68,9 +75,9 @@ function Draw(){
         startHour = nowData.currentHour;
         weeks.map(function(item,index){
 
-            getTasks(item,function(tasks:Array<Task>){
-                let week:Week = new Week(item);
-                week.create(document.body, (item==currentWeek));
+            getTasks(item.week_id,function(tasks:Array<Task>){
+                let week:Week = new Week(item.week_number, item.week_id);
+                week.create(document.body, (item.week_number==currentWeek));
                 week.loadDays(days);
                 week.setStartHour(startHour);
                 week.loadTasks(tasks);
@@ -87,7 +94,7 @@ function Draw(){
 }
 
 Draw();
-notificationManager();
+notificationManager(new Task("","",0,0,0,-1,0));
 //bind lie in /dist/additional/notifications
 // window['createNotification']("Уведомление","Пора просыпаться",function(){
 //  console.log("Hello")

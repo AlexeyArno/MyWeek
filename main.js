@@ -25,7 +25,7 @@ function createWindow () {
   mainWindow = new BrowserWindow(params);
 
   // and load the index.html of the app.
-  mainWindow.setMenu(null);
+  // mainWindow.setMenu(null);
 
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'dist/index.html'),
