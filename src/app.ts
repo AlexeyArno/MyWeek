@@ -6,6 +6,8 @@ import {clickCreateTask, clickCreateWeek} from './menu/week'
 import {getTasks,getWeeks} from "./db/db_api";
 
 let days:Array<string> = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+// require('./time');
+import {getTimeDataSecond, notificationManager, timeData} from "./time";
 
 
 // let plans:Array<Task> = [];
@@ -21,7 +23,6 @@ let currentWeeks:Array<Week> = [];
 dbInit();
 
 function redrawWeek(id:number){
-    console.log("RedrawWeek");
     currentWeeks.map(function(item){
         if(item.week_number == id){
             getTasks(item.week_number,function(tasks:Array<Task>){
@@ -50,16 +51,21 @@ function drawButton(){
         }
 }
 
+
 function Draw(){
     clear("paper  main-container");
     clear("buttonShell");
     clear("taskTooltip");
 
 
+
     getWeeks(function(weeks:Array<number>){
         if(weeks.length == 0){
             drawButton();
         }
+        let nowData:timeData = getTimeDataSecond(weeks);
+        currentWeek = nowData.currentWeek;
+        startHour = nowData.currentHour;
         weeks.map(function(item,index){
 
             getTasks(item,function(tasks:Array<Task>){
@@ -81,6 +87,11 @@ function Draw(){
 }
 
 Draw();
+notificationManager();
+//bind lie in /dist/additional/notifications
+// window['createNotification']("Уведомление","Пора просыпаться",function(){
+//  console.log("Hello")
+// });
 
 export {Draw, redrawWeek}
 

@@ -29,27 +29,23 @@ class Tooltip{
     drawInner(){
         if(!this.element) throw new Error("tooltip yet not created");
         let text:HTMLElement = document.createElement("div");
-        let color:HTMLElement = document.createElement("div");
         let time:HTMLElement = document.createElement("div");
 
         text.className = "tooltipText";
-        color.className = "tooltipColor";
         time.className = "tooltipTime";
 
         text.innerText = this.text;
-        color.style.background = this.color;
         time.innerText = String(this.start)+
             ":00 - "+String(this.stop)+":00";
 
         this.element.appendChild(text);
-        this.element.appendChild(color);
         this.element.appendChild(time);
     }
 
     draw(top:number,left:number){
         this.element.className = "taskTooltip active";
         let borderRight:number = window.innerWidth;
-        let borderBottom:number = window.innerHeight;
+        // let borderBottom:number = window.innerHeight;
 
         let elementHeight:number = this.element.getBoundingClientRect().height;
         let elementWidth:number = this.element.getBoundingClientRect().width;

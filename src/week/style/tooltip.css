@@ -20,9 +20,10 @@
 }
 .tooltipText{
     display: inline-block;
+    font-size: 18px;
 }
 .tooltipTime{
-
+    font-size: 14px;
 }
 .tooltipColor{
     width:10px;

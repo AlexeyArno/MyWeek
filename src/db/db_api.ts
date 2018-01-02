@@ -23,7 +23,7 @@ function createWeek(){
 	return true;
 }
 
-function createTask(task:Task, callback:any){
+function createTask(task:Task, callback:Function){
 	if (!db) throw new Error("DB is not init, use dbInit()");
 	db.transaction(function(tx:any){
 		 tx.executeSql("INSERT INTO tasks (text,start,stop,day,color,week_id) VALUES(?,?,?,?,?,?)",
@@ -39,7 +39,7 @@ function createTask(task:Task, callback:any){
 	return true;
 }
 
-function getTasks(week_id:number, res:any){
+function getTasks(week_id:number, callback:Function){
 	let final:Array<Task> = [];
     if (!db) throw new Error("DB is not init, use dbInit()");
     db.transaction(function(tx:any){
@@ -55,12 +55,33 @@ function getTasks(week_id:number, res:any){
                     result.rows.item(i).week_id);
                 final.push(now_task);
             }
-            res(final)
+            callback(final)
 		});
 	});
 }
 
-function getWeeks(ret:any){
+function getTasksByDay(week_id:number,day:number, callback:Function){
+    let final:Array<Task> = [];
+    if (!db) throw new Error("DB is not init, use dbInit()");
+    db.transaction(function(tx:any){
+        tx.executeSql("SELECT * FROM tasks WHERE week_id = ? and day = ?", [week_id,day], function(tx,result){
+            for (let i=0; i < result.rows.length; i++) {
+                let now_task:Task = new Task(
+                    result.rows.item(i).text,
+                    result.rows.item(i).color,
+                    result.rows.item(i).start,
+                    result.rows.item(i).stop,
+                    result.rows.item(i).day,
+                    result.rows.item(i).ID,
+                    result.rows.item(i).week_id);
+                final.push(now_task);
+            }
+            callback(final)
+        });
+    });
+}
+
+function getWeeks(callback:Function){
     let final:Array<number> = [];
     if (!db) throw new Error("DB is not init, use dbInit()");
     db.transaction(function(tx:any){
@@ -68,12 +89,12 @@ function getWeeks(ret:any){
             for (let i=0; i < result.rows.length; i++) {
                 final.push(Number(result.rows.item(i).ID));
             }
-           ret(final)
+           callback(final)
         });
     });
 }
 
-function deleteTask(task_id:number,  callback:any){
+function deleteTask(task_id:number,  callback:Function){
     if (!db) throw new Error("DB is not init, use dbInit()");
     db.transaction(function(tx){
         tx.executeSql("DELETE FROM tasks WHERE ID=?",[task_id],function(transaction:any, result:any){
@@ -86,7 +107,7 @@ function deleteTask(task_id:number,  callback:any){
   	return true;
 }
 
-function changeTask(up_task:Task, callback:any){
+function changeTask(up_task:Task, callback:Function){
 	console.log(up_task.text, up_task.id);
     if (!db) throw new Error("DB is not init, use dbInit()");
     db.transaction(function(tx){
@@ -109,4 +130,4 @@ function changeTask(up_task:Task, callback:any){
 
 export {dbInit, createWeek, createTask,
 		getTasks, getWeeks, deleteTask,
-    	changeTask}
+    	changeTask, getTasksByDay}
