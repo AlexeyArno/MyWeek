@@ -1,6 +1,7 @@
 import Task from './task'
 import {getPopup} from "../features/popup/popup";
 import TaskCreate from '../features/popup_contents/task_create/task_create'
+import {weekData} from "./week";
 require("./style/graph.css");
 
 class Graph{
@@ -8,7 +9,7 @@ class Graph{
 	count:number;
 	hourWidth:number;
  	nativeElement:HTMLElement;
- 	week_number:number;
+ 	currentWeekData:weekData={week_id:0,week_number:0};
  	elementClick = function(e:Event){
 
 	};
@@ -17,12 +18,13 @@ class Graph{
 		this.nativeElement = element
 	}
 
-	setup(start: number, count:number, hourWidth:number, week_number:number){
+	setup(start: number, count:number, hourWidth:number, week_number:number, week_id:number){
 		// this.nativeElement = element;
 		this.start = start;
 		this.count = count;
 		this.hourWidth = hourWidth;
-		this.week_number = week_number;
+		this.currentWeekData.week_number = week_number;
+		this.currentWeekData.week_id = week_id;
 	}
 
 	draw(tasks:Array<Array<Task>>){
@@ -42,7 +44,7 @@ class Graph{
 					newColumn.style.width =  20+"px";
 				}
 				if(tasks[i][j].id !=-1) {
-                    tasks[i][j].draw(newEl, i, j, this.week_number);
+                    tasks[i][j].draw(newEl, i, j, this.currentWeekData.week_number);
                     tasks[i][j].setAtrib("data-group", String(tasks[i][j].currentGroup)+":"+String(tasks[i][j].id));
                     if (i != this.start + this.count) {
                         if (tasks[i][j].id == tasks[i + 1][j].id) {
@@ -83,7 +85,7 @@ class Graph{
 
                     	// taskCreateWindow.draw(,false)
 						let content:TaskCreate = new TaskCreate();
-						content.setCurrentTask(new Task("","#fff",startTask-1,startTask,j,0,this.week_number));
+						content.setCurrentTask(new Task("","#fff",startTask-1,startTask,j,0,this.currentWeekData.week_id));
 						let popup:any = getPopup();
 						popup.open(content);
 

@@ -12,7 +12,6 @@ Date.prototype['getWeekNumber'] = function(){
 
 let nowTimeout:any;
 
-console.log('The current ISO week number is ' + new Date("21 May 1958 10:12")['getWeekNumber']());
 
 interface timeData{
     currentDay:number;
@@ -74,6 +73,8 @@ function notificationManager(lastTask:Task){
                 console.log(data.currentDay);
                 if(data.currentHour>=item.start && data.currentHour<item.stop){
                     if(lastTask.id!=item.id){
+                        // window['openLink']('https://github.com');
+                        // window['openFile'](`C:\\Users\\alex\\Desktop\\Utilites\\ActivationJetBrains.exe`);
                         // window['createNotification'](item.text,String(item.start)+":00 - "+String(item.stop)+":00");
                         lastTask = item
                     }

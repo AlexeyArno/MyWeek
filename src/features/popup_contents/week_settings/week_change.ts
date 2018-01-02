@@ -2,19 +2,21 @@ import {createElement} from "../../../functions/functions";
 import Task from "../../../week/task";
 import {drawButtons} from "../../popup/popup_basic_functions";
 import {drawColor} from "../task_basic_functions";
-import {changeTask, createTask, deleteTask} from "../../../db/db_api";
-import {redrawWeek} from "../../../app";
+import {changeTask, createTask, deleteTask, deleteWeek} from "../../../db/db_api";
+import {Draw} from "../../../app";
+import {weekData} from "../../../week/week";
 
 require("./week_change.css");
 
 interface data{
     week_id:number;
+
 }
 
 
 class WeekChange{
     element:HTMLElement;
-    currentWeek:data;
+    currentWeek:weekData;
     buttons = [{name:"Exit", click:function(){}, bg:"#f4f4f4",
         color: "#59606a", border:"#f4f4f4", float:"left"},
         {name:"Save", click:function(){this.save()}.bind(this), bg:"#3b9fff",
@@ -23,7 +25,7 @@ class WeekChange{
             color: "#59606a", border:"#f4f4f4", float:"right"},];
     closePopup:Function;
 
-    constructor(currentWeek:data){
+    constructor(currentWeek:weekData){
         this.currentWeek = currentWeek
     }
 
@@ -49,7 +51,7 @@ class WeekChange{
             "</div>";
         // colors
 
-        drawButtons(this.buttons, <HTMLElement>this.element.children[0])
+        drawButtons(this.buttons, <HTMLElement>this.element.children[0]);
         background.appendChild(this.element)
 
     }
@@ -72,10 +74,12 @@ class WeekChange{
     }
 
     delete(){
-        deleteWeek(this.currentTask.id,function(result:boolean){
+        console.log(this.currentWeek);
+        deleteWeek(this.currentWeek.week_id,function(result:boolean){
+            console.log(result);
             if(result){
                 this.closePopup();
-                redrawWeek(this.currentTask.week_id);
+                Draw();
             }
         }.bind(this));
 

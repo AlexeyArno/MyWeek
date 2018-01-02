@@ -30,17 +30,34 @@ function createWeek(callback:Function){
     })
 }
 
-function deleteWeek(wek_id:number,  callback:Function){
+
+//decrement weeks numbers after current week, because save right collection week's numbers [1,2,3,4]
+function deleteWeek(week_id:number,  callback:Function){
     if (!db) throw new Error("DB is not init, use dbInit()");
+    getWeeks(function(weeks:Array<weekData>){
+        let past:boolean = false;
+        for(let i=0;i<weeks.length;i++){
+           if(past){
+               weeks[i].week_number--;
+               db.transaction(function(tx){
+                   tx.executeSql("update weeks set number=?  where ID=? ",
+                       [weeks[i].week_number,weeks[i].week_id],
+                       function(){},
+                       function(transaction, error){
+                            throw new Error(error);
+                       });
+               });
+           }
+           if(weeks[i].week_id == week_id) past = true;
+       }
+    });
     db.transaction(function(tx){
-        tx.executeSql("DELETE FROM weeks WHERE ID=?",[wek_id],function(transaction:any, result:any){
+        tx.executeSql("DELETE FROM weeks WHERE ID=?",[week_id],function(transaction:any, result:any){
             callback(true);
         },function(transaction, error){
-            console.log(error);
-            callback(false);
+            throw new Error(error);
         });
     });
-    return true;
 }
 
 function createTask(task:Task, callback:Function){

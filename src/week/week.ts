@@ -49,11 +49,11 @@ class Week{
             let settings:HTMLElement = document.createElement("div");
             settings.innerHTML =
                 `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve" width="512px" height="512px">`+
-                `<g>`+
-                    `<path d="M8,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S12.411,22,8,22z" fill="#3e97f3"/>`+
-                    `<path d="M52,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S56.411,22,52,22z" fill="#3e97f3"/>`+
-                    `<path d="M30,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S34.411,22,30,22z" fill="#3e97f3"/>`+
-                `</g>`+
+                    `<g>`+
+                        `<path d="M8,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S12.411,22,8,22z" fill="#3e97f3"/>`+
+                        `<path d="M52,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S56.411,22,52,22z" fill="#3e97f3"/>`+
+                        `<path d="M30,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S34.411,22,30,22z" fill="#3e97f3"/>`+
+                    `</g>`+
                 `</svg>`;
             settings.className = "settingsButtonWeek";
             up.appendChild(settings);
@@ -70,7 +70,7 @@ class Week{
             };
 
             settings.onclick = function(e:Event){
-                let content:WeekChange = new WeekChange(this.data.week_id);
+                let content:WeekChange = new WeekChange(this.data);
                 let popup:any = getPopup();
                 popup.open(content);
             }.bind(this);
@@ -155,7 +155,7 @@ class Week{
 		let count:number = this.timePanel.draw();
 
 		
-		this.graphPanel.setup(this.startHour, count, this.hourWidth, this.data.week_number);
+		this.graphPanel.setup(this.startHour, count, this.hourWidth, this.data.week_number, this.data.week_id);
 		this.graphPanel.draw(this.tasks);
 
 		this.daysPanel.draw();
