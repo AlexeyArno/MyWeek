@@ -1,6 +1,5 @@
 node_modules
 .idea
-dist
 npm-debug.log
 start.bat
 watch.bat

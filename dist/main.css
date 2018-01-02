@@ -1,0 +1,25 @@
+@font-face {
+    font-family: Helvetica-Light; /* Имя шрифта */
+    src: url(../res/fonts/HelveticaLight/HelveticaLight.ttf); /* Путь к файлу со шрифтом */
+}
+@font-face {
+    font-family: Helvetica-Medium; /* Имя шрифта */
+    src: url(../res/fonts/HelveticaMedium/HelveticaMedium.ttf); /* Путь к файлу со шрифтом */
+}
+@font-face {
+    font-family: Helvetica-Regular; /* Имя шрифта */
+    src: url(../res/fonts/HelveticaRegular/HelveticaRegular.ttf); /* Путь к файлу со шрифтом */
+}
+
+body{
+	background: #fbfbfb;
+}
+
+.button.createWeek{
+    background: #f4f4f4;
+}
+.buttonShell{
+    margin-top: 10px;
+    text-align: center;
+}
+
