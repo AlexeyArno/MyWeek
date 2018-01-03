@@ -126,7 +126,7 @@ function getWeeks(callback:Function){
     let final:Array<weekData> = [];
     if (!db) throw new Error("DB is not init, use dbInit()");
     db.transaction(function(tx:any){
-       tx.executeSql("SELECT * FROM weeks", [], function(tx,result){
+       tx.executeSql("SELECT * FROM weeks ORDER BY number ASC", [], function(tx,result){
             for (let i=0; i < result.rows.length; i++) {
                 final.push({week_id:Number(result.rows.item(i).ID), week_number:Number(result.rows.item(i).number)});
             }
@@ -168,8 +168,28 @@ function changeTask(up_task:Task, callback:Function){
     return true;
 }
 
+function changeWeekNumber(currentWeekData:weekData, newNumber:number, callback:Function){
+    db.transaction(function(tx){
+        tx.executeSql("update weeks set number=?  where number=? ",
+            [currentWeekData.week_number,newNumber],
+            function(){
+                tx.executeSql("update weeks set number=?  where ID=? ",
+                    [newNumber,currentWeekData.week_id],
+                    function(){
+                        callback(true);
+                    },
+                    function(transaction, error){
+                        throw new Error(error);
+                    });
+            },
+            function(transaction, error){
+                throw new Error(error);
+            });
 
+    });
+}
 
 export {dbInit, createWeek, createTask,
 		getTasks, getWeeks, deleteTask,
-    	changeTask, getTasksByDay, deleteWeek}
+    	changeTask, getTasksByDay, deleteWeek,
+    changeWeekNumber}

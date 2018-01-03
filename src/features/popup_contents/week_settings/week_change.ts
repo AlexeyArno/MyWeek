@@ -2,7 +2,7 @@ import {createElement} from "../../../functions/functions";
 import Task from "../../../week/task";
 import {drawButtons} from "../../popup/popup_basic_functions";
 import {drawColor} from "../task_basic_functions";
-import {changeTask, createTask, deleteTask, deleteWeek} from "../../../db/db_api";
+import {changeTask, changeWeekNumber, createTask, deleteTask, deleteWeek, getWeeks} from "../../../db/db_api";
 import {Draw} from "../../../app";
 import {weekData} from "../../../week/week";
 
@@ -34,32 +34,42 @@ class WeekChange{
         this.buttons[0].click = function(){closePopup()};
         this.element = createElement("div", "", background);
         // language=HTML
-        this.element.innerHTML =
-            "<div class='popupContent week_change'>" +
-            "<div>Change week</div>"+
-            "<hr/>"+
-            // "<div>" +
-            // "<div>Name</div>" +
-            // `<input id='namePopup' >` +
-            // "</div>"+
-            // "<div class='timeChoosePopup'>" +
-            // "<div>Time</div>" +
-            // `<input  id='startTimePopup'>` +
-            // " - "+
-            // `<input id='stopTimePopup'>` +
-            // "</div>"+
-            "</div>";
+        let options:string = "";
+        getWeeks(function(weeks:Array<weekData>){
+            for(let i=0;i<weeks.length;i++){
+                options+= `<option value='${weeks[i].week_number}' ${(weeks[i].week_id == this.currentWeek.week_id)?'selected':''}>
+                                ${weeks[i].week_number}
+                           </option>`
+            }
+            this.element.innerHTML =
+                `<div class='popupContent week_change'>
+            <div>Change week</div>
+            <hr/>
+            <div>
+                <div>Number</div>
+                <select id='actionSelect' class='number'>
+                    ${options}
+                </select>
+            </div>
+            </div>`;
+            drawButtons(this.buttons, <HTMLElement>this.element.children[0]);
+            background.appendChild(this.element)
+        }.bind(this));
+
         // colors
-
-        drawButtons(this.buttons, <HTMLElement>this.element.children[0]);
-        background.appendChild(this.element)
-
     }
 
 
 
 
     save(){
+        let newNumber:number = Number(document.getElementById('actionSelect')['value']);
+        if(this.currentWeek.week_number != newNumber && newNumber!= undefined){
+            changeWeekNumber(this.currentWeek,newNumber,function(){
+                this.closePopup();
+                Draw();
+            }.bind(this))
+        }
         // console.log(this.currentTask);
         // this.currentTask.text = document.getElementById("namePopup")['value'];
         // this.currentTask.start = Number(document.getElementById("startTimePopup")['value']);

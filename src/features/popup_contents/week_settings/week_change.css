@@ -1,9 +1,12 @@
 .week_change{
     width: 300px;
-    height: 180px;
+    height: 140px;
     left: calc(50vw - 150px);
-    top: calc(50vh - 90px);
+    top: calc(50vh - 70px);
 }
 .week_change{
     font-size: 14px;
+}
+.number{
+    width: 50px;
 }

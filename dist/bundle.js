@@ -537,15 +537,16 @@ function createElement(type, className, parent) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return dbInit; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return createWeek; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createTask; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return getTasks; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return getWeeks; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return deleteTask; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return dbInit; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return createWeek; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return createTask; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return getTasks; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return getWeeks; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return deleteTask; });
 /* unused harmony export changeTask */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return getTasksByDay; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return deleteWeek; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return getTasksByDay; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return deleteWeek; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return changeWeekNumber; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_task__ = __webpack_require__(5);
 
 let db;
@@ -653,7 +654,7 @@ function getWeeks(callback) {
     if (!db)
         throw new Error("DB is not init, use dbInit()");
     db.transaction(function (tx) {
-        tx.executeSql("SELECT * FROM weeks", [], function (tx, result) {
+        tx.executeSql("SELECT * FROM weeks ORDER BY number ASC", [], function (tx, result) {
             for (let i = 0; i < result.rows.length; i++) {
                 final.push({ week_id: Number(result.rows.item(i).ID), week_number: Number(result.rows.item(i).number) });
             }
@@ -692,6 +693,19 @@ function changeTask(up_task, callback) {
     });
     return true;
 }
+function changeWeekNumber(currentWeekData, newNumber, callback) {
+    db.transaction(function (tx) {
+        tx.executeSql("update weeks set number=?  where number=? ", [currentWeekData.week_number, newNumber], function () {
+            tx.executeSql("update weeks set number=?  where ID=? ", [newNumber, currentWeekData.week_id], function () {
+                callback(true);
+            }, function (transaction, error) {
+                throw new Error(error);
+            });
+        }, function (transaction, error) {
+            throw new Error(error);
+        });
+    });
+}
 
 
 
@@ -718,11 +732,11 @@ let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 let currentWeek = 2;
 let startHour = 11;
 let currentWeeks = [];
-Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["c" /* dbInit */])();
+Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["d" /* dbInit */])();
 function redrawWeek(id) {
     currentWeeks.map(function (item) {
         if (item.data.week_id == id) {
-            Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["f" /* getTasks */])(item.data.week_id, function (tasks) {
+            Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["g" /* getTasks */])(item.data.week_id, function (tasks) {
                 item.loadTasks(tasks);
                 item.draw();
             });
@@ -741,7 +755,7 @@ function drawButton() {
     button.innerText = "Create week";
     button.onclick = function () {
         buttonShell.style.display = "none";
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["b" /* createWeek */])(function (res) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["c" /* createWeek */])(function (res) {
             if (!res)
                 return;
             Draw();
@@ -753,7 +767,7 @@ function Draw() {
     clear("paper  main-container");
     clear("buttonShell");
     clear("taskTooltip");
-    Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["h" /* getWeeks */])(function (weeks) {
+    Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["i" /* getWeeks */])(function (weeks) {
         if (weeks.length == 0) {
             drawButton();
         }
@@ -761,7 +775,7 @@ function Draw() {
         currentWeek = nowData.currentWeek;
         startHour = nowData.currentHour;
         weeks.map(function (item, index) {
-            Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["f" /* getTasks */])(item.week_id, function (tasks) {
+            Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["g" /* getTasks */])(item.week_id, function (tasks) {
                 let week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* Week */](item.week_number, item.week_id);
                 week.create(document.body, (item.week_number == currentWeek));
                 week.loadDays(days);
@@ -1465,7 +1479,7 @@ class TaskChange {
                 this.currentTask.action_body = document.getElementById("actionExtension").innerText;
                 break;
         }
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["a" /* createTask */])(this.currentTask, function (result) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["b" /* createTask */])(this.currentTask, function (result) {
             if (result) {
                 this.closePopup();
                 Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
@@ -1473,7 +1487,7 @@ class TaskChange {
         }.bind(this));
     }
     delete() {
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["d" /* deleteTask */])(this.currentTask.id, function (result) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["e" /* deleteTask */])(this.currentTask.id, function (result) {
             if (result) {
                 this.closePopup();
                 Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
@@ -1589,8 +1603,6 @@ __webpack_require__(24);
 class Graph {
     constructor() {
         this.currentWeekData = { week_id: 0, week_number: 0 };
-        this.elementClick = function (e) {
-        };
     }
     setNativeElement(element) {
         this.nativeElement = element;
@@ -1811,7 +1823,7 @@ class TaskCreate {
                 this.currentTask.action_body = document.getElementById("actionExtension").innerText;
                 break;
         }
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["a" /* createTask */])(this.currentTask, function (result) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["b" /* createTask */])(this.currentTask, function (result) {
             if (result) {
                 this.closePopup();
                 Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
@@ -1862,7 +1874,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".task_create{\r\n    width: 300px;\r\n    height: 250px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 125px);\r\n}\r\n.task_create div{\r\n    font-size: 14px;\r\n\r\n}\r\n#startTimePopup,\r\n#stopTimePopup{\r\n    width: 30px;\r\n}\r\n.timeChoosePopup{\r\n    margin-top: 10px;\r\n}\r\n.colorPopup{\r\n    height: 20px;\r\n    cursor: pointer;\r\n    width: 20px;\r\n    border-radius: 2px;\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.39);\r\n    display: inline-block;\r\n    margin-right: 10px;\r\n}\r\n.colorPopup:hover{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.25);\r\n}\r\n.colorPopup.current{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0);\r\n}\r\n.colorWrapper{\r\n    display: inline-block;\r\n    margin-left: 20px;\r\n    margin-top: 10px;\r\n}\r\n.timeChoosePopup{\r\n    display: inline-block;\r\n    float:left;\r\n}\r\n.actionsPopup{\r\n    margin-top: 10px;\r\n}\r\n#actionSelect:focus{\r\n    outline: none;\r\n}\r\n#actionSelect{\r\n    margin-top: 5px;\r\n    border: none;\r\n    border-bottom: 1px solid rgba(0,0,0,0.1);\r\n}\r\n#wrapperAction{\r\n    float:right;\r\n}\r\n#actionExtension{\r\n    height:18px;\r\n    margin-top: 5px;\r\n    width:170px;\r\n    overflow: hidden;\r\n}", ""]);
+exports.push([module.i, ".task_create{\r\n    width: 300px;\r\n    height: 250px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 125px);\r\n}\r\n.task_create div{\r\n    font-size: 14px;\r\n\r\n}\r\n#startTimePopup,\r\n#stopTimePopup{\r\n    width: 30px;\r\n}\r\n.timeChoosePopup{\r\n    margin-top: 10px;\r\n}\r\n.colorPopup{\r\n    height: 20px;\r\n    cursor: pointer;\r\n    width: 20px;\r\n    border-radius: 2px;\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.39);\r\n    display: inline-block;\r\n    margin-right: 10px;\r\n}\r\n.colorPopup:hover{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.25);\r\n}\r\n.colorPopup.current{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0);\r\n}\r\n.colorWrapper{\r\n    display: inline-block;\r\n    margin-left: 20px;\r\n    margin-top: 10px;\r\n}\r\n.timeChoosePopup{\r\n    display: inline-block;\r\n    float:left;\r\n}\r\n.actionsPopup{\r\n    margin-top: 10px;\r\n}\r\n#actionSelect:focus{\r\n    outline: none;\r\n}\r\n#actionSelect{\r\n    margin-top: 5px;\r\n    border: none;\r\n    border-bottom: 1px solid rgba(0,0,0,0.1);\r\n}\r\n#wrapperAction{\r\n    float:right;\r\n}\r\n#actionExtension{\r\n    height:18px;\r\n    margin-top: 5px;\r\n    width:170px;\r\n    overflow: hidden;\r\n}\r\n#inputLinkPopup{\r\n    margin-top: 5px;\r\n}", ""]);
 
 // exports
 
@@ -2011,19 +2023,40 @@ class WeekChange {
         this.closePopup = closePopup;
         this.buttons[0].click = function () { closePopup(); };
         this.element = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "", background);
-        this.element.innerHTML =
-            "<div class='popupContent week_change'>" +
-                "<div>Change week</div>" +
-                "<hr/>" +
-                "</div>";
-        Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
-        background.appendChild(this.element);
+        let options = "";
+        Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["i" /* getWeeks */])(function (weeks) {
+            for (let i = 0; i < weeks.length; i++) {
+                options += `<option value='${weeks[i].week_number}' ${(weeks[i].week_id == this.currentWeek.week_id) ? 'selected' : ''}>
+                                ${weeks[i].week_number}
+                           </option>`;
+            }
+            this.element.innerHTML =
+                `<div class='popupContent week_change'>
+            <div>Change week</div>
+            <hr/>
+            <div>
+                <div>Number</div>
+                <select id='actionSelect' class='number'>
+                    ${options}
+                </select>
+            </div>
+            </div>`;
+            Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
+            background.appendChild(this.element);
+        }.bind(this));
     }
     save() {
+        let newNumber = Number(document.getElementById('actionSelect')['value']);
+        if (this.currentWeek.week_number != newNumber && newNumber != undefined) {
+            Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["a" /* changeWeekNumber */])(this.currentWeek, newNumber, function () {
+                this.closePopup();
+                Object(__WEBPACK_IMPORTED_MODULE_3__app__["Draw"])();
+            }.bind(this));
+        }
     }
     delete() {
         console.log(this.currentWeek);
-        Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["e" /* deleteWeek */])(this.currentWeek.week_id, function (result) {
+        Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["f" /* deleteWeek */])(this.currentWeek.week_id, function (result) {
             console.log(result);
             if (result) {
                 this.closePopup();
@@ -2075,7 +2108,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".week_change{\r\n    width: 300px;\r\n    height: 180px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 90px);\r\n}\r\n.week_change{\r\n    font-size: 14px;\r\n}", ""]);
+exports.push([module.i, ".week_change{\r\n    width: 300px;\r\n    height: 140px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 70px);\r\n}\r\n.week_change{\r\n    font-size: 14px;\r\n}\r\n.number{\r\n    width: 50px;\r\n}", ""]);
 
 // exports
 
@@ -2149,7 +2182,7 @@ function getTimeDataFirst(callBack) {
     final.currentWeek = now['getWeekNumber']();
     final.currentDay = now.getDay();
     final.currentHour = now.getHours();
-    Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["h" /* getWeeks */])(function (weeks) {
+    Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["i" /* getWeeks */])(function (weeks) {
         let maxWeekNumber = Math.max.apply(Math, weeks);
         let processDate = final.currentWeek % maxWeekNumber;
         if (processDate == 0) {
@@ -2189,7 +2222,7 @@ function getTimeDataSecond(weeks) {
 function notificationManager(lastTask) {
     clearTimeout(nowTimeout);
     getTimeDataFirst(function (data) {
-        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["g" /* getTasksByDay */])(data.currentWeek, data.currentDay - 1, function (tasks) {
+        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["h" /* getTasksByDay */])(data.currentWeek, data.currentDay - 1, function (tasks) {
             tasks.map(function (item) {
                 if (data.currentHour >= item.start && data.currentHour < item.stop) {
                     if (lastTask.id != item.id) {

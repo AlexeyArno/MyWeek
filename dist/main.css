@@ -31,3 +31,14 @@ input{
 input:focus{
     outline: none;
 }
+
+select{
+    background: #efefef;
+    border-radius: 5px;
+}
+select:focus{
+    outline: none;
+}
+select optgroup{
+    outline: none;
+}

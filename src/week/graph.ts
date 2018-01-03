@@ -10,9 +10,6 @@ class Graph{
 	hourWidth:number;
  	nativeElement:HTMLElement;
  	currentWeekData:weekData={week_id:0,week_number:0};
- 	elementClick = function(e:Event){
-
-	};
 
 	setNativeElement(element:HTMLElement){
 		this.nativeElement = element
