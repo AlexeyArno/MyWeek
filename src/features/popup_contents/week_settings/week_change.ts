@@ -21,15 +21,31 @@ class WeekChange{
         color: "#59606a", border:"#f4f4f4", float:"left"},
         {name:"Save", click:function(){this.save()}.bind(this), bg:"#3b9fff",
             color: "#fff", border:"#177bf3", float:"right"},
-        {name:"Delete", click:function(){this.delete()}.bind(this), bg:"#f4f4f4",
+        {name:"Delete", click:function(){this.drawDelete()}.bind(this), bg:"#f4f4f4",
             color: "#59606a", border:"#f4f4f4", float:"right"},];
     closePopup:Function;
+    background:HTMLElement;
 
     constructor(currentWeek:weekData){
         this.currentWeek = currentWeek
     }
 
+    drawDelete(){
+        let del_buttons = [
+            {name:"Yes", click:function(){this.delete()}.bind(this), bg:"#3b9fff",
+                color: "#fff", border:"#177bf3", float:"right"},
+            {name:"No", click:function(){this.draw(this.background, this.closePopup)}.bind(this), bg:"#f4f4f4",
+                color: "#59606a", border:"#f4f4f4", float:"right"},];
+
+        this.element.innerHTML =
+            `<div class='popupContent week_delete'>
+                <p>Do you really want delete <b>${this.currentWeek.week_number}'st</b> week?</p>
+             </div>`;
+        drawButtons(del_buttons, <HTMLElement>this.element.children[0]);
+    }
+
     draw(background:HTMLElement, closePopup:Function){
+        this.background = background;
         this.closePopup = closePopup;
         this.buttons[0].click = function(){closePopup()};
         this.element = createElement("div", "", background);

@@ -1,0 +1,7 @@
+.task_delete,
+.week_delete{
+    width: 300px;
+    height: 90px;
+    left: calc(50vw - 150px);
+    top: calc(50vh - 45px);
+}

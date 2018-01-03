@@ -10,7 +10,7 @@ require("./task_create_style.css");
 class TaskCreate{
     element:HTMLElement;
     currentTask:Task;
-    colorsList:Array<string> =  ["#cbf0e8", "#ffd9a5", "#dae8f5"];
+    colorsList:Array<string> =  ["#cbf0e8", "#ffd9a5", "#dae8f5", "#f5daf5"];
     colorsElements:Array<HTMLElement> = [];
     currentColor:string = this.colorsList[0];
     buttons = [{name:"Exit", click:function(){}, bg:"#f4f4f4",
