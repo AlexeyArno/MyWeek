@@ -30,6 +30,13 @@ $ cd MyWeek
 $ npm install 
 $ electrone .
 ```
+### Build
+
+Build work by [electron-packager](https://www.npmjs.com/package/electron-packager)
+
+```sh
+$ electron-packager path\to\MyWeek MyWeek --icon="path\to\MyWeek\res\images\logo.ico"
+```
 
 ### Development
 
@@ -61,3 +68,4 @@ GPL-3.0
    [node.js]: <http://nodejs.org>
    [Typescript]: <http://www.typescriptlang.org/>
    [Electron]: <https://electronjs.org/>
+   [electron-packager]:<https://www.npmjs.com/package/electron-packager>

@@ -5,7 +5,7 @@ window.openLink = function(link){
 }
 
 window.openFile = function(link){
-    shell.openItem(link);
+    return shell.openItem(link);
 }
 
 window.chooseFile = function(){

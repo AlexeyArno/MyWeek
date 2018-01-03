@@ -72,17 +72,15 @@ function notificationManager(lastTask:Task){
             tasks.map(function(item){
                 if(data.currentHour>=item.start && data.currentHour<item.stop){
                     if(lastTask.id!=item.id){
-                        // window['createNotification'](item.text,String(item.start)+":00 - "+String(item.stop)+":00");
-                        console.log(item);
+                        window['createNotification'](item.text,String(item.start)+":00 - "+String(item.stop)+":00");
                         switch(item.action_type){
                             case "link":
-                                // window['openLink'](item.action_body);
+                                window['openLink'](item.action_body);
                                 break;
                             case "file":
-                                // window['openFile'](item.action_body);
+                                console.log(window['openFile'](item.action_body));
                                 break;
                         }
-
                         lastTask = item
                     }
                 }

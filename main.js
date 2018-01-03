@@ -1,7 +1,6 @@
 const electron = require('electron');
 // Module to control application life.
 const app = electron.app;
-const Tray = electron.Tray;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
@@ -25,10 +24,10 @@ function createWindow () {
   mainWindow = new BrowserWindow(params);
 
   // and load the index.html of the app.
-  // mainWindow.setMenu(null);
+  mainWindow.setMenu(null);
 
   mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'dist/index.html'),
+    pathname: path.join(__dirname, 'final/index.html'),
     protocol: 'file:',
     slashes: true
   }));
@@ -45,7 +44,7 @@ function createWindow () {
   })
 }
 
-require('electron-reload')(__dirname);
+// require('electron-reload')(__dirname);
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -59,7 +58,7 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     app.quit()
   }
-})
+});
 
 app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the

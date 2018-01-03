@@ -22,6 +22,7 @@ class TaskChange{
             color: "#59606a", border:"#f4f4f4", float:"right"},];
     closePopup:Function;
     background:HTMLElement;
+    newExtensional:string;
 
     drawDelete(){
         let del_buttons = [
@@ -107,12 +108,14 @@ class TaskChange{
             case "file":
                 let chooseButton ={name:"Choose", click:function(){
                         let path:string = window['chooseFile']()[0];
+                        this.newExtensional = path;
                         path = (path.length>=20)?
                             "..."+path.substring(path.length-20,path.length):path;
                         document.getElementById('actionExtension').innerText = path;
-                    }, bg:"#3b9fff",
+                    }.bind(this), bg:"#3b9fff",
                     color: "#fff", border:"#177bf3", float:"right"};
                 let path:string = this.currentTask.action_body;
+                this.newExtensional = path;
                 path = (path.length>=20)?
                     "..."+path.substring(path.length-20,path.length):path;
                 document.getElementById('actionExtension').innerText = path;
@@ -157,10 +160,10 @@ class TaskChange{
                 this.currentTask.action_body = document.getElementById("inputLinkPopup")['value'];
                 break;
             case "file":
-                this.currentTask.action_body = document.getElementById("actionExtension").innerText;
+                this.currentTask.action_body =this.newExtensional;
                 break;
         }
-        createTask(this.currentTask,function(result:boolean){
+        changeTask(this.currentTask,function(result:boolean){
             if(result){
                 this.closePopup();
                 redrawWeek(this.currentTask.week_id);

@@ -53,7 +53,13 @@ function deleteWeek(week_id:number,  callback:Function){
     });
     db.transaction(function(tx){
         tx.executeSql("DELETE FROM weeks WHERE ID=?",[week_id],function(transaction:any, result:any){
-            callback(true);
+            db.transaction(function(tx){
+                tx.executeSql("DELETE FROM tasks WHERE week_id=?",[week_id],function(transaction:any, result:any){
+                    callback(true);
+                },function(transaction, error){
+                    throw new Error(error);
+                });
+            });
         },function(transaction, error){
             throw new Error(error);
         });

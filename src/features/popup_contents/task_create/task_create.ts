@@ -18,6 +18,7 @@ class TaskCreate{
                 {name:"Create", click:function(){this.create()}.bind(this), bg:"#3b9fff",
                 color: "#fff", border:"#177bf3", float:"right"}];
     closePopup:Function;
+    newExtension:string;
 
 
     draw(background:HTMLElement, closePopup:Function){
@@ -81,10 +82,11 @@ class TaskCreate{
                 case "file":
                     let chooseButton ={name:"Choose", click:function(){
                             let path:string = window['chooseFile']()[0];
+                            this.newExtension = path;
                             path = (path.length>=20)?
                                 "..."+path.substring(path.length-20,path.length):path;
                             document.getElementById('actionExtension').innerText = path;
-                        }, bg:"#3b9fff",
+                        }.bind(this), bg:"#3b9fff",
                         color: "#fff", border:"#177bf3", float:"right"};
                     wrapperAction.innerHTML = "";
                     let now:HTMLElement = createElement("div","button", wrapperAction);
@@ -128,7 +130,7 @@ class TaskCreate{
             this.currentTask.action_body = document.getElementById("inputLinkPopup")['value'];
             break;
         case "file":
-            this.currentTask.action_body = document.getElementById("actionExtension").innerText;
+            this.currentTask.action_body = this.newExtension;
             break;
         }
         createTask(this.currentTask,function(result:boolean){

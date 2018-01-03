@@ -5,7 +5,9 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "repository": "https://github.com/AlexeyArno/MyWeek",
   "author": "AlexArno",
@@ -13,6 +15,7 @@
   "devDependencies": {
     "css-loader": "^0.28.7",
     "electron": "~1.7.8",
+    "electron-builder": "^19.51.0",
     "ts-loader": "^3.2.0",
     "typescript": "^2.6.2",
     "webpack": "^3.10.0"
@@ -20,5 +23,11 @@
   "dependencies": {
     "electron-reload": "^1.2.2",
     "style-loader": "^0.19.1"
+  },
+  "build": {
+    "appId": "MyWeek",
+    "mac": {
+      "category": "organizer"
+    }
   }
 }

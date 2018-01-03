@@ -537,16 +537,16 @@ function createElement(type, className, parent) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return dbInit; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return createWeek; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return createTask; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return getTasks; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return getWeeks; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return deleteTask; });
-/* unused harmony export changeTask */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return getTasksByDay; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return deleteWeek; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return changeWeekNumber; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return dbInit; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return createWeek; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return createTask; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return getTasks; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return getWeeks; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return deleteTask; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return changeTask; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return getTasksByDay; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return deleteWeek; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return changeWeekNumber; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_task__ = __webpack_require__(5);
 
 let db;
@@ -597,7 +597,13 @@ function deleteWeek(week_id, callback) {
     });
     db.transaction(function (tx) {
         tx.executeSql("DELETE FROM weeks WHERE ID=?", [week_id], function (transaction, result) {
-            callback(true);
+            db.transaction(function (tx) {
+                tx.executeSql("DELETE FROM tasks WHERE week_id=?", [week_id], function (transaction, result) {
+                    callback(true);
+                }, function (transaction, error) {
+                    throw new Error(error);
+                });
+            });
         }, function (transaction, error) {
             throw new Error(error);
         });
@@ -732,11 +738,11 @@ let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 let currentWeek = 2;
 let startHour = 11;
 let currentWeeks = [];
-Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["d" /* dbInit */])();
+Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["e" /* dbInit */])();
 function redrawWeek(id) {
     currentWeeks.map(function (item) {
         if (item.data.week_id == id) {
-            Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["g" /* getTasks */])(item.data.week_id, function (tasks) {
+            Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["h" /* getTasks */])(item.data.week_id, function (tasks) {
                 item.loadTasks(tasks);
                 item.draw();
             });
@@ -755,7 +761,7 @@ function drawButton() {
     button.innerText = "Create week";
     button.onclick = function () {
         buttonShell.style.display = "none";
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["c" /* createWeek */])(function (res) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["d" /* createWeek */])(function (res) {
             if (!res)
                 return;
             Draw();
@@ -767,7 +773,7 @@ function Draw() {
     clear("paper  main-container");
     clear("buttonShell");
     clear("taskTooltip");
-    Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["i" /* getWeeks */])(function (weeks) {
+    Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["j" /* getWeeks */])(function (weeks) {
         if (weeks.length == 0) {
             drawButton();
         }
@@ -775,7 +781,7 @@ function Draw() {
         currentWeek = nowData.currentWeek;
         startHour = nowData.currentHour;
         weeks.map(function (item, index) {
-            Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["g" /* getTasks */])(item.week_id, function (tasks) {
+            Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["h" /* getTasks */])(item.week_id, function (tasks) {
                 let week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* Week */](item.week_number, item.week_id);
                 week.create(document.body, (item.week_number == currentWeek));
                 week.loadDays(days);
@@ -1442,12 +1448,14 @@ class TaskChange {
             case "file":
                 let chooseButton = { name: "Choose", click: function () {
                         let path = window['chooseFile']()[0];
+                        this.newExtensional = path;
                         path = (path.length >= 20) ?
                             "..." + path.substring(path.length - 20, path.length) : path;
                         document.getElementById('actionExtension').innerText = path;
-                    }, bg: "#3b9fff",
+                    }.bind(this), bg: "#3b9fff",
                     color: "#fff", border: "#177bf3", float: "right" };
                 let path = this.currentTask.action_body;
+                this.newExtensional = path;
                 path = (path.length >= 20) ?
                     "..." + path.substring(path.length - 20, path.length) : path;
                 document.getElementById('actionExtension').innerText = path;
@@ -1490,10 +1498,10 @@ class TaskChange {
                 this.currentTask.action_body = document.getElementById("inputLinkPopup")['value'];
                 break;
             case "file":
-                this.currentTask.action_body = document.getElementById("actionExtension").innerText;
+                this.currentTask.action_body = this.newExtensional;
                 break;
         }
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["b" /* createTask */])(this.currentTask, function (result) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["a" /* changeTask */])(this.currentTask, function (result) {
             if (result) {
                 this.closePopup();
                 Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
@@ -1501,7 +1509,7 @@ class TaskChange {
         }.bind(this));
     }
     delete() {
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["e" /* deleteTask */])(this.currentTask.id, function (result) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["f" /* deleteTask */])(this.currentTask.id, function (result) {
             if (result) {
                 this.closePopup();
                 Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
@@ -1790,10 +1798,11 @@ class TaskCreate {
                 case "file":
                     let chooseButton = { name: "Choose", click: function () {
                             let path = window['chooseFile']()[0];
+                            this.newExtension = path;
                             path = (path.length >= 20) ?
                                 "..." + path.substring(path.length - 20, path.length) : path;
                             document.getElementById('actionExtension').innerText = path;
-                        }, bg: "#3b9fff",
+                        }.bind(this), bg: "#3b9fff",
                         color: "#fff", border: "#177bf3", float: "right" };
                     wrapperAction.innerHTML = "";
                     let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "button", wrapperAction);
@@ -1834,10 +1843,10 @@ class TaskCreate {
                 this.currentTask.action_body = document.getElementById("inputLinkPopup")['value'];
                 break;
             case "file":
-                this.currentTask.action_body = document.getElementById("actionExtension").innerText;
+                this.currentTask.action_body = this.newExtension;
                 break;
         }
-        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["b" /* createTask */])(this.currentTask, function (result) {
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["c" /* createTask */])(this.currentTask, function (result) {
             if (result) {
                 this.closePopup();
                 Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
@@ -2052,7 +2061,7 @@ class WeekChange {
         this.buttons[0].click = function () { closePopup(); };
         this.element = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "", background);
         let options = "";
-        Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["i" /* getWeeks */])(function (weeks) {
+        Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["j" /* getWeeks */])(function (weeks) {
             for (let i = 0; i < weeks.length; i++) {
                 options += `<option value='${weeks[i].week_number}' ${(weeks[i].week_id == this.currentWeek.week_id) ? 'selected' : ''}>
                                 ${weeks[i].week_number}
@@ -2076,7 +2085,7 @@ class WeekChange {
     save() {
         let newNumber = Number(document.getElementById('actionSelect')['value']);
         if (this.currentWeek.week_number != newNumber && newNumber != undefined) {
-            Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["a" /* changeWeekNumber */])(this.currentWeek, newNumber, function () {
+            Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["b" /* changeWeekNumber */])(this.currentWeek, newNumber, function () {
                 this.closePopup();
                 Object(__WEBPACK_IMPORTED_MODULE_3__app__["Draw"])();
             }.bind(this));
@@ -2084,7 +2093,7 @@ class WeekChange {
     }
     delete() {
         console.log(this.currentWeek);
-        Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["f" /* deleteWeek */])(this.currentWeek.week_id, function (result) {
+        Object(__WEBPACK_IMPORTED_MODULE_2__db_db_api__["g" /* deleteWeek */])(this.currentWeek.week_id, function (result) {
             console.log(result);
             if (result) {
                 this.closePopup();
@@ -2210,7 +2219,7 @@ function getTimeDataFirst(callBack) {
     final.currentWeek = now['getWeekNumber']();
     final.currentDay = now.getDay();
     final.currentHour = now.getHours();
-    Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["i" /* getWeeks */])(function (weeks) {
+    Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["j" /* getWeeks */])(function (weeks) {
         let maxWeekNumber = Math.max.apply(Math, weeks);
         let processDate = final.currentWeek % maxWeekNumber;
         if (processDate == 0) {
@@ -2250,15 +2259,17 @@ function getTimeDataSecond(weeks) {
 function notificationManager(lastTask) {
     clearTimeout(nowTimeout);
     getTimeDataFirst(function (data) {
-        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["h" /* getTasksByDay */])(data.currentWeek, data.currentDay - 1, function (tasks) {
+        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["i" /* getTasksByDay */])(data.currentWeek, data.currentDay - 1, function (tasks) {
             tasks.map(function (item) {
                 if (data.currentHour >= item.start && data.currentHour < item.stop) {
                     if (lastTask.id != item.id) {
-                        console.log(item);
+                        window['createNotification'](item.text, String(item.start) + ":00 - " + String(item.stop) + ":00");
                         switch (item.action_type) {
                             case "link":
+                                window['openLink'](item.action_body);
                                 break;
                             case "file":
+                                console.log(window['openFile'](item.action_body));
                                 break;
                         }
                         lastTask = item;
