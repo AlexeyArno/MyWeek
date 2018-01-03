@@ -51,7 +51,7 @@ $ npm watch
 License
 ----
 
-MIT
+GPL-3.0
 
 
 **Free Software, Hell Yeah!**
