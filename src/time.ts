@@ -70,12 +70,19 @@ function notificationManager(lastTask:Task){
     getTimeDataFirst(function(data:timeData){
         getTasksByDay(data.currentWeek, data.currentDay-1,function(tasks:Array<Task>){
             tasks.map(function(item){
-                console.log(data.currentDay);
                 if(data.currentHour>=item.start && data.currentHour<item.stop){
                     if(lastTask.id!=item.id){
-                        // window['openLink']('https://github.com');
-                        // window['openFile'](`C:\\Users\\alex\\Desktop\\Utilites\\ActivationJetBrains.exe`);
                         // window['createNotification'](item.text,String(item.start)+":00 - "+String(item.stop)+":00");
+                        console.log(item);
+                        switch(item.action_type){
+                            case "link":
+                                // window['openLink'](item.action_body);
+                                break;
+                            case "file":
+                                // window['openFile'](item.action_body);
+                                break;
+                        }
+
                         lastTask = item
                     }
                 }

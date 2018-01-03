@@ -1,4 +1,4 @@
-const {shell} = require('electron').remote
+const {shell,dialog} = require('electron').remote
 
 window.openLink = function(link){
     shell.openExternal(link);
@@ -6,4 +6,11 @@ window.openLink = function(link){
 
 window.openFile = function(link){
     shell.openItem(link);
+}
+
+window.chooseFile = function(){
+    var path = dialog.showOpenDialog({
+        properties: ['openFile']
+    });
+    return path;
 }

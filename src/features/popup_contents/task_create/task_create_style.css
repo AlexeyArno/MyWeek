@@ -1,20 +1,12 @@
 .task_create{
     width: 300px;
-    height: 180px;
+    height: 250px;
     left: calc(50vw - 150px);
-    top: calc(50vh - 90px);
+    top: calc(50vh - 125px);
 }
 .task_create div{
     font-size: 14px;
 
-}
-.task_create input{
-    background: #efefef;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 5px;
-}
-.task_create input:focus{
-    outline: none;
 }
 #startTimePopup,
 #stopTimePopup{
@@ -46,4 +38,24 @@
 .timeChoosePopup{
     display: inline-block;
     float:left;
+}
+.actionsPopup{
+    margin-top: 10px;
+}
+#actionSelect:focus{
+    outline: none;
+}
+#actionSelect{
+    margin-top: 5px;
+    border: none;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+#wrapperAction{
+    float:right;
+}
+#actionExtension{
+    height:18px;
+    margin-top: 5px;
+    width:170px;
+    overflow: hidden;
 }

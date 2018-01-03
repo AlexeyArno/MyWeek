@@ -10,7 +10,7 @@ function dbInit(){
 	db.transaction(function(tx:any){
 	     tx.executeSql("CREATE TABLE IF NOT EXISTS tasks"+
 	     	" (ID INTEGER PRIMARY KEY ASC,text TEXT,start "+
-	     	"INTEGER, stop INTEGER, day INTEGER, color TEXT, week_id INTEGER)", []);
+	     	"INTEGER, stop INTEGER, day INTEGER, color TEXT, action_type TEXT, action_body TEXT, week_id INTEGER)", []);
 	      tx.executeSql("CREATE TABLE IF NOT EXISTS weeks (ID INTEGER PRIMARY KEY ASC, number INTEGER)", []);
 	 });
 }
@@ -63,8 +63,8 @@ function deleteWeek(week_id:number,  callback:Function){
 function createTask(task:Task, callback:Function){
 	if (!db) throw new Error("DB is not init, use dbInit()");
 	db.transaction(function(tx:any){
-		 tx.executeSql("INSERT INTO tasks (text,start,stop,day,color,week_id) VALUES(?,?,?,?,?,?)",
-		 	[task.text,task.start,task.stop,task.day,task.color,task.week_id]
+		 tx.executeSql("INSERT INTO tasks (text,start,stop,day,color,action_type,action_body, week_id) VALUES(?,?,?,?,?,?,?,?)",
+		 	[task.text,task.start,task.stop,task.day,task.color,task.action_type,task.action_body,task.week_id]
              ,function(transaction:any, result:any){
                  console.log(result);
                  callback(true);
@@ -90,6 +90,8 @@ function getTasks(week_id:number, callback:Function){
                     result.rows.item(i).day,
                     result.rows.item(i).ID,
                     result.rows.item(i).week_id);
+				now_task.action_body = result.rows.item(i).action_body;
+                now_task.action_type = result.rows.item(i).action_type;
                 final.push(now_task);
             }
             callback(final)
@@ -111,6 +113,8 @@ function getTasksByDay(week_id:number,day:number, callback:Function){
                     result.rows.item(i).day,
                     result.rows.item(i).ID,
                     result.rows.item(i).week_id);
+                now_task.action_body = result.rows.item(i).action_body;
+                now_task.action_type = result.rows.item(i).action_type;
                 final.push(now_task);
             }
             callback(final)
@@ -148,11 +152,12 @@ function changeTask(up_task:Task, callback:Function){
 	console.log(up_task.text, up_task.id);
     if (!db) throw new Error("DB is not init, use dbInit()");
     db.transaction(function(tx){
-        tx.executeSql("update tasks set text=?, start=?, stop=?, day=?, color=?, week_id=? "+
+        tx.executeSql("update tasks set text=?, start=?, stop=?, day=?, color=?,action_type=?,action_body=?, week_id=? "+
 						" where ID=? ",
 			[up_task.text, up_task.start, up_task.stop,
-			up_task.day, up_task.color, up_task.week_id,
-			up_task.id],function(transaction:any, result:any){
+			up_task.day, up_task.color, up_task.action_type,
+            up_task.action_body, up_task.week_id, up_task.id],
+            function(transaction:any, result:any){
                 console.log(result);
                 callback(true);
 		},function(transaction, error){

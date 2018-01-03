@@ -557,7 +557,7 @@ function dbInit() {
     db.transaction(function (tx) {
         tx.executeSql("CREATE TABLE IF NOT EXISTS tasks" +
             " (ID INTEGER PRIMARY KEY ASC,text TEXT,start " +
-            "INTEGER, stop INTEGER, day INTEGER, color TEXT, week_id INTEGER)", []);
+            "INTEGER, stop INTEGER, day INTEGER, color TEXT, action_type TEXT, action_body TEXT, week_id INTEGER)", []);
         tx.executeSql("CREATE TABLE IF NOT EXISTS weeks (ID INTEGER PRIMARY KEY ASC, number INTEGER)", []);
     });
 }
@@ -606,7 +606,7 @@ function createTask(task, callback) {
     if (!db)
         throw new Error("DB is not init, use dbInit()");
     db.transaction(function (tx) {
-        tx.executeSql("INSERT INTO tasks (text,start,stop,day,color,week_id) VALUES(?,?,?,?,?,?)", [task.text, task.start, task.stop, task.day, task.color, task.week_id], function (transaction, result) {
+        tx.executeSql("INSERT INTO tasks (text,start,stop,day,color,action_type,action_body, week_id) VALUES(?,?,?,?,?,?,?,?)", [task.text, task.start, task.stop, task.day, task.color, task.action_type, task.action_body, task.week_id], function (transaction, result) {
             console.log(result);
             callback(true);
         }, function (transaction, error) {
@@ -624,6 +624,8 @@ function getTasks(week_id, callback) {
         tx.executeSql("SELECT * FROM tasks WHERE week_id = ?", [week_id], function (tx, result) {
             for (let i = 0; i < result.rows.length; i++) {
                 let now_task = new __WEBPACK_IMPORTED_MODULE_0__week_task__["a" /* default */](result.rows.item(i).text, result.rows.item(i).color, result.rows.item(i).start, result.rows.item(i).stop, result.rows.item(i).day, result.rows.item(i).ID, result.rows.item(i).week_id);
+                now_task.action_body = result.rows.item(i).action_body;
+                now_task.action_type = result.rows.item(i).action_type;
                 final.push(now_task);
             }
             callback(final);
@@ -638,6 +640,8 @@ function getTasksByDay(week_id, day, callback) {
         tx.executeSql("SELECT * FROM tasks WHERE week_id = ? and day = ?", [week_id, day], function (tx, result) {
             for (let i = 0; i < result.rows.length; i++) {
                 let now_task = new __WEBPACK_IMPORTED_MODULE_0__week_task__["a" /* default */](result.rows.item(i).text, result.rows.item(i).color, result.rows.item(i).start, result.rows.item(i).stop, result.rows.item(i).day, result.rows.item(i).ID, result.rows.item(i).week_id);
+                now_task.action_body = result.rows.item(i).action_body;
+                now_task.action_type = result.rows.item(i).action_type;
                 final.push(now_task);
             }
             callback(final);
@@ -675,10 +679,10 @@ function changeTask(up_task, callback) {
     if (!db)
         throw new Error("DB is not init, use dbInit()");
     db.transaction(function (tx) {
-        tx.executeSql("update tasks set text=?, start=?, stop=?, day=?, color=?, week_id=? " +
+        tx.executeSql("update tasks set text=?, start=?, stop=?, day=?, color=?,action_type=?,action_body=?, week_id=? " +
             " where ID=? ", [up_task.text, up_task.start, up_task.stop,
-            up_task.day, up_task.color, up_task.week_id,
-            up_task.id], function (transaction, result) {
+            up_task.day, up_task.color, up_task.action_type,
+            up_task.action_body, up_task.week_id, up_task.id], function (transaction, result) {
             console.log(result);
             callback(true);
         }, function (transaction, error) {
@@ -947,7 +951,8 @@ function drawColor(colors, callback, parent) {
     colors.map(function (item) {
         let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "colorPopup", wrapper);
         now.style.background = item;
-        now.onclick = function () { callback(item); };
+        now.onclick = () => callback(item);
+        console.log(now.onclick);
         final.push(now);
     });
     return final;
@@ -1375,7 +1380,58 @@ class TaskChange {
                 this.drawColors();
             }.bind(this), this.element.children[0]);
         this.drawColors();
+        let actionPopup = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "actionsPopup", this.element.children[0]);
+        actionPopup.innerHTML +=
+            "<div>Action</div>" +
+                `<select id='actionSelect'>
+                <option value='none' ${(this.currentTask.action_type == 'none') ? 'selected' : ''}>None</option>
+                <option value='link'  ${(this.currentTask.action_type == 'link') ? 'selected' : ''}>Link</option>
+                <option value='file'  ${(this.currentTask.action_type == 'file') ? 'selected' : ''}>File/Application</option>
+            </select>
+            
+            <div id='wrapperAction'>
+                
+            </div>
+            <div id='actionExtension'>
+            </div>`;
         Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
+        console.log(this.currentTask);
+        this.wrapperAction = document.getElementById('wrapperAction');
+        this.actionHandler(this.currentTask.action_type);
+        document.getElementById('actionSelect').onchange = function (e) {
+            this.actionHandler(e.target['value']);
+        }.bind(this);
+    }
+    actionHandler(value) {
+        switch (value) {
+            case "none":
+                this.wrapperAction.innerHTML = "";
+                break;
+            case "link":
+                this.wrapperAction.innerHTML = `<input id="inputLinkPopup" 
+                        value="${(this.currentTask.action_type == "link") ? this.currentTask.action_body : ""}"/>`;
+                break;
+            case "file":
+                let chooseButton = { name: "Choose", click: function () {
+                        let path = window['chooseFile']()[0];
+                        path = (path.length >= 20) ?
+                            "..." + path.substring(path.length - 20, path.length) : path;
+                        document.getElementById('actionExtension').innerText = path;
+                    }, bg: "#3b9fff",
+                    color: "#fff", border: "#177bf3", float: "right" };
+                let path = this.currentTask.action_body;
+                path = (path.length >= 20) ?
+                    "..." + path.substring(path.length - 20, path.length) : path;
+                document.getElementById('actionExtension').innerText = path;
+                this.wrapperAction.innerHTML = "";
+                let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "button", this.wrapperAction);
+                now.innerText = chooseButton.name;
+                now.style.background = chooseButton.bg;
+                now.style.color = chooseButton.color;
+                now.style['float'] = chooseButton.float;
+                now.style.border = "1px solid " + chooseButton.border;
+                now.onclick = function () { chooseButton.click(); };
+        }
     }
     setCurrentTask(task) {
         this.currentTask = task;
@@ -1397,6 +1453,18 @@ class TaskChange {
         this.currentTask.start = Number(document.getElementById("startTimePopup")['value']);
         this.currentTask.stop = Number(document.getElementById("stopTimePopup")['value']);
         this.currentTask.color = this.currentColor;
+        this.currentTask.action_type = document.getElementById("actionSelect")['value'];
+        switch (this.currentTask.action_type) {
+            case "none":
+                this.currentTask.action_body = "";
+                break;
+            case "link":
+                this.currentTask.action_body = document.getElementById("inputLinkPopup")['value'];
+                break;
+            case "file":
+                this.currentTask.action_body = document.getElementById("actionExtension").innerText;
+                break;
+        }
         Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["a" /* createTask */])(this.currentTask, function (result) {
             if (result) {
                 this.closePopup();
@@ -1652,7 +1720,7 @@ class TaskCreate {
                 "<hr/>" +
                 "<div>" +
                 "<div>Name</div>" +
-                "<input id='namePopup'>" +
+                "<input id='namePopup' >" +
                 "</div>" +
                 "<div class='timeChoosePopup'>" +
                 "<div>Time</div>" +
@@ -1663,17 +1731,59 @@ class TaskCreate {
                 "</div>";
         this.colorsElements =
             Object(__WEBPACK_IMPORTED_MODULE_2__task_basic_functions__["a" /* drawColor */])(this.colorsList, function (click_color) {
+                console.log(click_color);
                 this.currentColor = click_color;
                 this.drawColors();
             }.bind(this), this.element.children[0]);
         this.drawColors();
+        let actionPopup = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "actionsPopup", this.element.children[0]);
+        actionPopup.innerHTML +=
+            "<div>Action</div>" +
+                `<select id='actionSelect'>
+                 <option value='none'>None</option>
+                <option value='link'>Link</option>
+                <option value='file'>File/Application</option>
+            </select>
+            
+            <div id='wrapperAction'>
+               
+            </div>
+            <div id='actionExtension'>
+              
+            </div>`;
         Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
+        let wrapperAction = document.getElementById('wrapperAction');
+        document.getElementById('actionSelect').onchange = function (e) {
+            switch (e.target['value']) {
+                case "none":
+                    wrapperAction.innerHTML = "";
+                    break;
+                case "link":
+                    wrapperAction.innerHTML = `<input id="inputLinkPopup"/>`;
+                    break;
+                case "file":
+                    let chooseButton = { name: "Choose", click: function () {
+                            let path = window['chooseFile']()[0];
+                            path = (path.length >= 20) ?
+                                "..." + path.substring(path.length - 20, path.length) : path;
+                            document.getElementById('actionExtension').innerText = path;
+                        }, bg: "#3b9fff",
+                        color: "#fff", border: "#177bf3", float: "right" };
+                    wrapperAction.innerHTML = "";
+                    let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "button", wrapperAction);
+                    now.innerText = chooseButton.name;
+                    now.style.background = chooseButton.bg;
+                    now.style.color = chooseButton.color;
+                    now.style['float'] = chooseButton.float;
+                    now.style.border = "1px solid " + chooseButton.border;
+                    now.onclick = function () { chooseButton.click(); };
+            }
+        }.bind(this);
     }
     setCurrentTask(task) {
         this.currentTask = task;
     }
     drawColors() {
-        console.log(this.currentTask);
         this.colorsList.map(function (item, index) {
             if (item == this.currentColor) {
                 this.colorsElements[index].className = "colorPopup current";
@@ -1689,9 +1799,20 @@ class TaskCreate {
         this.currentTask.start = Number(document.getElementById("startTimePopup")['value']);
         this.currentTask.stop = Number(document.getElementById("stopTimePopup")['value']);
         this.currentTask.color = this.currentColor;
+        this.currentTask.action_type = document.getElementById("actionSelect")['value'];
+        switch (this.currentTask.action_type) {
+            case "none":
+                this.currentTask.action_body = "";
+                break;
+            case "link":
+                this.currentTask.action_body = document.getElementById("inputLinkPopup")['value'];
+                break;
+            case "file":
+                this.currentTask.action_body = document.getElementById("actionExtension").innerText;
+                break;
+        }
         Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["a" /* createTask */])(this.currentTask, function (result) {
             if (result) {
-                console.log("Result");
                 this.closePopup();
                 Object(__WEBPACK_IMPORTED_MODULE_4__app__["redrawWeek"])(this.currentTask.week_id);
             }
@@ -1741,7 +1862,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".task_create{\r\n    width: 300px;\r\n    height: 180px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 90px);\r\n}\r\n.task_create div{\r\n    font-size: 14px;\r\n\r\n}\r\n.task_create input{\r\n    background: #efefef;\r\n    border: 1px solid rgba(0,0,0,0.1);\r\n    border-radius: 5px;\r\n}\r\n.task_create input:focus{\r\n    outline: none;\r\n}\r\n#startTimePopup,\r\n#stopTimePopup{\r\n    width: 30px;\r\n}\r\n.timeChoosePopup{\r\n    margin-top: 10px;\r\n}\r\n.colorPopup{\r\n    height: 20px;\r\n    cursor: pointer;\r\n    width: 20px;\r\n    border-radius: 2px;\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.39);\r\n    display: inline-block;\r\n    margin-right: 10px;\r\n}\r\n.colorPopup:hover{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.25);\r\n}\r\n.colorPopup.current{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0);\r\n}\r\n.colorWrapper{\r\n    display: inline-block;\r\n    margin-left: 20px;\r\n    margin-top: 10px;\r\n}\r\n.timeChoosePopup{\r\n    display: inline-block;\r\n    float:left;\r\n}", ""]);
+exports.push([module.i, ".task_create{\r\n    width: 300px;\r\n    height: 250px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 125px);\r\n}\r\n.task_create div{\r\n    font-size: 14px;\r\n\r\n}\r\n#startTimePopup,\r\n#stopTimePopup{\r\n    width: 30px;\r\n}\r\n.timeChoosePopup{\r\n    margin-top: 10px;\r\n}\r\n.colorPopup{\r\n    height: 20px;\r\n    cursor: pointer;\r\n    width: 20px;\r\n    border-radius: 2px;\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.39);\r\n    display: inline-block;\r\n    margin-right: 10px;\r\n}\r\n.colorPopup:hover{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.25);\r\n}\r\n.colorPopup.current{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0);\r\n}\r\n.colorWrapper{\r\n    display: inline-block;\r\n    margin-left: 20px;\r\n    margin-top: 10px;\r\n}\r\n.timeChoosePopup{\r\n    display: inline-block;\r\n    float:left;\r\n}\r\n.actionsPopup{\r\n    margin-top: 10px;\r\n}\r\n#actionSelect:focus{\r\n    outline: none;\r\n}\r\n#actionSelect{\r\n    margin-top: 5px;\r\n    border: none;\r\n    border-bottom: 1px solid rgba(0,0,0,0.1);\r\n}\r\n#wrapperAction{\r\n    float:right;\r\n}\r\n#actionExtension{\r\n    height:18px;\r\n    margin-top: 5px;\r\n    width:170px;\r\n    overflow: hidden;\r\n}", ""]);
 
 // exports
 
@@ -2070,9 +2191,15 @@ function notificationManager(lastTask) {
     getTimeDataFirst(function (data) {
         Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["g" /* getTasksByDay */])(data.currentWeek, data.currentDay - 1, function (tasks) {
             tasks.map(function (item) {
-                console.log(data.currentDay);
                 if (data.currentHour >= item.start && data.currentHour < item.stop) {
                     if (lastTask.id != item.id) {
+                        console.log(item);
+                        switch (item.action_type) {
+                            case "link":
+                                break;
+                            case "file":
+                                break;
+                        }
                         lastTask = item;
                     }
                 }

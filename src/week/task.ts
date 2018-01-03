@@ -13,6 +13,8 @@ class Task{
 	element: HTMLElement;
 	tooltipElement: Tooltip;
 	currentGroup:number = 0;
+	action_type:string;
+	action_body:string;
 
 	constructor(text:string,color:string,start:number,stop:number,day:number,id:number,week_id:number){
 		this.color = color;
