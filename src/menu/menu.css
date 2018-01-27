@@ -1,0 +1,106 @@
+
+/*wrapper*/
+.main_menu{
+    margin-right: 10px;
+    margin-top: -10px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+    /*transition: width 0.3s ease-in-out;*/
+    height: 100vh;
+    float: left;
+}
+.main_menu.close{
+    width: 60px;
+
+
+}
+.main_menu.open{
+    width: 230px;
+}
+
+/*up*/
+.menu_logo{
+    user-select: none;
+    /*width:30px;*/
+    text-align: center;
+    margin: 10px auto auto;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s ease-in-out;
+}
+.menu_logo:hover{
+    opacity: 1;
+}
+.menu_logo:active{
+    opacity: 0.4;
+}
+#menu_logo_svg{
+    margin-left: 3px;
+    display: inline-block;
+    width:30px;
+}
+.menu_logo_name{
+    font-family: Helvetica-Light;
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    bottom: 10px;
+
+}
+.menu_line{
+    margin:5px;
+    background: #efefef;
+    height: 2px;
+}
+
+/*content*/
+.menu_choose{
+    height: 40px;
+    padding-top: 10px;
+    width: 230px;
+    text-align: center;
+    font-family: Helvetica-Light;
+    cursor: pointer;
+}
+.menu_choose:hover{
+    background: rgba(218, 232, 245,0.4);
+}
+
+.menu_choose.close{
+    width: 30px;
+    cursor: default;
+}
+.menu_choose.close:hover{
+    background-color: #fff;
+}
+.menu_choose.close>.menu_button{
+    margin: 0px 15px;
+    cursor: pointer;
+}
+
+.menu_choose_text{
+    display: inline-block;
+    width: 160px;
+    text-align: left;
+}
+.menu_choose_text.close{
+    display: none;
+
+}
+
+
+.menu_button{
+    color: rgba(0, 0, 0,0.7);
+    height: 30px;
+    margin: 0px 15px;
+    background: #e3e3e3;
+    border-radius: 5px;
+    line-height: 2;
+    width: 30px;
+    text-align: center;
+    display: inline-block;
+
+}
+.menu_button.active{
+    
+}
+

@@ -5,10 +5,11 @@
     padding-top: 16px;
     background: #fff;
     position: absolute;
-    left: 15px;
+    /*left: 15px;*/
     width: 40px;
     transition: height 0.3s ease-out;
     overflow-y: hidden;
+    margin-left: -40px;
 }
 .days.close{
     height: 0;

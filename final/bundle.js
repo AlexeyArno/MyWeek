@@ -728,12 +728,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions_functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__time__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__menu_menu__ = __webpack_require__(35);
 
 
 
 
 
 let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 
 let currentWeek = 2;
 let startHour = 11;
@@ -773,6 +775,8 @@ function Draw() {
     clear("paper  main-container");
     clear("buttonShell");
     clear("taskTooltip");
+    __WEBPACK_IMPORTED_MODULE_5__menu_menu__["a" /* default */].clear();
+    __WEBPACK_IMPORTED_MODULE_5__menu_menu__["a" /* default */].create(document.getElementById('menu'));
     Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["j" /* getWeeks */])(function (weeks) {
         if (weeks.length == 0) {
             drawButton();
@@ -783,7 +787,7 @@ function Draw() {
         weeks.map(function (item, index) {
             Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["h" /* getTasks */])(item.week_id, function (tasks) {
                 let week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* Week */](item.week_number, item.week_id);
-                week.create(document.body, (item.week_number == currentWeek));
+                week.create(document.getElementById('content'), (item.week_number == currentWeek));
                 week.loadDays(days);
                 week.setStartHour(startHour);
                 week.loadTasks(tasks);
@@ -2013,7 +2017,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".days{\r\n    float: left;\r\n    height: 280px;\r\n    margin-top: -20px;\r\n    padding-top: 16px;\r\n    background: #fff;\r\n    position: absolute;\r\n    left: 15px;\r\n    width: 40px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n}\r\n.days.close{\r\n    height: 0;\r\n}\r\n.day{\r\n    height: 20px;\r\n    background: #fff;\r\n    font-size: 12px;\r\n    text-align: center;\r\n    margin-bottom: 20px;\r\n    line-height: 3;\r\n}", ""]);
+exports.push([module.i, ".days{\r\n    float: left;\r\n    height: 280px;\r\n    margin-top: -20px;\r\n    padding-top: 16px;\r\n    background: #fff;\r\n    position: absolute;\r\n    /*left: 15px;*/\r\n    width: 40px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n    margin-left: -40px;\r\n}\r\n.days.close{\r\n    height: 0;\r\n}\r\n.day{\r\n    height: 20px;\r\n    background: #fff;\r\n    font-size: 12px;\r\n    text-align: center;\r\n    margin-bottom: 20px;\r\n    line-height: 3;\r\n}", ""]);
 
 // exports
 
@@ -2220,7 +2224,8 @@ function getTimeDataFirst(callBack) {
     final.currentDay = now.getDay();
     final.currentHour = now.getHours();
     Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["j" /* getWeeks */])(function (weeks) {
-        let maxWeekNumber = Math.max.apply(Math, weeks);
+        let weeksNumbers = weeks.map((i) => i.week_number);
+        let maxWeekNumber = Math.max.apply(Math, weeksNumbers);
         let processDate = final.currentWeek % maxWeekNumber;
         if (processDate == 0) {
             final.currentWeek = maxWeekNumber;
@@ -2283,6 +2288,208 @@ function notificationManager(lastTask) {
     });
 }
 
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(2);
+
+__webpack_require__(36);
+let MenuNative = (function () {
+    let _menu;
+    let create = function (parent) {
+        _menu = new Menu(parent);
+    };
+    let clear = function () {
+        if (!_menu) {
+            return;
+        }
+        _menu.clear();
+    };
+    return {
+        create, clear
+    };
+})();
+/* harmony default export */ __webpack_exports__["a"] = (MenuNative);
+class Menu {
+    constructor(_parent) {
+        this.menu_logo_click = function () {
+            console.log('change');
+            this.state = !this.state;
+            this.draw();
+        }.bind(this);
+        this.parent = _parent;
+        this.state = true;
+        this.draw();
+    }
+    draw() {
+        if (this.current_el) {
+            this.current_el.innerHTML = "";
+            this.current_el.className = (this.state) ? 'main_menu open' : 'main_menu close';
+        }
+        else {
+            this.current_el = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])('div', (this.state) ? 'main_menu open' : 'main_menu close', this.parent);
+        }
+        this.current_el.innerHTML =
+            `<div class="menu_logo" id="menu_logo">
+                   <div id="menu_logo_svg">
+                        <svg version="1.1"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                     viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                                <g>
+                                    <g>
+                                        <path style="fill:#D8DCE1;" d="M0,134v328c0,22.055,17.945,40,40,40h432c22.055,0,40-17.945,40-40V134H0z"/>
+                                    </g>
+                                    <g>
+                                        <path style="fill:#FF4F19;" d="M472,22H40C17.945,22,0,39.945,0,62v72h512V62C512,39.945,494.054,22,472,22z M64,102
+                                            c-13.255,0-24-10.745-24-24s10.745-24,24-24s24,10.745,24,24S77.255,102,64,102z M448,102c-13.255,0-24-10.745-24-24
+                                            s10.745-24,24-24s24,10.745,24,24S461.255,102,448,102z"/>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M256,206c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S273.648,206,256,206z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M176,206c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S193.648,206,176,206z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M96,206c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S113.648,206,96,206z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M336,206c-17.648,0-32,14.352-32,32s14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                S353.648,206,336,206z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M416,270c17.648,0,32-14.352,32-32s-14.352-32-32-32c-17.648,0-32,14.352-32,32
+                                                S398.351,270,416,270z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M256,286c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S273.648,286,256,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M176,286c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S193.648,286,176,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M96,286c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S113.648,286,96,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M336,286c-17.648,0-32,14.352-32,32s14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                S353.648,286,336,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M416,286c-17.648,0-32,14.352-32,32s14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                S433.648,286,416,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M256,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32s32-14.352,32-32
+                                                C288,380.351,273.648,366,256,366z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M176,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32s32-14.352,32-32
+                                                C208,380.351,193.648,366,176,366z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M96,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32s32-14.352,32-32
+                                                C128,380.351,113.648,366,96,366z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M336,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                C368,380.351,353.648,366,336,366z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M416,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                C448,380.351,433.648,366,416,366z"/>
+                                        </g>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path style="fill:#5C546A;" d="M64,90c-6.625,0-12-5.371-12-12V22c0-6.629,5.375-12,12-12s12,5.371,12,12v56
+                                                C76,84.629,70.625,90,64,90z"/>
+                                        </g>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path style="fill:#5C546A;" d="M448,90c-6.625,0-12-5.371-12-12V22c0-6.629,5.375-12,12-12s12,5.371,12,12v56
+                                                C460,84.629,454.625,90,448,90z"/>
+                                        </g>
+                                    </g>
+                                    <g>
+                                        <circle style="fill:#FFD200;" cx="96" cy="238" r="32"/>
+                                    </g>
+                                    <g>
+                                        <circle style="fill:#FF9600;" cx="256" cy="398" r="32"/>
+                                    </g>
+                                    <g>
+                                        <circle style="fill:#FF4F19;" cx="336" cy="318" r="32"/>
+                                    </g>
+                                </g>
+                                </svg>
+                   </div>             
+                   <div class="menu_logo_name">${(this.state) ? 'MyWeek' : ''}</div>             
+             </div>
+             <div class="menu_line"></div>
+             <div class=" ${(this.state) ? 'menu_choose' : 'menu_choose close'}">
+                <div class="menu_button">
+                   W
+                </div>
+                <div class="${(this.state) ? 'menu_choose_text' : 'menu_choose_text close'}">
+                    Weeks
+                </div>
+            </div>`;
+        document.getElementById('menu_logo').onclick = this.menu_logo_click;
+    }
+    ;
+    clear() {
+        parent['innerHTML'] = "";
+    }
+}
+
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(37);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(1)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../node_modules/css-loader/index.js!./menu.css", function() {
+			var newContent = require("!!../../node_modules/css-loader/index.js!./menu.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\r\n/*wrapper*/\r\n.main_menu{\r\n    margin-right: 10px;\r\n    margin-top: -10px;\r\n    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;\r\n    /*transition: width 0.3s ease-in-out;*/\r\n    height: 100vh;\r\n    float: left;\r\n}\r\n.main_menu.close{\r\n    width: 60px;\r\n\r\n\r\n}\r\n.main_menu.open{\r\n    width: 230px;\r\n}\r\n\r\n/*up*/\r\n.menu_logo{\r\n    user-select: none;\r\n    /*width:30px;*/\r\n    text-align: center;\r\n    margin: 10px auto auto;\r\n    cursor: pointer;\r\n    opacity: 0.6;\r\n    transition: opacity 0.3s ease-in-out;\r\n}\r\n.menu_logo:hover{\r\n    opacity: 1;\r\n}\r\n.menu_logo:active{\r\n    opacity: 0.4;\r\n}\r\n#menu_logo_svg{\r\n    margin-left: 3px;\r\n    display: inline-block;\r\n    width:30px;\r\n}\r\n.menu_logo_name{\r\n    font-family: Helvetica-Light;\r\n    display: inline-block;\r\n    vertical-align: middle;\r\n    position: relative;\r\n    bottom: 10px;\r\n\r\n}\r\n.menu_line{\r\n    margin:5px;\r\n    background: #efefef;\r\n    height: 2px;\r\n}\r\n\r\n/*content*/\r\n.menu_choose{\r\n    height: 40px;\r\n    padding-top: 10px;\r\n    width: 230px;\r\n    text-align: center;\r\n    font-family: Helvetica-Light;\r\n    cursor: pointer;\r\n}\r\n.menu_choose:hover{\r\n    background: rgba(218, 232, 245,0.4);\r\n}\r\n\r\n.menu_choose.close{\r\n    width: 30px;\r\n    cursor: default;\r\n}\r\n.menu_choose.close:hover{\r\n    background-color: #fff;\r\n}\r\n.menu_choose.close>.menu_button{\r\n    margin: 0px 15px;\r\n    cursor: pointer;\r\n}\r\n\r\n.menu_choose_text{\r\n    display: inline-block;\r\n    width: 160px;\r\n    text-align: left;\r\n}\r\n.menu_choose_text.close{\r\n    display: none;\r\n\r\n}\r\n\r\n\r\n.menu_button{\r\n    color: rgba(0, 0, 0,0.7);\r\n    height: 30px;\r\n    margin: 0px 15px;\r\n    background: #e3e3e3;\r\n    border-radius: 5px;\r\n    line-height: 2;\r\n    width: 30px;\r\n    text-align: center;\r\n    display: inline-block;\r\n\r\n}\r\n.menu_button.active{\r\n    \r\n}\r\n\r\n", ""]);
+
+// exports
 
 
 /***/ })

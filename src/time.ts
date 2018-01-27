@@ -27,8 +27,9 @@ function getTimeDataFirst(callBack:Function){
     final.currentDay = now.getDay();
     final.currentHour = now.getHours();
 
-    getWeeks(function(weeks:Array<number>){
-        let maxWeekNumber:number = Math.max.apply(Math,weeks);
+    getWeeks(function(weeks:Array<weekData>){
+        let weeksNumbers:Array<number> = weeks.map((i)=>i.week_number);
+        let maxWeekNumber:number = Math.max.apply(Math,weeksNumbers);
         let processDate:number = final.currentWeek % maxWeekNumber;
         if(processDate==0){
             final.currentWeek = maxWeekNumber;
@@ -39,6 +40,7 @@ function getTimeDataFirst(callBack:Function){
                 }
             }
         }
+
         callBack(final);
     });
 }

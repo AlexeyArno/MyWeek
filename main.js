@@ -24,7 +24,7 @@ function createWindow () {
   mainWindow = new BrowserWindow(params);
 
   // and load the index.html of the app.
-  mainWindow.setMenu(null);
+  // mainWindow.setMenu(null);
 
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'final/index.html'),
@@ -33,7 +33,7 @@ function createWindow () {
   }));
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -44,7 +44,7 @@ function createWindow () {
   })
 }
 
-// require('electron-reload')(__dirname);
+require('electron-reload')(__dirname);
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
