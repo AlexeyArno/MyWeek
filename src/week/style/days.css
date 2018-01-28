@@ -11,6 +11,7 @@
     overflow-y: hidden;
     margin-left: -40px;
 }
+
 .days.close{
     height: 0;
 }
@@ -21,4 +22,7 @@
     text-align: center;
     margin-bottom: 20px;
     line-height: 3;
+}
+.day.active{
+    color: #3e97f3;
 }

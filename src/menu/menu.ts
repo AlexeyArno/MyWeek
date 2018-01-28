@@ -1,11 +1,18 @@
 import {createElement} from "../functions/functions";
+import TasksPanelComponent from './components/tasks_panel/tasks_panel'
 require("./menu.css");
 
 let MenuNative = (function(){
     let _menu:Menu;
 
     let create=function(parent:HTMLElement){
-        _menu = new Menu(parent);
+        if(_menu){
+            _menu.clear();
+            _menu.draw();
+        }else{
+            _menu = new Menu(parent);
+        }
+
     };
 
     let clear=function(){
@@ -25,9 +32,10 @@ class Menu{
     parent:HTMLElement;
     current_el:HTMLElement;
     state:boolean;
+    task_panel=TasksPanelComponent;
+
 
     menu_logo_click = function () {
-        console.log('change');
         this.state = !this.state;
         this.draw();
     }.bind(this);
@@ -150,8 +158,28 @@ class Menu{
                 <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
                     Weeks
                 </div>
-            </div>`;
+            </div>
+            <div class=" ${(this.state)?'menu_choose':'menu_choose close'}">
+                  <div class="menu_button">
+                        S
+                  </div>
+                  <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
+                         Settings
+                  </div>
+            </div>
+            <div class=" ${(this.state)?'menu_choose':'menu_choose close'}">
+                  <div class="menu_button">
+                        A
+                  </div>
+                  <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
+                         About
+                  </div>
+            </div>
+            <div class="menu_line"></div>
+            <div class="task_panel" id="menu_task_panel"></div>
+            `;
         document.getElementById('menu_logo').onclick = this.menu_logo_click;
+        this.task_panel.create(document.getElementById('menu_task_panel'), this.state);
     };
 
     clear(){

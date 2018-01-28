@@ -28,7 +28,7 @@
     padding: 10px;
     border-radius: 5px;
     margin-top: 10px;
-    border:0.1px solid #efefef;
+    border: 0.1px solid #efefef;
 }
 .main-container{
     height: 351px;
@@ -39,10 +39,14 @@
     height: 40px;
 }
 .settingsButtonWeek{
-    width:15px;
+    width:30px;
     display: inline-block;
     float:right;
-    margin-right: 10px;
+    height: 20px;
+    position: relative;
+    margin-top: -7.5px;
+    padding-top: 5px;
+    border-radius: 5px;
 }
 .settingsButtonWeek svg{
     width:25px;

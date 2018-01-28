@@ -523,11 +523,21 @@ function updateLink (link, options, obj) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createElement; });
+/* unused harmony export hexToDec */
 function createElement(type, className, parent) {
     let element = document.createElement(type);
     element.className = className;
     parent.appendChild(element);
     return element;
+}
+function hexToDec(hex) {
+    let result = 0, digitValue;
+    hex = hex.toLowerCase();
+    for (let i = 0; i < hex.length; i++) {
+        digitValue = '0123456789abcdefgh'.indexOf(hex[i]);
+        result = result * 16 + digitValue;
+    }
+    return result;
 }
 
 
@@ -540,6 +550,7 @@ function createElement(type, className, parent) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return dbInit; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return createWeek; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return createTask; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return tasks; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return getTasks; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return getWeeks; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return deleteTask; });
@@ -622,6 +633,35 @@ function createTask(task, callback) {
         });
     });
     return true;
+}
+function tasks(week_id, day, callback) {
+    let final = [];
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        let resultFunc = function (tx, result) {
+            for (let i = 0; i < result.rows.length; i++) {
+                let now_task = new __WEBPACK_IMPORTED_MODULE_0__week_task__["a" /* default */](result.rows.item(i).text, result.rows.item(i).color, result.rows.item(i).start, result.rows.item(i).stop, result.rows.item(i).day, result.rows.item(i).ID, result.rows.item(i).week_id);
+                now_task.action_body = result.rows.item(i).action_body;
+                now_task.action_type = result.rows.item(i).action_type;
+                final.push(now_task);
+            }
+            callback(final);
+        };
+        let expression = "";
+        if (week_id == -1 && day == -1) {
+            tx.executeSql("SELECT * FROM tasks", [], resultFunc);
+            return;
+        }
+        else if (week_id != -1 && day != -1) {
+            tx.executeSql("SELECT * FROM tasks WHERE week_id = ? and day = ?", [week_id, day], resultFunc);
+            return;
+        }
+        if (week_id !== -1) {
+            tx.executeSql("SELECT * FROM tasks WHERE week_id = ?", [week_id], resultFunc);
+            return;
+        }
+    });
 }
 function getTasks(week_id, callback) {
     let final = [];
@@ -1025,9 +1065,9 @@ class Week {
         settings.innerHTML =
             `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve" width="512px" height="512px">` +
                 `<g>` +
-                `<path d="M8,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S12.411,22,8,22z" fill="#3e97f3"/>` +
-                `<path d="M52,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S56.411,22,52,22z" fill="#3e97f3"/>` +
-                `<path d="M30,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S34.411,22,30,22z" fill="#3e97f3"/>` +
+                `<path d="M8,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S12.411,22,8,22z" fill="rgba(0, 0, 0,0.4)"/>` +
+                `<path d="M52,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S56.411,22,52,22z" fill="rgba(0, 0, 0,0.4)"/>` +
+                `<path d="M30,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S34.411,22,30,22z" fill="rgba(0, 0, 0,0.4)"/>` +
                 `</g>` +
                 `</svg>`;
         settings.className = "settingsButtonWeek";
@@ -1956,19 +1996,27 @@ exports.push([module.i, ".graph{\r\n    /*width:100vw;*/\r\n    overflow: hidden
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__db_db_api__ = __webpack_require__(3);
+
+
 __webpack_require__(27);
 class Days {
     setup(element) {
         this.nativeElement = element;
     }
     draw() {
-        this.nativeElement.innerHTML = "";
-        for (let i = 0; i < this.days.length; i++) {
-            let newEl = document.createElement("div");
-            newEl.innerHTML = this.days[i];
-            newEl.className = "day";
-            this.nativeElement.appendChild(newEl);
-        }
+        Object(__WEBPACK_IMPORTED_MODULE_1__db_db_api__["j" /* getWeeks */])(function (weeks) {
+            let data = Object(__WEBPACK_IMPORTED_MODULE_0__time__["a" /* getTimeDataSecond */])(weeks);
+            console.log(data.currentDay);
+            this.nativeElement.innerHTML = "";
+            for (let i = 0; i < this.days.length; i++) {
+                let newEl = document.createElement("div");
+                newEl.innerHTML = this.days[i];
+                newEl.className = (i == data.currentDay) ? "day active" : "day";
+                this.nativeElement.appendChild(newEl);
+            }
+        }.bind(this));
     }
     loadDays(days) {
         this.days = days;
@@ -2017,7 +2065,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".days{\r\n    float: left;\r\n    height: 280px;\r\n    margin-top: -20px;\r\n    padding-top: 16px;\r\n    background: #fff;\r\n    position: absolute;\r\n    /*left: 15px;*/\r\n    width: 40px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n    margin-left: -40px;\r\n}\r\n.days.close{\r\n    height: 0;\r\n}\r\n.day{\r\n    height: 20px;\r\n    background: #fff;\r\n    font-size: 12px;\r\n    text-align: center;\r\n    margin-bottom: 20px;\r\n    line-height: 3;\r\n}", ""]);
+exports.push([module.i, ".days{\r\n    float: left;\r\n    height: 280px;\r\n    margin-top: -20px;\r\n    padding-top: 16px;\r\n    background: #fff;\r\n    position: absolute;\r\n    /*left: 15px;*/\r\n    width: 40px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n    margin-left: -40px;\r\n}\r\n\r\n.days.close{\r\n    height: 0;\r\n}\r\n.day{\r\n    height: 20px;\r\n    background: #fff;\r\n    font-size: 12px;\r\n    text-align: center;\r\n    margin-bottom: 20px;\r\n    line-height: 3;\r\n}\r\n.day.active{\r\n    color: #3e97f3;\r\n}", ""]);
 
 // exports
 
@@ -2194,7 +2242,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".header{\r\n    padding-left: 5px;\r\n    margin: 5px 0;\r\n}\r\n.hour{\r\n    display: inline-block;\r\n    font-size: 12px;\r\n}\r\n.up{\r\n    text-align: center;\r\n    font-size: 14px;\r\n    opacity: 0.9;\r\n    padding-bottom: 5px;\r\n    border-bottom: 1px solid #efefef;\r\n    user-select: none;\r\n    height: 15px;\r\n}\r\n.up:hover{\r\n    color:#3e97f3;\r\n}\r\n.up.active{\r\n    color:#3e97f3;\r\n}\r\n.paper{\r\n    background: #fff;\r\n    color:#707070;\r\n    font-family: Helvetica-Light;\r\n    padding: 10px;\r\n    border-radius: 5px;\r\n    margin-top: 10px;\r\n    border:0.1px solid #efefef;\r\n}\r\n.main-container{\r\n    height: 351px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n}\r\n.main-container.closed{\r\n    height: 40px;\r\n}\r\n.settingsButtonWeek{\r\n    width:15px;\r\n    display: inline-block;\r\n    float:right;\r\n    margin-right: 10px;\r\n}\r\n.settingsButtonWeek svg{\r\n    width:25px;\r\n    height:15px;\r\n    cursor: pointer;\r\n}\r\n.settingsButtonWeek:hover{\r\n    opacity: 0.6;\r\n}\r\n.settingsButtonWeek:active{\r\n    opacity: 0.3;\r\n}\r\n.weekUpText{\r\n   float:left;\r\n   cursor: pointer;\r\n}\r\n", ""]);
+exports.push([module.i, ".header{\r\n    padding-left: 5px;\r\n    margin: 5px 0;\r\n}\r\n.hour{\r\n    display: inline-block;\r\n    font-size: 12px;\r\n}\r\n.up{\r\n    text-align: center;\r\n    font-size: 14px;\r\n    opacity: 0.9;\r\n    padding-bottom: 5px;\r\n    border-bottom: 1px solid #efefef;\r\n    user-select: none;\r\n    height: 15px;\r\n}\r\n.up:hover{\r\n    color:#3e97f3;\r\n}\r\n.up.active{\r\n    color:#3e97f3;\r\n}\r\n.paper{\r\n    background: #fff;\r\n    color:#707070;\r\n    font-family: Helvetica-Light;\r\n    padding: 10px;\r\n    border-radius: 5px;\r\n    margin-top: 10px;\r\n    border: 0.1px solid #efefef;\r\n}\r\n.main-container{\r\n    height: 351px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n}\r\n.main-container.closed{\r\n    height: 40px;\r\n}\r\n.settingsButtonWeek{\r\n    width:30px;\r\n    display: inline-block;\r\n    float:right;\r\n    height: 20px;\r\n    position: relative;\r\n    margin-top: -7.5px;\r\n    padding-top: 5px;\r\n    border-radius: 5px;\r\n}\r\n.settingsButtonWeek svg{\r\n    width:25px;\r\n    height:15px;\r\n    cursor: pointer;\r\n}\r\n.settingsButtonWeek:hover{\r\n    opacity: 0.6;\r\n}\r\n.settingsButtonWeek:active{\r\n    opacity: 0.3;\r\n}\r\n.weekUpText{\r\n   float:left;\r\n   cursor: pointer;\r\n}\r\n", ""]);
 
 // exports
 
@@ -2296,12 +2344,20 @@ function notificationManager(lastTask) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_tasks_panel_tasks_panel__ = __webpack_require__(38);
+
 
 __webpack_require__(36);
 let MenuNative = (function () {
     let _menu;
     let create = function (parent) {
-        _menu = new Menu(parent);
+        if (_menu) {
+            _menu.clear();
+            _menu.draw();
+        }
+        else {
+            _menu = new Menu(parent);
+        }
     };
     let clear = function () {
         if (!_menu) {
@@ -2316,8 +2372,8 @@ let MenuNative = (function () {
 /* harmony default export */ __webpack_exports__["a"] = (MenuNative);
 class Menu {
     constructor(_parent) {
+        this.task_panel = __WEBPACK_IMPORTED_MODULE_1__components_tasks_panel_tasks_panel__["a" /* default */];
         this.menu_logo_click = function () {
-            console.log('change');
             this.state = !this.state;
             this.draw();
         }.bind(this);
@@ -2437,8 +2493,28 @@ class Menu {
                 <div class="${(this.state) ? 'menu_choose_text' : 'menu_choose_text close'}">
                     Weeks
                 </div>
-            </div>`;
+            </div>
+            <div class=" ${(this.state) ? 'menu_choose' : 'menu_choose close'}">
+                  <div class="menu_button">
+                        S
+                  </div>
+                  <div class="${(this.state) ? 'menu_choose_text' : 'menu_choose_text close'}">
+                         Settings
+                  </div>
+            </div>
+            <div class=" ${(this.state) ? 'menu_choose' : 'menu_choose close'}">
+                  <div class="menu_button">
+                        A
+                  </div>
+                  <div class="${(this.state) ? 'menu_choose_text' : 'menu_choose_text close'}">
+                         About
+                  </div>
+            </div>
+            <div class="menu_line"></div>
+            <div class="task_panel" id="menu_task_panel"></div>
+            `;
         document.getElementById('menu_logo').onclick = this.menu_logo_click;
+        this.task_panel.create(document.getElementById('menu_task_panel'), this.state);
     }
     ;
     clear() {
@@ -2487,7 +2563,136 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\r\n/*wrapper*/\r\n.main_menu{\r\n    margin-right: 10px;\r\n    margin-top: -10px;\r\n    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;\r\n    /*transition: width 0.3s ease-in-out;*/\r\n    height: 100vh;\r\n    float: left;\r\n}\r\n.main_menu.close{\r\n    width: 60px;\r\n\r\n\r\n}\r\n.main_menu.open{\r\n    width: 230px;\r\n}\r\n\r\n/*up*/\r\n.menu_logo{\r\n    user-select: none;\r\n    /*width:30px;*/\r\n    text-align: center;\r\n    margin: 10px auto auto;\r\n    cursor: pointer;\r\n    opacity: 0.6;\r\n    transition: opacity 0.3s ease-in-out;\r\n}\r\n.menu_logo:hover{\r\n    opacity: 1;\r\n}\r\n.menu_logo:active{\r\n    opacity: 0.4;\r\n}\r\n#menu_logo_svg{\r\n    margin-left: 3px;\r\n    display: inline-block;\r\n    width:30px;\r\n}\r\n.menu_logo_name{\r\n    font-family: Helvetica-Light;\r\n    display: inline-block;\r\n    vertical-align: middle;\r\n    position: relative;\r\n    bottom: 10px;\r\n\r\n}\r\n.menu_line{\r\n    margin:5px;\r\n    background: #efefef;\r\n    height: 2px;\r\n}\r\n\r\n/*content*/\r\n.menu_choose{\r\n    height: 40px;\r\n    padding-top: 10px;\r\n    width: 230px;\r\n    text-align: center;\r\n    font-family: Helvetica-Light;\r\n    cursor: pointer;\r\n}\r\n.menu_choose:hover{\r\n    background: rgba(218, 232, 245,0.4);\r\n}\r\n\r\n.menu_choose.close{\r\n    width: 30px;\r\n    cursor: default;\r\n}\r\n.menu_choose.close:hover{\r\n    background-color: #fff;\r\n}\r\n.menu_choose.close>.menu_button{\r\n    margin: 0px 15px;\r\n    cursor: pointer;\r\n}\r\n\r\n.menu_choose_text{\r\n    display: inline-block;\r\n    width: 160px;\r\n    text-align: left;\r\n}\r\n.menu_choose_text.close{\r\n    display: none;\r\n\r\n}\r\n\r\n\r\n.menu_button{\r\n    color: rgba(0, 0, 0,0.7);\r\n    height: 30px;\r\n    margin: 0px 15px;\r\n    background: #e3e3e3;\r\n    border-radius: 5px;\r\n    line-height: 2;\r\n    width: 30px;\r\n    text-align: center;\r\n    display: inline-block;\r\n\r\n}\r\n.menu_button.active{\r\n    \r\n}\r\n\r\n", ""]);
+exports.push([module.i, "\r\n/*wrapper*/\r\n.main_menu{\r\n    margin-right: 10px;\r\n    margin-top: -10px;\r\n    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;\r\n    /*transition: width 0.3s ease-in-out;*/\r\n    height: 100vh;\r\n    float: left;\r\n}\r\n.main_menu.close{\r\n    width: 60px;\r\n\r\n\r\n}\r\n.main_menu.open{\r\n    width: 230px;\r\n}\r\n\r\n/*up*/\r\n.menu_logo{\r\n    user-select: none;\r\n    /*width:30px;*/\r\n    text-align: center;\r\n    margin: 10px auto auto;\r\n    cursor: pointer;\r\n    opacity: 0.6;\r\n    transition: opacity 0.3s ease-in-out;\r\n}\r\n.menu_logo:hover{\r\n    opacity: 1;\r\n}\r\n.menu_logo:active{\r\n    opacity: 0.4;\r\n}\r\n#menu_logo_svg{\r\n    margin-left: 3px;\r\n    display: inline-block;\r\n    width:30px;\r\n}\r\n.menu_logo_name{\r\n    font-family: Helvetica-Light;\r\n    display: inline-block;\r\n    vertical-align: middle;\r\n    position: relative;\r\n    bottom: 10px;\r\n\r\n}\r\n.menu_line{\r\n    margin:5px;\r\n    background: #efefef;\r\n    height: 2px;\r\n}\r\n\r\n/*content*/\r\n.menu_choose{\r\n    height: 40px;\r\n    padding-top: 10px;\r\n    width: 230px;\r\n    text-align: center;\r\n    font-family: Helvetica-Light;\r\n    cursor: pointer;\r\n}\r\n.menu_choose:hover{\r\n    background: rgba(218, 232, 245,0.4);\r\n}\r\n\r\n.menu_choose.close{\r\n    width: 30px;\r\n    cursor: default;\r\n}\r\n.menu_choose.close:hover{\r\n    background-color: #fff;\r\n}\r\n.menu_choose.close>.menu_button{\r\n    margin: 0px 15px;\r\n    cursor: pointer;\r\n}\r\n\r\n.menu_choose_text{\r\n    display: inline-block;\r\n    width: 160px;\r\n    text-align: left;\r\n}\r\n.menu_choose_text.close{\r\n    display: none;\r\n\r\n}\r\n\r\n\r\n.menu_button{\r\n    color: rgba(0, 0, 0,0.7);\r\n    height: 30px;\r\n    margin: 0px 15px;\r\n    background: #e3e3e3;\r\n    border-radius: 5px;\r\n    line-height: 2;\r\n    width: 30px;\r\n    text-align: center;\r\n    display: inline-block;\r\n\r\n}\r\n.menu_button.active{\r\n\r\n}\r\n\r\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__db_db_api__ = __webpack_require__(3);
+
+__webpack_require__(39);
+let TasksPanelComponent = (function () {
+    let _tasks_panel;
+    let create = function (_parent, open) {
+        if (!_tasks_panel) {
+            _tasks_panel = new TasksPanel(_parent, open);
+        }
+        else {
+            _tasks_panel.clear();
+            _tasks_panel.setParent(_parent);
+            _tasks_panel.setOpen(open);
+            _tasks_panel.draw();
+        }
+    };
+    return { create };
+})();
+class TasksPanel {
+    constructor(_parent, _open) {
+        this.parent = _parent;
+        this.open = _open;
+        this.draw();
+    }
+    setParent(_parent) {
+        this.parent = _parent;
+    }
+    setOpen(_open) {
+        this.open = _open;
+    }
+    draw() {
+        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["k" /* tasks */])(-1, -1, function (_tasks) {
+            function find(name, ar) {
+                for (let i = 0; i < ar.length; i++) {
+                    if (ar[i].text == name) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            let unique_tasks = [];
+            _tasks.forEach(function (item) {
+                if (!find(item.text, unique_tasks)) {
+                    unique_tasks.push(item);
+                }
+            });
+            let inner = "";
+            unique_tasks.forEach(function (item) {
+                let time = 0;
+                _tasks.forEach(function (jitem) {
+                    if (item.text == jitem.text) {
+                        time += Math.abs(jitem.start - jitem.stop);
+                    }
+                });
+                inner += `
+                       <div class="menu_panel_task" style="background:${item.color}">
+                               <div class="menu_panel_task_icon" >
+                                    ${item.text.substring(0, 1).toUpperCase()}
+                                </div>
+                                <div class="menu_panel_task_text" style="display: ${(this.open) ? "inline-block" : "none"}">
+                                    ${(this.open) ? item.text : ""}
+                                </div>
+                                 <div class="menu_panel_task_time" >
+                                   ${time + 'h'}
+                                </div>
+                        </div>
+                   `;
+            }.bind(this));
+            console.log(this.parent);
+            this.parent.innerHTML = inner;
+        }.bind(this));
+    }
+    clear() {
+        this.parent.innerHTML = "";
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (TasksPanelComponent);
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(40);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(1)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../../../node_modules/css-loader/index.js!./tasks_panel.css", function() {
+			var newContent = require("!!../../../../node_modules/css-loader/index.js!./tasks_panel.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, ".menu_panel_task{\r\n    font-family: Helvetica-Light;\r\n    width:max-content;\r\n    font-size: 14px;\r\n    margin: 5px ;\r\n    padding: 2px 5px 2px 5px;\r\n    cursor:pointer;\r\n    border-radius: 5px;\r\n    font-weight: bold;\r\n    color: rgba(0,0,0,0.5);\r\n    display: inline-block;\r\n    transition: opacity 300ms ease-in-out;\r\n}\r\n.menu_panel_task:hover{\r\n    opacity: 0.6;\r\n}\r\n.menu_panel_task_icon{\r\n    display: inline-block;\r\n    width: 15px;\r\n    text-align: center;\r\n    border-right: 1px solid rgba(0,0,0,0.1);\r\n}\r\n.menu_panel_task_time{\r\n    display: inline-block;\r\n    border-left: 1px solid rgba(0,0,0,0.1);\r\n    text-align: center;\r\n    width: 20px;\r\n\r\n}\r\n.menu_panel_task_text{\r\n    display: inline-block;\r\n}\r\n", ""]);
 
 // exports
 

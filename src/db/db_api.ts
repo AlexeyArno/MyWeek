@@ -82,6 +82,42 @@ function createTask(task:Task, callback:Function){
 	return true;
 }
 
+
+function tasks(week_id:number, day:number, callback:Function){
+    let final:Array<Task> = [];
+    if (!db) throw new Error("DB is not init, use dbInit()");
+    db.transaction(function(tx:any){
+        let resultFunc:Function = function(tx,result){
+            for (let i=0; i < result.rows.length; i++) {
+                let now_task:Task = new Task(
+                    result.rows.item(i).text,
+                    result.rows.item(i).color,
+                    result.rows.item(i).start,
+                    result.rows.item(i).stop,
+                    result.rows.item(i).day,
+                    result.rows.item(i).ID,
+                    result.rows.item(i).week_id);
+                now_task.action_body = result.rows.item(i).action_body;
+                now_task.action_type = result.rows.item(i).action_type;
+                final.push(now_task);
+            }
+            callback(final)
+        };
+        let expression:string = "";
+        if(week_id==-1 && day==-1){
+            tx.executeSql("SELECT * FROM tasks", [],resultFunc);
+            return;
+        }else if(week_id != -1 && day!=-1){
+            tx.executeSql("SELECT * FROM tasks WHERE week_id = ? and day = ?", [week_id,day], resultFunc);
+            return
+        }
+        if(week_id!==-1){
+            tx.executeSql("SELECT * FROM tasks WHERE week_id = ?", [week_id],resultFunc);
+            return;
+        }
+    })
+}
+
 function getTasks(week_id:number, callback:Function){
 	let final:Array<Task> = [];
     if (!db) throw new Error("DB is not init, use dbInit()");
@@ -196,6 +232,7 @@ function changeWeekNumber(currentWeekData:weekData, newNumber:number, callback:F
 }
 
 export {dbInit, createWeek, createTask,
+        tasks,
 		getTasks, getWeeks, deleteTask,
     	changeTask, getTasksByDay, deleteWeek,
     changeWeekNumber}

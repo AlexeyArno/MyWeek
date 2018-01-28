@@ -5,4 +5,14 @@ function createElement(type:string,className: string, parent:HTMLElement):HTMLEl
     return element
 }
 
-export  {createElement}
+function hexToDec(hex) {
+    let result = 0, digitValue;
+    hex = hex.toLowerCase();
+    for (let i = 0; i < hex.length; i++) {
+        digitValue = '0123456789abcdefgh'.indexOf(hex[i]);
+        result = result * 16 + digitValue;
+    }
+    return result;
+}
+
+export  {createElement, hexToDec}
