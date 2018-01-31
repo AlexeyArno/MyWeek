@@ -13,11 +13,22 @@
 
 body{
 	background: #fbfbfb;
+    margin: 0px;
+}
+#content{
+    padding-right: 10px;
 }
 
 .button.createWeek{
     background: #f4f4f4;
 }
+
+.click_text{
+    color:rgb(59, 159, 255);
+    cursor:pointer;
+    user-select: none;
+}
+
 .buttonShell{
     margin-top: 10px;
     text-align: center;

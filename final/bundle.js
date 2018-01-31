@@ -202,7 +202,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(14);
+var	fixUrls = __webpack_require__(15);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -522,24 +522,10 @@ function updateLink (link, options, obj) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createElement; });
-function createElement(type, className, parent) {
-    let element = document.createElement(type);
-    element.className = className;
-    parent.appendChild(element);
-    return element;
-}
-
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return dbInit; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return createWeek; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return createTask; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return tasks; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return getTasks; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return getWeeks; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return deleteTask; });
@@ -622,6 +608,35 @@ function createTask(task, callback) {
         });
     });
     return true;
+}
+function tasks(week_id, day, callback) {
+    let final = [];
+    if (!db)
+        throw new Error("DB is not init, use dbInit()");
+    db.transaction(function (tx) {
+        let resultFunc = function (tx, result) {
+            for (let i = 0; i < result.rows.length; i++) {
+                let now_task = new __WEBPACK_IMPORTED_MODULE_0__week_task__["a" /* default */](result.rows.item(i).text, result.rows.item(i).color, result.rows.item(i).start, result.rows.item(i).stop, result.rows.item(i).day, result.rows.item(i).ID, result.rows.item(i).week_id);
+                now_task.action_body = result.rows.item(i).action_body;
+                now_task.action_type = result.rows.item(i).action_type;
+                final.push(now_task);
+            }
+            callback(final);
+        };
+        let expression = "";
+        if (week_id == -1 && day == -1) {
+            tx.executeSql("SELECT * FROM tasks", [], resultFunc);
+            return;
+        }
+        else if (week_id != -1 && day != -1) {
+            tx.executeSql("SELECT * FROM tasks WHERE week_id = ? and day = ?", [week_id, day], resultFunc);
+            return;
+        }
+        if (week_id !== -1) {
+            tx.executeSql("SELECT * FROM tasks WHERE week_id = ?", [week_id], resultFunc);
+            return;
+        }
+    });
 }
 function getTasks(week_id, callback) {
     let final = [];
@@ -716,6 +731,31 @@ function changeWeekNumber(currentWeekData, newNumber, callback) {
 
 
 /***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createElement; });
+/* unused harmony export hexToDec */
+function createElement(type, className, parent) {
+    let element = document.createElement(type);
+    element.className = className;
+    parent.appendChild(element);
+    return element;
+}
+function hexToDec(hex) {
+    let result = 0, digitValue;
+    hex = hex.toLowerCase();
+    for (let i = 0; i < hex.length; i++) {
+        digitValue = '0123456789abcdefgh'.indexOf(hex[i]);
+        result = result * 16 + digitValue;
+    }
+    return result;
+}
+
+
+
+/***/ }),
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -723,11 +763,12 @@ function changeWeekNumber(currentWeekData, newNumber, callback) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Draw", function() { return Draw; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "redrawWeek", function() { return redrawWeek; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__week_week__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__week_task__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__time__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions_functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__time__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__menu_menu__ = __webpack_require__(35);
 
 
 
@@ -735,11 +776,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+
 let currentWeek = 2;
 let startHour = 11;
 let currentWeeks = [];
 Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["e" /* dbInit */])();
 function redrawWeek(id) {
+    __WEBPACK_IMPORTED_MODULE_5__menu_menu__["a" /* default */].draw();
     currentWeeks.map(function (item) {
         if (item.data.week_id == id) {
             Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["h" /* getTasks */])(item.data.week_id, function (tasks) {
@@ -773,6 +816,8 @@ function Draw() {
     clear("paper  main-container");
     clear("buttonShell");
     clear("taskTooltip");
+    __WEBPACK_IMPORTED_MODULE_5__menu_menu__["a" /* default */].clear();
+    __WEBPACK_IMPORTED_MODULE_5__menu_menu__["a" /* default */].create(document.getElementById('menu'));
     Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["j" /* getWeeks */])(function (weeks) {
         if (weeks.length == 0) {
             drawButton();
@@ -783,7 +828,7 @@ function Draw() {
         weeks.map(function (item, index) {
             Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["h" /* getTasks */])(item.week_id, function (tasks) {
                 let week = new __WEBPACK_IMPORTED_MODULE_0__week_week__["a" /* Week */](item.week_number, item.week_id);
-                week.create(document.body, (item.week_number == currentWeek));
+                week.create(document.getElementById('content'), (item.week_number == currentWeek));
                 week.loadDays(days);
                 week.setStartHour(startHour);
                 week.loadTasks(tasks);
@@ -806,8 +851,8 @@ Object(__WEBPACK_IMPORTED_MODULE_4__time__["b" /* notificationManager */])(new _
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__tooltip__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__features_popup_contents_task_change_task_change__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__tooltip__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__features_popup_contents_task_change_task_change__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__features_popup_popup__ = __webpack_require__(7);
 
 
@@ -893,7 +938,7 @@ class Task {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return drawButtons; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(3);
 
 function drawButtons(buttons, parent) {
     let wrapper = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "buttonWrapper", parent);
@@ -916,7 +961,7 @@ function drawButtons(buttons, parent) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getPopup; });
-__webpack_require__(18);
+__webpack_require__(19);
 class Popup {
     constructor() {
         this.now_open = false;
@@ -962,7 +1007,7 @@ function getPopup() {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return drawColor; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(3);
 
 function drawColor(colors, callback, parent) {
     let final = [];
@@ -972,7 +1017,6 @@ function drawColor(colors, callback, parent) {
         let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "colorPopup", wrapper);
         now.style.background = item;
         now.onclick = () => callback(item);
-        console.log(now.onclick);
         final.push(now);
     });
     return final;
@@ -985,20 +1029,111 @@ function drawColor(colors, callback, parent) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* unused harmony export getTimeDataFirst */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getTimeDataSecond; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return notificationManager; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__db_db_api__ = __webpack_require__(2);
+
+Date.prototype['getWeekNumber'] = function () {
+    let d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+    let dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    let yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+};
+let nowTimeout;
+function getTimeDataFirst(callBack) {
+    let final = { currentDay: 0, currentWeek: 0, currentHour: 0 };
+    let now = new Date();
+    final.currentWeek = now['getWeekNumber']();
+    final.currentDay = now.getDay();
+    final.currentHour = now.getHours();
+    Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["j" /* getWeeks */])(function (weeks) {
+        let weeksNumbers = weeks.map((i) => i.week_number);
+        let maxWeekNumber = Math.max.apply(Math, weeksNumbers);
+        let processDate = final.currentWeek % maxWeekNumber;
+        if (processDate == 0) {
+            final.currentWeek = maxWeekNumber;
+        }
+        else {
+            for (let i = 1; i < maxWeekNumber; i++) {
+                if (processDate == i / maxWeekNumber) {
+                    final.currentWeek = i;
+                }
+            }
+        }
+        callBack(final);
+    });
+}
+function getTimeDataSecond(weeks) {
+    let final = { currentDay: 0, currentWeek: 0, currentHour: 0 };
+    let weeksNumbers = weeks.map((i) => i.week_number);
+    let now = new Date();
+    final.currentWeek = now['getWeekNumber']();
+    final.currentDay = now.getDay();
+    final.currentHour = now.getHours();
+    let maxWeekNumber = Math.max.apply(Math, weeksNumbers);
+    let processDate = final.currentWeek % maxWeekNumber;
+    if (processDate == 0) {
+        final.currentWeek = maxWeekNumber;
+    }
+    else {
+        for (let i = 1; i < maxWeekNumber; i++) {
+            if (processDate == i / maxWeekNumber) {
+                final.currentWeek = i;
+            }
+        }
+    }
+    return final;
+}
+function notificationManager(lastTask) {
+    clearTimeout(nowTimeout);
+    getTimeDataFirst(function (data) {
+        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["i" /* getTasksByDay */])(data.currentWeek, data.currentDay - 1, function (tasks) {
+            tasks.map(function (item) {
+                if (data.currentHour >= item.start && data.currentHour < item.stop) {
+                    if (lastTask.id != item.id) {
+                        window['createNotification'](item.text, String(item.start) + ":00 - " + String(item.stop) + ":00");
+                        switch (item.action_type) {
+                            case "link":
+                                window['openLink'](item.action_body);
+                                break;
+                            case "file":
+                                window['openFile'](item.action_body);
+                                break;
+                        }
+                        lastTask = item;
+                    }
+                }
+            });
+            nowTimeout = setTimeout(function () {
+                notificationManager(lastTask);
+            }, (60 - new Date().getMinutes()) * 60000);
+        });
+    });
+}
+
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Week; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__task__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__graph__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__days__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__features_popup_popup__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__features_popup_contents_week_settings_week_change__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__features_popup_contents_week_settings_week_change__ = __webpack_require__(30);
 
 
 
 
 
 
-__webpack_require__(32);
+__webpack_require__(33);
 class Week {
     constructor(week_number, week_id) {
         this.hourWidth = 80;
@@ -1021,16 +1156,15 @@ class Week {
         settings.innerHTML =
             `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve" width="512px" height="512px">` +
                 `<g>` +
-                `<path d="M8,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S12.411,22,8,22z" fill="#3e97f3"/>` +
-                `<path d="M52,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S56.411,22,52,22z" fill="#3e97f3"/>` +
-                `<path d="M30,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S34.411,22,30,22z" fill="#3e97f3"/>` +
+                `<path d="M8,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S12.411,22,8,22z" fill="rgba(0, 0, 0,0.4)"/>` +
+                `<path d="M52,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S56.411,22,52,22z" fill="rgba(0, 0, 0,0.4)"/>` +
+                `<path d="M30,22c-4.411,0-8,3.589-8,8s3.589,8,8,8s8-3.589,8-8S34.411,22,30,22z" fill="rgba(0, 0, 0,0.4)"/>` +
                 `</g>` +
                 `</svg>`;
         settings.className = "settingsButtonWeek";
         up.appendChild(settings);
         wrap.appendChild(up);
         upText.onclick = function (e) {
-            console.log(e.target);
             wrap.classList;
             let clList = wrap.classList;
             for (let i = 0; i < clList.length; i++) {
@@ -1114,7 +1248,7 @@ class Week {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1151,11 +1285,11 @@ class Time {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-__webpack_require__(12);
+__webpack_require__(13);
 class Tooltip {
     constructor(text, color, start, stop) {
         this.open = false;
@@ -1205,13 +1339,13 @@ class Tooltip {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(13);
+var content = __webpack_require__(14);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -1236,7 +1370,7 @@ if(false) {
 }
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(undefined);
@@ -1250,7 +1384,7 @@ exports.push([module.i, ".taskTooltip{\r\n    position: absolute;\r\n    height:
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 
@@ -1345,21 +1479,22 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__task_basic_functions__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app__ = __webpack_require__(4);
 
 
 
 
 
-__webpack_require__(16);
+
+__webpack_require__(17);
 class TaskChange {
     constructor() {
         this.colorsList = ["#cbf0e8", "#ffd9a5", "#dae8f5", "#f5daf5"];
@@ -1386,55 +1521,77 @@ class TaskChange {
         Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(del_buttons, this.element.children[0]);
     }
     draw(background, closePopup) {
-        this.background = background;
-        this.currentColor = this.currentTask.color;
-        this.closePopup = closePopup;
-        this.buttons[0].click = function () { closePopup(); };
-        if (!this.currentTask)
-            return;
-        this.element = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "", background);
-        this.element.innerHTML =
-            "<div class='popupContent task_create'>" +
-                "<div>Change task</div>" +
-                "<hr/>" +
-                "<div>" +
-                "<div>Name</div>" +
-                `<input id='namePopup' value=${this.currentTask.text}>` +
-                "</div>" +
-                "<div class='timeChoosePopup'>" +
-                "<div>Time</div>" +
-                `<input value=${this.currentTask.start} id='startTimePopup'>` +
-                " - " +
-                `<input value=${this.currentTask.stop} id='stopTimePopup'>` +
-                "</div>" +
-                "</div>";
-        this.colorsElements =
-            Object(__WEBPACK_IMPORTED_MODULE_2__task_basic_functions__["a" /* drawColor */])(this.colorsList, function (click_color) {
-                this.currentColor = click_color;
-                this.drawColors();
-            }.bind(this), this.element.children[0]);
-        this.drawColors();
-        let actionPopup = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "actionsPopup", this.element.children[0]);
-        actionPopup.innerHTML +=
-            "<div>Action</div>" +
-                `<select id='actionSelect'>
+        function find(name, ar) {
+            for (let i = 0; i < ar.length; i++) {
+                if (ar[i].text == name) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+        function draw(_tasks) {
+            let unique_tasks = [];
+            _tasks.forEach(function (item) {
+                if (!find(item.text, unique_tasks)) {
+                    unique_tasks.push(item);
+                }
+            });
+            let datalist = `<datalist id='name_tooltips'>`;
+            unique_tasks.forEach(function (item) {
+                datalist += `<option value = "${item.text}" id="${'id' + item.text}">`;
+            });
+            datalist += `</datalist>`;
+            this.background = background;
+            this.currentColor = this.currentTask.color;
+            this.closePopup = closePopup;
+            this.buttons[0].click = function () { closePopup(); };
+            if (!this.currentTask)
+                return;
+            this.element = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "", background);
+            this.element.innerHTML =
+                `<div class='popupContent task_create'>
+              <div >Change task</div>
+              <hr/>
+              <div>
+                <div>Name</div>
+                <input id='namePopup' value=${this.currentTask.text} list='name_tooltips'>
+                ${datalist}
+              </div>
+              <div class='timeChoosePopup'>
+                <div>Time</div>
+                <input value=${this.currentTask.start} id='startTimePopup'>
+                  -
+                <input value=${this.currentTask.stop} id='stopTimePopup'>
+              </div>
+            </div>`;
+            this.colorsElements =
+                Object(__WEBPACK_IMPORTED_MODULE_2__task_basic_functions__["a" /* drawColor */])(this.colorsList, function (click_color) {
+                    this.currentColor = click_color;
+                    this.drawColors();
+                }.bind(this), this.element.children[0]);
+            this.drawColors();
+            let actionPopup = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "actionsPopup", this.element.children[0]);
+            actionPopup.innerHTML +=
+                "<div>Action</div>" +
+                    `<select id='actionSelect'>
                 <option value='none' ${(this.currentTask.action_type == 'none') ? 'selected' : ''}>None</option>
                 <option value='link'  ${(this.currentTask.action_type == 'link') ? 'selected' : ''}>Link</option>
                 <option value='file'  ${(this.currentTask.action_type == 'file') ? 'selected' : ''}>File/Application</option>
             </select>
-            
+
             <div id='wrapperAction'>
-                
+
             </div>
             <div id='actionExtension'>
             </div>`;
-        Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
-        console.log(this.currentTask);
-        this.wrapperAction = document.getElementById('wrapperAction');
-        this.actionHandler(this.currentTask.action_type);
-        document.getElementById('actionSelect').onchange = function (e) {
-            this.actionHandler(e.target['value']);
-        }.bind(this);
+            Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
+            this.wrapperAction = document.getElementById('wrapperAction');
+            this.actionHandler(this.currentTask.action_type);
+            document.getElementById('actionSelect').onchange = function (e) {
+                this.actionHandler(e.target['value']);
+            }.bind(this);
+        }
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["k" /* tasks */])(-1, -1, draw.bind(this));
     }
     actionHandler(value) {
         switch (value) {
@@ -1442,7 +1599,7 @@ class TaskChange {
                 this.wrapperAction.innerHTML = "";
                 break;
             case "link":
-                this.wrapperAction.innerHTML = `<input id="inputLinkPopup" 
+                this.wrapperAction.innerHTML = `<input id="inputLinkPopup"
                         value="${(this.currentTask.action_type == "link") ? this.currentTask.action_body : ""}"/>`;
                 break;
             case "file":
@@ -1521,13 +1678,13 @@ class TaskChange {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(17);
+var content = __webpack_require__(18);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -1552,7 +1709,7 @@ if(false) {
 }
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(undefined);
@@ -1560,19 +1717,19 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".task_delete,\r\n.week_delete{\r\n    width: 300px;\r\n    height: 90px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 45px);\r\n}", ""]);
+exports.push([module.i, ".task_delete,\r\n.week_delete{\r\n    width: 300px;\r\n    height: 90px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 45px);\r\n}\r\n.copy_button{\r\n    display: inline-block;\r\n    float:right;\r\n}\r\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(19);
+var content = __webpack_require__(20);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -1597,7 +1754,7 @@ if(false) {
 }
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(undefined);
@@ -1611,17 +1768,17 @@ exports.push([module.i, ".popupBack{\r\n    position: fixed;\r\n    z-index: 999
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__task__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__features_popup_popup__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__features_popup_contents_task_create_task_create__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__features_popup_contents_task_create_task_create__ = __webpack_require__(22);
 
 
 
-__webpack_require__(24);
+__webpack_require__(25);
 class Graph {
     constructor() {
         this.currentWeekData = { week_id: 0, week_number: 0 };
@@ -1717,21 +1874,22 @@ class Graph {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__task_basic_functions__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db_db_api__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app__ = __webpack_require__(4);
 
 
 
 
 
-__webpack_require__(22);
+
+__webpack_require__(23);
 class TaskCreate {
     constructor() {
         this.colorsList = ["#cbf0e8", "#ffd9a5", "#dae8f5", "#f5daf5"];
@@ -1743,77 +1901,101 @@ class TaskCreate {
                 color: "#fff", border: "#177bf3", float: "right" }];
     }
     draw(background, closePopup) {
-        this.closePopup = closePopup;
-        this.buttons[0].click = function () { closePopup(); };
-        if (!this.currentTask)
-            return;
-        this.element = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "", background);
-        this.element.innerHTML =
-            "<div class='popupContent task_create'>" +
-                "<div>Create task</div>" +
-                "<hr/>" +
-                "<div>" +
-                "<div>Name</div>" +
-                "<input id='namePopup' >" +
-                "</div>" +
-                "<div class='timeChoosePopup'>" +
-                "<div>Time</div>" +
-                `<input value=${this.currentTask.start} id='startTimePopup'>` +
-                " - " +
-                `<input value=${this.currentTask.stop} id='stopTimePopup'>` +
-                "</div>" +
-                "</div>";
-        this.colorsElements =
-            Object(__WEBPACK_IMPORTED_MODULE_2__task_basic_functions__["a" /* drawColor */])(this.colorsList, function (click_color) {
-                console.log(click_color);
-                this.currentColor = click_color;
-                this.drawColors();
-            }.bind(this), this.element.children[0]);
-        this.drawColors();
-        let actionPopup = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "actionsPopup", this.element.children[0]);
-        actionPopup.innerHTML +=
-            "<div>Action</div>" +
-                `<select id='actionSelect'>
-                 <option value='none'>None</option>
-                <option value='link'>Link</option>
-                <option value='file'>File/Application</option>
-            </select>
-            
-            <div id='wrapperAction'>
-               
-            </div>
-            <div id='actionExtension'>
-              
-            </div>`;
-        Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
-        let wrapperAction = document.getElementById('wrapperAction');
-        document.getElementById('actionSelect').onchange = function (e) {
-            switch (e.target['value']) {
-                case "none":
-                    wrapperAction.innerHTML = "";
-                    break;
-                case "link":
-                    wrapperAction.innerHTML = `<input id="inputLinkPopup"/>`;
-                    break;
-                case "file":
-                    let chooseButton = { name: "Choose", click: function () {
-                            let path = window['chooseFile']()[0];
-                            this.newExtension = path;
-                            path = (path.length >= 20) ?
-                                "..." + path.substring(path.length - 20, path.length) : path;
-                            document.getElementById('actionExtension').innerText = path;
-                        }.bind(this), bg: "#3b9fff",
-                        color: "#fff", border: "#177bf3", float: "right" };
-                    wrapperAction.innerHTML = "";
-                    let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "button", wrapperAction);
-                    now.innerText = chooseButton.name;
-                    now.style.background = chooseButton.bg;
-                    now.style.color = chooseButton.color;
-                    now.style['float'] = chooseButton.float;
-                    now.style.border = "1px solid " + chooseButton.border;
-                    now.onclick = function () { chooseButton.click(); };
+        function find(name, ar) {
+            for (let i = 0; i < ar.length; i++) {
+                if (ar[i].text == name) {
+                    return true;
+                }
             }
-        }.bind(this);
+            return false;
+        }
+        function draw(_tasks) {
+            let unique_tasks = [];
+            _tasks.forEach(function (item) {
+                if (!find(item.text, unique_tasks)) {
+                    unique_tasks.push(item);
+                }
+            });
+            let datalist = `<datalist id='name_tooltips'>`;
+            unique_tasks.forEach(function (item) {
+                datalist += `<option>
+                          ${item.text}
+                      </option>`;
+            });
+            datalist += `<datalist>`;
+            this.closePopup = closePopup;
+            this.buttons[0].click = function () { closePopup(); };
+            if (!this.currentTask)
+                return;
+            this.element = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "", background);
+            this.element.innerHTML =
+                "<div class='popupContent task_create'>" +
+                    "<div>Create task</div>" +
+                    "<hr/>" +
+                    "<div>" +
+                    "<div>Name</div>" +
+                    "<input id='namePopup'  list='name_tooltips'>" + datalist +
+                    "</div>" +
+                    "<div class='timeChoosePopup'>" +
+                    "<div>Time</div>" +
+                    `<input value=${this.currentTask.start} id='startTimePopup'  type="number">` +
+                    " - " +
+                    `<input value=${this.currentTask.stop} id='stopTimePopup' type="number">` +
+                    "</div>" +
+                    "</div>";
+            this.colorsElements =
+                Object(__WEBPACK_IMPORTED_MODULE_2__task_basic_functions__["a" /* drawColor */])(this.colorsList, function (click_color) {
+                    console.log(click_color);
+                    this.currentColor = click_color;
+                    this.drawColors();
+                }.bind(this), this.element.children[0]);
+            this.drawColors();
+            let actionPopup = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "actionsPopup", this.element.children[0]);
+            actionPopup.innerHTML +=
+                "<div>Action</div>" +
+                    `<select id='actionSelect'>
+                   <option value='none'>None</option>
+                  <option value='link'>Link</option>
+                  <option value='file'>File/Application</option>
+              </select>
+
+              <div id='wrapperAction'>
+
+              </div>
+              <div id='actionExtension'>
+
+              </div>`;
+            Object(__WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__["a" /* drawButtons */])(this.buttons, this.element.children[0]);
+            let wrapperAction = document.getElementById('wrapperAction');
+            document.getElementById('actionSelect').onchange = function (e) {
+                switch (e.target['value']) {
+                    case "none":
+                        wrapperAction.innerHTML = "";
+                        break;
+                    case "link":
+                        wrapperAction.innerHTML = `<input id="inputLinkPopup"/>`;
+                        break;
+                    case "file":
+                        let chooseButton = { name: "Choose", click: function () {
+                                let path = window['chooseFile']()[0];
+                                this.newExtension = path;
+                                path = (path.length >= 20) ?
+                                    "..." + path.substring(path.length - 20, path.length) : path;
+                                document.getElementById('actionExtension').innerText = path;
+                            }.bind(this), bg: "#3b9fff",
+                            color: "#fff", border: "#177bf3", float: "right" };
+                        wrapperAction.innerHTML = "";
+                        let now = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])("div", "button", wrapperAction);
+                        now.innerText = chooseButton.name;
+                        now.style.background = chooseButton.bg;
+                        now.style.color = chooseButton.color;
+                        now.style['float'] = chooseButton.float;
+                        now.style.border = "1px solid " + chooseButton.border;
+                        now.onclick = function () { chooseButton.click(); };
+                }
+            }.bind(this);
+        }
+        Object(__WEBPACK_IMPORTED_MODULE_3__db_db_api__["k" /* tasks */])(-1, -1, draw.bind(this));
     }
     setCurrentTask(task) {
         this.currentTask = task;
@@ -1829,7 +2011,6 @@ class TaskCreate {
         }.bind(this));
     }
     create() {
-        console.log(this.currentTask);
         this.currentTask.text = document.getElementById("namePopup")['value'];
         this.currentTask.start = Number(document.getElementById("startTimePopup")['value']);
         this.currentTask.stop = Number(document.getElementById("stopTimePopup")['value']);
@@ -1858,13 +2039,13 @@ class TaskCreate {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(23);
+var content = __webpack_require__(24);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -1889,7 +2070,7 @@ if(false) {
 }
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(undefined);
@@ -1897,19 +2078,19 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".task_create{\r\n    width: 300px;\r\n    height: 250px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 125px);\r\n}\r\n.task_create div{\r\n    font-size: 14px;\r\n\r\n}\r\n#startTimePopup,\r\n#stopTimePopup{\r\n    width: 30px;\r\n}\r\n.timeChoosePopup{\r\n    margin-top: 10px;\r\n}\r\n.colorPopup{\r\n    height: 20px;\r\n    cursor: pointer;\r\n    width: 20px;\r\n    border-radius: 2px;\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.39);\r\n    display: inline-block;\r\n    margin-right: 10px;\r\n}\r\n.colorPopup:hover{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.25);\r\n}\r\n.colorPopup.current{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0);\r\n}\r\n.colorWrapper{\r\n    display: inline-block;\r\n    margin-left: 20px;\r\n    margin-top: 10px;\r\n}\r\n.timeChoosePopup{\r\n    display: inline-block;\r\n    float:left;\r\n}\r\n.actionsPopup{\r\n    margin-top: 10px;\r\n}\r\n#actionSelect:focus{\r\n    outline: none;\r\n}\r\n#actionSelect{\r\n    margin-top: 5px;\r\n    border: none;\r\n    border-bottom: 1px solid rgba(0,0,0,0.1);\r\n}\r\n#wrapperAction{\r\n    float:right;\r\n}\r\n#actionExtension{\r\n    height:18px;\r\n    margin-top: 5px;\r\n    width:170px;\r\n    overflow: hidden;\r\n}\r\n#inputLinkPopup{\r\n    margin-top: 5px;\r\n}", ""]);
+exports.push([module.i, ".task_create{\r\n    width: 300px;\r\n    height: 250px;\r\n    left: calc(50vw - 150px);\r\n    top: calc(50vh - 125px);\r\n}\r\n.task_create div{\r\n    font-size: 14px;\r\n\r\n}\r\n#startTimePopup,\r\n#stopTimePopup{\r\n    width: 40px;\r\n    appearance: textfield;\r\n}\r\n.timeChoosePopup{\r\n    margin-top: 10px;\r\n}\r\n.colorPopup{\r\n    height: 20px;\r\n    cursor: pointer;\r\n    width: 20px;\r\n    border-radius: 2px;\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.39);\r\n    display: inline-block;\r\n    margin-right: 10px;\r\n}\r\n.colorPopup:hover{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.25);\r\n}\r\n.colorPopup.current{\r\n    box-shadow: 1px 1px 5px 1px rgba(0,0,0,0);\r\n}\r\n.colorWrapper{\r\n    display: inline-block;\r\n    margin-left: 20px;\r\n    margin-top: 10px;\r\n}\r\n.timeChoosePopup{\r\n    display: inline-block;\r\n    float:left;\r\n}\r\n.actionsPopup{\r\n    margin-top: 10px;\r\n}\r\n#actionSelect:focus{\r\n    outline: none;\r\n}\r\n#actionSelect{\r\n    margin-top: 5px;\r\n    border: none;\r\n    border-bottom: 1px solid rgba(0,0,0,0.1);\r\n}\r\n#wrapperAction{\r\n    float:right;\r\n}\r\n#actionExtension{\r\n    height:18px;\r\n    margin-top: 5px;\r\n    width:170px;\r\n    overflow: hidden;\r\n}\r\n#inputLinkPopup{\r\n    margin-top: 5px;\r\n}\r\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(25);
+var content = __webpack_require__(26);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -1934,7 +2115,7 @@ if(false) {
 }
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(undefined);
@@ -1948,23 +2129,30 @@ exports.push([module.i, ".graph{\r\n    /*width:100vw;*/\r\n    overflow: hidden
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-__webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__time__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__db_db_api__ = __webpack_require__(2);
+
+
+__webpack_require__(28);
 class Days {
     setup(element) {
         this.nativeElement = element;
     }
     draw() {
-        this.nativeElement.innerHTML = "";
-        for (let i = 0; i < this.days.length; i++) {
-            let newEl = document.createElement("div");
-            newEl.innerHTML = this.days[i];
-            newEl.className = "day";
-            this.nativeElement.appendChild(newEl);
-        }
+        Object(__WEBPACK_IMPORTED_MODULE_1__db_db_api__["j" /* getWeeks */])(function (weeks) {
+            let data = Object(__WEBPACK_IMPORTED_MODULE_0__time__["a" /* getTimeDataSecond */])(weeks);
+            this.nativeElement.innerHTML = "";
+            for (let i = 0; i < this.days.length; i++) {
+                let newEl = document.createElement("div");
+                newEl.innerHTML = this.days[i];
+                newEl.className = (i == data.currentDay - 1) ? "day active" : "day";
+                this.nativeElement.appendChild(newEl);
+            }
+        }.bind(this));
     }
     loadDays(days) {
         this.days = days;
@@ -1974,13 +2162,13 @@ class Days {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(28);
+var content = __webpack_require__(29);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -2005,7 +2193,7 @@ if(false) {
 }
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(undefined);
@@ -2013,25 +2201,25 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".days{\r\n    float: left;\r\n    height: 280px;\r\n    margin-top: -20px;\r\n    padding-top: 16px;\r\n    background: #fff;\r\n    position: absolute;\r\n    left: 15px;\r\n    width: 40px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n}\r\n.days.close{\r\n    height: 0;\r\n}\r\n.day{\r\n    height: 20px;\r\n    background: #fff;\r\n    font-size: 12px;\r\n    text-align: center;\r\n    margin-bottom: 20px;\r\n    line-height: 3;\r\n}", ""]);
+exports.push([module.i, ".days{\r\n    float: left;\r\n    height: 280px;\r\n    margin-top: -20px;\r\n    padding-top: 16px;\r\n    background: #fff;\r\n    position: absolute;\r\n    /*left: 15px;*/\r\n    width: 40px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n    margin-left: -40px;\r\n}\r\n\r\n.days.close{\r\n    height: 0;\r\n}\r\n.day{\r\n    height: 20px;\r\n    background: #fff;\r\n    font-size: 12px;\r\n    text-align: center;\r\n    margin-bottom: 20px;\r\n    line-height: 3;\r\n}\r\n.day.active{\r\n    color: #3e97f3;\r\n}", ""]);
 
 // exports
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__popup_popup_basic_functions__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db_db_api__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app__ = __webpack_require__(4);
 
 
 
 
-__webpack_require__(30);
+__webpack_require__(31);
 class WeekChange {
     constructor(currentWeek) {
         this.buttons = [{ name: "Exit", click: function () { }, bg: "#f4f4f4",
@@ -2106,13 +2294,13 @@ class WeekChange {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(31);
+var content = __webpack_require__(32);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -2137,7 +2325,7 @@ if(false) {
 }
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(undefined);
@@ -2151,13 +2339,13 @@ exports.push([module.i, ".week_change{\r\n    width: 300px;\r\n    height: 140px
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(33);
+var content = __webpack_require__(34);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -2182,7 +2370,7 @@ if(false) {
 }
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(undefined);
@@ -2190,99 +2378,349 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".header{\r\n    padding-left: 5px;\r\n    margin: 5px 0;\r\n}\r\n.hour{\r\n    display: inline-block;\r\n    font-size: 12px;\r\n}\r\n.up{\r\n    text-align: center;\r\n    font-size: 14px;\r\n    opacity: 0.9;\r\n    padding-bottom: 5px;\r\n    border-bottom: 1px solid #efefef;\r\n    user-select: none;\r\n    height: 15px;\r\n}\r\n.up:hover{\r\n    color:#3e97f3;\r\n}\r\n.up.active{\r\n    color:#3e97f3;\r\n}\r\n.paper{\r\n    background: #fff;\r\n    color:#707070;\r\n    font-family: Helvetica-Light;\r\n    padding: 10px;\r\n    border-radius: 5px;\r\n    margin-top: 10px;\r\n    border:0.1px solid #efefef;\r\n}\r\n.main-container{\r\n    height: 351px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n}\r\n.main-container.closed{\r\n    height: 40px;\r\n}\r\n.settingsButtonWeek{\r\n    width:15px;\r\n    display: inline-block;\r\n    float:right;\r\n    margin-right: 10px;\r\n}\r\n.settingsButtonWeek svg{\r\n    width:25px;\r\n    height:15px;\r\n    cursor: pointer;\r\n}\r\n.settingsButtonWeek:hover{\r\n    opacity: 0.6;\r\n}\r\n.settingsButtonWeek:active{\r\n    opacity: 0.3;\r\n}\r\n.weekUpText{\r\n   float:left;\r\n   cursor: pointer;\r\n}\r\n", ""]);
+exports.push([module.i, ".header{\r\n    padding-left: 5px;\r\n    margin: 5px 0;\r\n}\r\n.hour{\r\n    display: inline-block;\r\n    font-size: 12px;\r\n}\r\n.up{\r\n    text-align: center;\r\n    font-size: 14px;\r\n    opacity: 0.9;\r\n    padding-bottom: 5px;\r\n    border-bottom: 1px solid #efefef;\r\n    user-select: none;\r\n    height: 15px;\r\n}\r\n.up:hover{\r\n    color:#3e97f3;\r\n}\r\n.up.active{\r\n    color:#3e97f3;\r\n}\r\n.paper{\r\n    background: #fff;\r\n    color:#707070;\r\n    font-family: Helvetica-Light;\r\n    padding: 10px;\r\n    border-radius: 5px;\r\n    margin-top: 10px;\r\n    border: 0.1px solid #efefef;\r\n}\r\n.main-container{\r\n    height: 351px;\r\n    transition: height 0.3s ease-out;\r\n    overflow-y: hidden;\r\n}\r\n.main-container.closed{\r\n    height: 40px;\r\n}\r\n.settingsButtonWeek{\r\n    width:30px;\r\n    display: inline-block;\r\n    float:right;\r\n    height: 20px;\r\n    position: relative;\r\n    margin-top: -7.5px;\r\n    padding-top: 5px;\r\n    border-radius: 5px;\r\n}\r\n.settingsButtonWeek svg{\r\n    width:25px;\r\n    height:15px;\r\n    cursor: pointer;\r\n}\r\n.settingsButtonWeek:hover{\r\n    opacity: 0.6;\r\n}\r\n.settingsButtonWeek:active{\r\n    opacity: 0.3;\r\n}\r\n.weekUpText{\r\n   float:left;\r\n   cursor: pointer;\r\n}\r\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export getTimeDataFirst */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getTimeDataSecond; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return notificationManager; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__db_db_api__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions_functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_tasks_panel_tasks_panel__ = __webpack_require__(36);
 
-Date.prototype['getWeekNumber'] = function () {
-    let d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
-    let dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-    let yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-};
-let nowTimeout;
-function getTimeDataFirst(callBack) {
-    let final = { currentDay: 0, currentWeek: 0, currentHour: 0 };
-    let now = new Date();
-    final.currentWeek = now['getWeekNumber']();
-    final.currentDay = now.getDay();
-    final.currentHour = now.getHours();
-    Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["j" /* getWeeks */])(function (weeks) {
-        let maxWeekNumber = Math.max.apply(Math, weeks);
-        let processDate = final.currentWeek % maxWeekNumber;
-        if (processDate == 0) {
-            final.currentWeek = maxWeekNumber;
+
+__webpack_require__(39);
+let MenuNative = (function () {
+    let _menu;
+    let create = function (parent) {
+        if (_menu) {
+            _menu.clear();
+            _menu.draw();
         }
         else {
-            for (let i = 1; i < maxWeekNumber; i++) {
-                if (processDate == i / maxWeekNumber) {
-                    final.currentWeek = i;
-                }
-            }
+            _menu = new Menu(parent);
         }
-        callBack(final);
-    });
-}
-function getTimeDataSecond(weeks) {
-    let final = { currentDay: 0, currentWeek: 0, currentHour: 0 };
-    let weeksNumbers = weeks.map((i) => i.week_number);
-    let now = new Date();
-    final.currentWeek = now['getWeekNumber']();
-    final.currentDay = now.getDay();
-    final.currentHour = now.getHours();
-    let maxWeekNumber = Math.max.apply(Math, weeksNumbers);
-    let processDate = final.currentWeek % maxWeekNumber;
-    if (processDate == 0) {
-        final.currentWeek = maxWeekNumber;
-    }
-    else {
-        for (let i = 1; i < maxWeekNumber; i++) {
-            if (processDate == i / maxWeekNumber) {
-                final.currentWeek = i;
-            }
+    };
+    let draw = function () {
+        if (_menu) {
+            _menu.draw();
         }
+    };
+    let clear = function () {
+        if (!_menu) {
+            return;
+        }
+        _menu.clear();
+    };
+    return {
+        create, clear, draw
+    };
+})();
+/* harmony default export */ __webpack_exports__["a"] = (MenuNative);
+class Menu {
+    constructor(_parent) {
+        this.task_panel = __WEBPACK_IMPORTED_MODULE_1__components_tasks_panel_tasks_panel__["a" /* default */];
+        this.menu_logo_click = function () {
+            this.state = !this.state;
+            this.draw();
+        }.bind(this);
+        this.parent = _parent;
+        this.state = false;
+        this.draw();
     }
-    return final;
-}
-function notificationManager(lastTask) {
-    clearTimeout(nowTimeout);
-    getTimeDataFirst(function (data) {
-        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["i" /* getTasksByDay */])(data.currentWeek, data.currentDay - 1, function (tasks) {
-            tasks.map(function (item) {
-                if (data.currentHour >= item.start && data.currentHour < item.stop) {
-                    if (lastTask.id != item.id) {
-                        window['createNotification'](item.text, String(item.start) + ":00 - " + String(item.stop) + ":00");
-                        switch (item.action_type) {
-                            case "link":
-                                window['openLink'](item.action_body);
-                                break;
-                            case "file":
-                                console.log(window['openFile'](item.action_body));
-                                break;
-                        }
-                        lastTask = item;
-                    }
-                }
-            });
-            nowTimeout = setTimeout(function () {
-                notificationManager(lastTask);
-            }, (60 - new Date().getMinutes()) * 60000);
-        });
-    });
+    draw() {
+        if (this.current_el) {
+            this.current_el.innerHTML = "";
+            this.current_el.className = (this.state) ? 'main_menu open' : 'main_menu close';
+        }
+        else {
+            this.current_el = Object(__WEBPACK_IMPORTED_MODULE_0__functions_functions__["a" /* createElement */])('div', (this.state) ? 'main_menu open' : 'main_menu close', this.parent);
+        }
+        this.current_el.innerHTML =
+            `<div class="menu_logo" id="menu_logo">
+                   <div id="menu_logo_svg">
+                        <svg version="1.1"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                     viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                                <g>
+                                    <g>
+                                        <path style="fill:#D8DCE1;" d="M0,134v328c0,22.055,17.945,40,40,40h432c22.055,0,40-17.945,40-40V134H0z"/>
+                                    </g>
+                                    <g>
+                                        <path style="fill:#FF4F19;" d="M472,22H40C17.945,22,0,39.945,0,62v72h512V62C512,39.945,494.054,22,472,22z M64,102
+                                            c-13.255,0-24-10.745-24-24s10.745-24,24-24s24,10.745,24,24S77.255,102,64,102z M448,102c-13.255,0-24-10.745-24-24
+                                            s10.745-24,24-24s24,10.745,24,24S461.255,102,448,102z"/>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M256,206c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S273.648,206,256,206z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M176,206c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S193.648,206,176,206z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M96,206c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S113.648,206,96,206z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M336,206c-17.648,0-32,14.352-32,32s14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                S353.648,206,336,206z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M416,270c17.648,0,32-14.352,32-32s-14.352-32-32-32c-17.648,0-32,14.352-32,32
+                                                S398.351,270,416,270z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M256,286c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S273.648,286,256,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M176,286c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S193.648,286,176,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M96,286c-17.648,0-32,14.352-32,32s14.352,32,32,32s32-14.352,32-32S113.648,286,96,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M336,286c-17.648,0-32,14.352-32,32s14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                S353.648,286,336,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M416,286c-17.648,0-32,14.352-32,32s14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                S433.648,286,416,286z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M256,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32s32-14.352,32-32
+                                                C288,380.351,273.648,366,256,366z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M176,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32s32-14.352,32-32
+                                                C208,380.351,193.648,366,176,366z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M96,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32s32-14.352,32-32
+                                                C128,380.351,113.648,366,96,366z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M336,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                C368,380.351,353.648,366,336,366z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M416,366c-17.648,0-32,14.352-32,32c0,17.648,14.352,32,32,32c17.648,0,32-14.352,32-32
+                                                C448,380.351,433.648,366,416,366z"/>
+                                        </g>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path style="fill:#5C546A;" d="M64,90c-6.625,0-12-5.371-12-12V22c0-6.629,5.375-12,12-12s12,5.371,12,12v56
+                                                C76,84.629,70.625,90,64,90z"/>
+                                        </g>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path style="fill:#5C546A;" d="M448,90c-6.625,0-12-5.371-12-12V22c0-6.629,5.375-12,12-12s12,5.371,12,12v56
+                                                C460,84.629,454.625,90,448,90z"/>
+                                        </g>
+                                    </g>
+                                    <g>
+                                        <circle style="fill:#FFD200;" cx="96" cy="238" r="32"/>
+                                    </g>
+                                    <g>
+                                        <circle style="fill:#FF9600;" cx="256" cy="398" r="32"/>
+                                    </g>
+                                    <g>
+                                        <circle style="fill:#FF4F19;" cx="336" cy="318" r="32"/>
+                                    </g>
+                                </g>
+                                </svg>
+                   </div>
+                   <div class="menu_logo_name">${(this.state) ? 'MyWeek' : ''}</div>
+             </div>
+             <div class="menu_line"></div>
+            ` +
+                `
+            <div class="task_panel" id="menu_task_panel"></div>
+            `;
+        document.getElementById('menu_logo').onclick = this.menu_logo_click;
+        this.task_panel.create(document.getElementById('menu_task_panel'), this.state);
+    }
+    ;
+    clear() {
+        parent['innerHTML'] = "";
+    }
 }
 
+
+/***/ }),
+/* 36 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__db_db_api__ = __webpack_require__(2);
+
+__webpack_require__(37);
+let TasksPanelComponent = (function () {
+    let _tasks_panel;
+    let create = function (_parent, open) {
+        if (!_tasks_panel) {
+            _tasks_panel = new TasksPanel(_parent, open);
+        }
+        else {
+            _tasks_panel.clear();
+            _tasks_panel.setParent(_parent);
+            _tasks_panel.setOpen(open);
+            _tasks_panel.draw();
+        }
+    };
+    return { create };
+})();
+class TasksPanel {
+    constructor(_parent, _open) {
+        this.parent = _parent;
+        this.open = _open;
+        this.draw();
+    }
+    setParent(_parent) {
+        this.parent = _parent;
+    }
+    setOpen(_open) {
+        this.open = _open;
+    }
+    draw() {
+        Object(__WEBPACK_IMPORTED_MODULE_0__db_db_api__["k" /* tasks */])(-1, -1, function (_tasks) {
+            function find(name, ar) {
+                for (let i = 0; i < ar.length; i++) {
+                    if (ar[i].text == name) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            let unique_tasks = [];
+            _tasks.forEach(function (item) {
+                if (!find(item.text, unique_tasks)) {
+                    unique_tasks.push(item);
+                }
+            });
+            let inner = "";
+            unique_tasks.forEach(function (item) {
+                let time = 0;
+                _tasks.forEach(function (jitem) {
+                    if (item.text == jitem.text) {
+                        time += Math.abs(jitem.start - jitem.stop);
+                    }
+                });
+                inner += `
+                       <div class="menu_panel_task" style="background:${item.color}">
+                               <div class="menu_panel_task_icon" >
+                                    ${item.text.substring(0, 1).toUpperCase()}
+                                </div>
+                                <div class="menu_panel_task_text" style="display: ${(this.open) ? "inline-block" : "none"}">
+                                    ${(this.open) ? item.text : ""}
+                                </div>
+                                 <div class="menu_panel_task_time" >
+                                   ${time + 'h'}
+                                </div>
+                        </div>
+                   `;
+            }.bind(this));
+            this.parent.innerHTML = inner;
+        }.bind(this));
+    }
+    clear() {
+        this.parent.innerHTML = "";
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (TasksPanelComponent);
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(38);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(1)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../../../node_modules/css-loader/index.js!./tasks_panel.css", function() {
+			var newContent = require("!!../../../../node_modules/css-loader/index.js!./tasks_panel.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, ".menu_panel_task{\r\n    font-family: Helvetica-Light;\r\n    width:max-content;\r\n    font-size: 14px;\r\n    margin: 5px ;\r\n    padding: 2px 5px 2px 5px;\r\n    cursor:pointer;\r\n    border-radius: 5px;\r\n    font-weight: bold;\r\n    color: rgba(0,0,0,0.5);\r\n    display: inline-block;\r\n    transition: opacity 300ms ease-in-out;\r\n}\r\n.menu_panel_task:hover{\r\n    opacity: 0.6;\r\n}\r\n.menu_panel_task_icon{\r\n    display: inline-block;\r\n    width: 15px;\r\n    text-align: center;\r\n    border-right: 1px solid rgba(0,0,0,0.1);\r\n}\r\n.menu_panel_task_time{\r\n    display: inline-block;\r\n    border-left: 1px solid rgba(0,0,0,0.1);\r\n    text-align: center;\r\n    width: 20px;\r\n\r\n}\r\n.menu_panel_task_text{\r\n    display: inline-block;\r\n}\r\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(40);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(1)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../node_modules/css-loader/index.js!./menu.css", function() {
+			var newContent = require("!!../../node_modules/css-loader/index.js!./menu.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\r\n/*wrapper*/\r\n.main_menu{\r\n    margin-right: 10px;\r\n    margin-top: -10px;\r\n    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;\r\n    /*transition: width 0.3s ease-in-out;*/\r\n    height: 100vh;\r\n    float: left;\r\n}\r\n.main_menu.close{\r\n    width: 60px;\r\n\r\n\r\n}\r\n.main_menu.open{\r\n    width: 230px;\r\n}\r\n\r\n/*up*/\r\n.menu_logo{\r\n    user-select: none;\r\n    /*width:30px;*/\r\n    text-align: center;\r\n    margin: 10px auto auto;\r\n    cursor: pointer;\r\n    opacity: 0.6;\r\n    transition: opacity 0.3s ease-in-out;\r\n}\r\n.menu_logo:hover{\r\n    opacity: 1;\r\n}\r\n.menu_logo:active{\r\n    opacity: 0.4;\r\n}\r\n#menu_logo_svg{\r\n    margin-left: 3px;\r\n    display: inline-block;\r\n    width:30px;\r\n}\r\n.menu_logo_name{\r\n    font-family: Helvetica-Light;\r\n    display: inline-block;\r\n    vertical-align: middle;\r\n    position: relative;\r\n    bottom: 10px;\r\n\r\n}\r\n.menu_line{\r\n    margin:5px;\r\n    background: #efefef;\r\n    height: 2px;\r\n}\r\n\r\n/*content*/\r\n.menu_choose{\r\n    height: 40px;\r\n    padding-top: 10px;\r\n    width: 230px;\r\n    text-align: center;\r\n    font-family: Helvetica-Light;\r\n    cursor: pointer;\r\n}\r\n.menu_choose:hover{\r\n    background: rgba(218, 232, 245,0.4);\r\n}\r\n\r\n.menu_choose.close{\r\n    width: 30px;\r\n    cursor: default;\r\n}\r\n.menu_choose.close:hover{\r\n    background-color: #fff;\r\n}\r\n.menu_choose.close>.menu_button{\r\n    margin: 0px 15px;\r\n    cursor: pointer;\r\n}\r\n\r\n.menu_choose.close>.menu_button:hover{\r\n    opacity: 0.8;\r\n}\r\n\r\n.menu_choose.close>.menu_button:active{\r\n    opacity: 0.6;\r\n}\r\n\r\n.menu_choose_text{\r\n    display: inline-block;\r\n    width: 160px;\r\n    text-align: left;\r\n}\r\n.menu_choose_text.close{\r\n    display: none;\r\n\r\n}\r\n\r\n\r\n.menu_button{\r\n    color: rgba(0, 0, 0,0.7);\r\n    height: 30px;\r\n    margin: 0px 15px;\r\n    background: #e3e3e3;\r\n    border-radius: 5px;\r\n    line-height: 2;\r\n    width: 30px;\r\n    text-align: center;\r\n    display: inline-block;\r\n\r\n}\r\n.menu_button.active{\r\n\r\n}\r\n", ""]);
+
+// exports
 
 
 /***/ })

@@ -1,0 +1,32 @@
+.menu_panel_task{
+    font-family: Helvetica-Light;
+    width:max-content;
+    font-size: 14px;
+    margin: 5px ;
+    padding: 2px 5px 2px 5px;
+    cursor:pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    color: rgba(0,0,0,0.5);
+    display: inline-block;
+    transition: opacity 300ms ease-in-out;
+}
+.menu_panel_task:hover{
+    opacity: 0.6;
+}
+.menu_panel_task_icon{
+    display: inline-block;
+    width: 15px;
+    text-align: center;
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+.menu_panel_task_time{
+    display: inline-block;
+    border-left: 1px solid rgba(0,0,0,0.1);
+    text-align: center;
+    width: 20px;
+
+}
+.menu_panel_task_text{
+    display: inline-block;
+}

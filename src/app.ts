@@ -3,12 +3,14 @@ import {Week,weekData} from "./week/week";
 import Task from './week/task'
 import {createElement} from "./functions/functions"
 import {createWeek, dbInit} from './db/db_api'
-import {clickCreateTask, clickCreateWeek} from './menu/week'
+// import {clickCreateTask, clickCreateWeek} from './menu/week'
 import {getTasks,getWeeks} from "./db/db_api";
 
 let days:Array<string> = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 // require('./time');
 import {getTimeDataSecond, notificationManager, timeData} from "./time";
+
+import MenuNative from './menu/menu'
 
 
 // let plans:Array<Task> = [];
@@ -23,7 +25,9 @@ let currentWeeks:Array<Week> = [];
 
 dbInit();
 
+
 function redrawWeek(id:number){
+    MenuNative.draw();
     currentWeeks.map(function(item){
         if(item.data.week_id == id){
             getTasks(item.data.week_id,function(tasks:Array<Task>){
@@ -64,7 +68,8 @@ function Draw(){
     clear("buttonShell");
     clear("taskTooltip");
 
-
+    MenuNative.clear();
+    MenuNative.create(document.getElementById('menu'));
 
     getWeeks(function(weeks:Array<weekData>){
         if(weeks.length == 0){
@@ -77,7 +82,7 @@ function Draw(){
 
             getTasks(item.week_id,function(tasks:Array<Task>){
                 let week:Week = new Week(item.week_number, item.week_id);
-                week.create(document.body, (item.week_number==currentWeek));
+                week.create(document.getElementById('content'), (item.week_number==currentWeek));
                 week.loadDays(days);
                 week.setStartHour(startHour);
                 week.loadTasks(tasks);

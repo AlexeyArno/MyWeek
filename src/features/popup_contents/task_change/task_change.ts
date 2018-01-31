@@ -4,7 +4,7 @@ import {drawButtons} from "../../popup/popup_basic_functions";
 import {drawColor} from "../task_basic_functions";
 import {changeTask, createTask, deleteTask} from "../../../db/db_api";
 import {redrawWeek} from "../../../app";
-
+import {tasks} from "../../../db/db_api"
 require("./task_change.css");
 
 class TaskChange{
@@ -40,6 +40,28 @@ class TaskChange{
 
 
     draw(background:HTMLElement, closePopup:Function){
+      function find(name:string, ar:Array<Task>):number{
+          for(let i=0;i<ar.length;i++){if (ar[i].text == name){return i}}
+          return 0;
+      }
+
+    function draw(_tasks:Array<Task>){
+
+      let unique_tasks:Array<Task> = [];
+      _tasks.forEach(function(item){
+          if(!find(item.text, unique_tasks)){unique_tasks.push(item)}
+      });
+
+      let datalist:string =`<datalist id='name_tooltips'>`;
+
+      unique_tasks.forEach(function(item){
+        datalist+=`<option value = "${item.text}" id="${'id'+item.text}">`
+
+      })
+
+      datalist+=`</datalist>`
+
+
         this.background = background;
         this.currentColor = this.currentTask.color;
         this.closePopup = closePopup;
@@ -48,20 +70,21 @@ class TaskChange{
         this.element = createElement("div", "", background);
         // language=HTML
         this.element.innerHTML =
-            "<div class='popupContent task_create'>" +
-            "<div>Change task</div>"+
-            "<hr/>"+
-            "<div>" +
-            "<div>Name</div>" +
-            `<input id='namePopup' value=${this.currentTask.text}>` +
-            "</div>"+
-            "<div class='timeChoosePopup'>" +
-            "<div>Time</div>" +
-            `<input value=${this.currentTask.start} id='startTimePopup'>` +
-            " - "+
-            `<input value=${this.currentTask.stop} id='stopTimePopup'>` +
-            "</div>"+
-            "</div>";
+            `<div class='popupContent task_create'>
+              <div >Change task</div>
+              <hr/>
+              <div>
+                <div>Name</div>
+                <input id='namePopup' value=${this.currentTask.text} list='name_tooltips'>
+                ${datalist}
+              </div>
+              <div class='timeChoosePopup'>
+                <div>Time</div>
+                <input value=${this.currentTask.start} id='startTimePopup'>
+                  -
+                <input value=${this.currentTask.stop} id='stopTimePopup'>
+              </div>
+            </div>`
         // colors
         this.colorsElements =
             drawColor(this.colorsList,
@@ -80,20 +103,22 @@ class TaskChange{
                 <option value='link'  ${(this.currentTask.action_type=='link')?'selected':''}>Link</option>
                 <option value='file'  ${(this.currentTask.action_type=='file')?'selected':''}>File/Application</option>
             </select>
-            
+
             <div id='wrapperAction'>
-                
+
             </div>
             <div id='actionExtension'>
             </div>`;
 
         drawButtons(this.buttons, <HTMLElement>this.element.children[0]);
-        console.log(this.currentTask);
         this.wrapperAction = document.getElementById('wrapperAction');
         this.actionHandler(this.currentTask.action_type);
         document.getElementById('actionSelect').onchange = function(e:Event){
             this.actionHandler(e.target['value'])
         }.bind(this);
+
+    }
+      tasks(-1,-1,draw.bind(this))
     }
 
     actionHandler(value){
@@ -102,7 +127,7 @@ class TaskChange{
                 this.wrapperAction.innerHTML = "";
                 break;
             case "link":
-                this.wrapperAction.innerHTML =`<input id="inputLinkPopup" 
+                this.wrapperAction.innerHTML =`<input id="inputLinkPopup"
                         value="${(this.currentTask.action_type=="link")?this.currentTask.action_body:""}"/>`;
                 break;
             case "file":
