@@ -80,7 +80,7 @@ function notificationManager(lastTask:Task){
                                 window['openLink'](item.action_body);
                                 break;
                             case "file":
-                                console.log(window['openFile'](item.action_body));
+                                window['openFile'](item.action_body)
                                 break;
                         }
                         lastTask = item

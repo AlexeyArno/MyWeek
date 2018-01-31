@@ -15,12 +15,18 @@ let MenuNative = (function(){
 
     };
 
+    let draw = function(){
+        if(_menu){
+            _menu.draw();
+        }
+    }
+
     let clear=function(){
         if(!_menu){return}
         _menu.clear();
     };
     return{
-        create,clear
+        create,clear,draw
     }
 
 })();
@@ -42,7 +48,7 @@ class Menu{
 
     constructor(_parent:HTMLElement){
            this.parent = _parent;
-           this.state = true;
+           this.state = false;
            this.draw();
     }
 
@@ -147,35 +153,45 @@ class Menu{
                                     </g>
                                 </g>
                                 </svg>
-                   </div>             
-                   <div class="menu_logo_name">${(this.state)?'MyWeek':''}</div>             
+                   </div>
+                   <div class="menu_logo_name">${(this.state)?'MyWeek':''}</div>
              </div>
              <div class="menu_line"></div>
-             <div class=" ${(this.state)?'menu_choose':'menu_choose close'}">
-                <div class="menu_button">
-                   W
-                </div>
-                <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
-                    Weeks
-                </div>
-            </div>
-            <div class=" ${(this.state)?'menu_choose':'menu_choose close'}">
-                  <div class="menu_button">
-                        S
-                  </div>
-                  <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
-                         Settings
-                  </div>
-            </div>
-            <div class=" ${(this.state)?'menu_choose':'menu_choose close'}">
-                  <div class="menu_button">
-                        A
-                  </div>
-                  <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
-                         About
-                  </div>
-            </div>
-            <div class="menu_line"></div>
+            `+
+            // <div class=" ${(this.state)?'menu_choose':'menu_choose close'}">
+            //     <div class="menu_button">
+            //        W
+            //     </div>
+            //     <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
+            //         Weeks
+            //     </div>
+            // </div>
+           //  <div class=" ${(this.state)?'menu_choose':'menu_choose close'}">
+           //     <div class="menu_button">
+           //        C
+           //     </div>
+           //     <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
+           //         Calendar
+           //     </div>
+           // </div>
+           //  <div class=" ${(this.state)?'menu_choose':'menu_choose close'}">
+           //        <div class="menu_button">
+           //              S
+           //        </div>
+           //        <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
+           //               Settings
+           //        </div>
+           //  </div>
+           //  <div class=" ${(this.state)?'menu_choose':'menu_choose close'}">
+           //        <div class="menu_button">
+           //              A
+           //        </div>
+           //        <div class="${(this.state)?'menu_choose_text':'menu_choose_text close'}">
+           //               About
+           //        </div>
+           //  </div>
+           //  <div class="menu_line"></div>
+            `
             <div class="task_panel" id="menu_task_panel"></div>
             `;
         document.getElementById('menu_logo').onclick = this.menu_logo_click;
@@ -187,4 +203,3 @@ class Menu{
     }
 
 }
-

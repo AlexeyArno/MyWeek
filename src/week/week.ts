@@ -59,7 +59,7 @@ class Week{
             up.appendChild(settings);
             wrap.appendChild(up);
             upText.onclick = function(e:Event){
-                console.log(e.target);
+                // console.log(e.target);
                 wrap.classList;
                 let clList = wrap.classList;
                 for(let i = 0;i<clList.length;i++){
@@ -154,7 +154,7 @@ class Week{
 		this.timePanel.setup(this.startHour, this.hourWidth);
 		let count:number = this.timePanel.draw();
 
-		
+
 		this.graphPanel.setup(this.startHour, count, this.hourWidth, this.data.week_number, this.data.week_id);
 		this.graphPanel.draw(this.tasks);
 

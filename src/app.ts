@@ -25,7 +25,9 @@ let currentWeeks:Array<Week> = [];
 
 dbInit();
 
+
 function redrawWeek(id:number){
+    MenuNative.draw();
     currentWeeks.map(function(item){
         if(item.data.week_id == id){
             getTasks(item.data.week_id,function(tasks:Array<Task>){

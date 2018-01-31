@@ -78,7 +78,6 @@ class TasksPanel{
                         </div>
                    `
             }.bind(this));
-            console.log(this.parent);
             this.parent.innerHTML = inner;
         }.bind(this))
     }

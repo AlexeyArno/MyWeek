@@ -4,6 +4,7 @@ import {drawButtons} from "../../popup/popup_basic_functions";
 import {drawColor} from "../task_basic_functions";
 import {changeTask, createTask} from "../../../db/db_api";
 import {redrawWeek} from "../../../app";
+import {tasks} from "../../../db/db_api"
 
 require("./task_create_style.css");
 
@@ -22,83 +23,114 @@ class TaskCreate{
 
 
     draw(background:HTMLElement, closePopup:Function){
-        this.closePopup = closePopup;
-        this.buttons[0].click = function(){closePopup()};
-        if(!this.currentTask) return;
-        this.element = createElement("div", "", background);
-        // language=HTML
-        this.element.innerHTML =
-        "<div class='popupContent task_create'>" +
-            "<div>Create task</div>"+
-            "<hr/>"+
-            "<div>" +
-                "<div>Name</div>" +
-                "<input id='namePopup' >" +
-            "</div>"+
-            "<div class='timeChoosePopup'>" +
-                "<div>Time</div>" +
-                `<input value=${this.currentTask.start} id='startTimePopup'>` +
-                    " - "+
-                `<input value=${this.currentTask.stop} id='stopTimePopup'>` +
-            "</div>"+
-        "</div>";
-        // colors
-        this.colorsElements =
-            drawColor(this.colorsList,
-                    function(click_color:string){
-                        console.log(click_color);
-                        this.currentColor = click_color;
-                        this.drawColors()
-                    }.bind(this),
-                    <HTMLElement>this.element.children[0]);
-        this.drawColors();
+        function find(name:string, ar:Array<Task>):boolean{
+            for(let i=0;i<ar.length;i++){if (ar[i].text == name){return true}}
+            return false;
+        }
 
-        let actionPopup:HTMLElement = createElement("div", "actionsPopup", <HTMLElement>this.element.children[0]);
-        actionPopup.innerHTML+=
-            "<div>Action</div>" +
-            `<select id='actionSelect'>
-                 <option value='none'>None</option>
-                <option value='link'>Link</option>
-                <option value='file'>File/Application</option>
-            </select>
-            
-            <div id='wrapperAction'>
-               
-            </div>
-            <div id='actionExtension'>
-              
-            </div>`;
 
-        drawButtons(this.buttons, <HTMLElement>this.element.children[0]);
-        let wrapperAction:HTMLElement = document.getElementById('wrapperAction');
-        document.getElementById('actionSelect').onchange = function(e:Event){
-            switch(e.target['value']){
-                case "none":
-                    wrapperAction.innerHTML = "";
-                    break;
-                case "link":
-                    wrapperAction.innerHTML = `<input id="inputLinkPopup"/>`;
-                    break;
-                case "file":
-                    let chooseButton ={name:"Choose", click:function(){
-                            let path:string = window['chooseFile']()[0];
-                            this.newExtension = path;
-                            path = (path.length>=20)?
-                                "..."+path.substring(path.length-20,path.length):path;
-                            document.getElementById('actionExtension').innerText = path;
-                        }.bind(this), bg:"#3b9fff",
-                        color: "#fff", border:"#177bf3", float:"right"};
-                    wrapperAction.innerHTML = "";
-                    let now:HTMLElement = createElement("div","button", wrapperAction);
-                    now.innerText = chooseButton.name;
-                    now.style.background = chooseButton.bg;
-                    now.style.color = chooseButton.color;
-                    now.style['float'] = chooseButton.float;
-                    now.style.border = "1px solid "+chooseButton.border;
-                    now.onclick = function(){chooseButton.click()};
-            }
+
+        function draw(_tasks:Array<Task>){
+          // generate tooltips
+          let unique_tasks:Array<Task> = [];
+          _tasks.forEach(function(item){
+              if(!find(item.text, unique_tasks)){unique_tasks.push(item)}
+          });
+
+          let datalist:string =`<datalist id='name_tooltips'>`;
+
+          unique_tasks.forEach(function(item){
+            datalist+=`<option>
+                          ${item.text}
+                      </option>`
+          })
+
+          datalist+=`<datalist>`
+
+
+
+
+
+          this.closePopup = closePopup;
+          this.buttons[0].click = function(){closePopup()};
+          if(!this.currentTask) return;
+          this.element = createElement("div", "", background);
+          // language=HTML
+          this.element.innerHTML =
+          "<div class='popupContent task_create'>" +
+              "<div>Create task</div>"+
+              "<hr/>"+
+              "<div>" +
+                  "<div>Name</div>" +
+                  "<input id='namePopup'  list='name_tooltips'>" + datalist+
+              "</div>"+
+              "<div class='timeChoosePopup'>" +
+                  "<div>Time</div>" +
+                  `<input value=${this.currentTask.start} id='startTimePopup'  type="number">` +
+                      " - "+
+                  `<input value=${this.currentTask.stop} id='stopTimePopup' type="number">` +
+              "</div>"+
+          "</div>";
+          // colors
+          this.colorsElements =
+              drawColor(this.colorsList,
+                      function(click_color:string){
+                          console.log(click_color);
+                          this.currentColor = click_color;
+                          this.drawColors()
+                      }.bind(this),
+                      <HTMLElement>this.element.children[0]);
+          this.drawColors();
+
+          let actionPopup:HTMLElement = createElement("div", "actionsPopup", <HTMLElement>this.element.children[0]);
+          actionPopup.innerHTML+=
+              "<div>Action</div>" +
+              `<select id='actionSelect'>
+                   <option value='none'>None</option>
+                  <option value='link'>Link</option>
+                  <option value='file'>File/Application</option>
+              </select>
+
+              <div id='wrapperAction'>
+
+              </div>
+              <div id='actionExtension'>
+
+              </div>`;
+
+          drawButtons(this.buttons, <HTMLElement>this.element.children[0]);
+          let wrapperAction:HTMLElement = document.getElementById('wrapperAction');
+          document.getElementById('actionSelect').onchange = function(e:Event){
+              switch(e.target['value']){
+                  case "none":
+                      wrapperAction.innerHTML = "";
+                      break;
+                  case "link":
+                      wrapperAction.innerHTML = `<input id="inputLinkPopup"/>`;
+                      break;
+                  case "file":
+                      let chooseButton ={name:"Choose", click:function(){
+                              let path:string = window['chooseFile']()[0];
+                              this.newExtension = path;
+                              path = (path.length>=20)?
+                                  "..."+path.substring(path.length-20,path.length):path;
+                              document.getElementById('actionExtension').innerText = path;
+                          }.bind(this), bg:"#3b9fff",
+                          color: "#fff", border:"#177bf3", float:"right"};
+                      wrapperAction.innerHTML = "";
+                      let now:HTMLElement = createElement("div","button", wrapperAction);
+                      now.innerText = chooseButton.name;
+                      now.style.background = chooseButton.bg;
+                      now.style.color = chooseButton.color;
+                      now.style['float'] = chooseButton.float;
+                      now.style.border = "1px solid "+chooseButton.border;
+                      now.onclick = function(){chooseButton.click()};
+              }
+
         }.bind(this)
+      }
 
+      tasks(-1,-1, draw.bind(this));
     }
 
     setCurrentTask(task:Task){
@@ -116,7 +148,7 @@ class TaskCreate{
     }
 
     create(){
-        console.log(this.currentTask);
+        // console.log(this.currentTask);
         this.currentTask.text = document.getElementById("namePopup")['value'];
         this.currentTask.start = Number(document.getElementById("startTimePopup")['value']);
         this.currentTask.stop = Number(document.getElementById("stopTimePopup")['value']);

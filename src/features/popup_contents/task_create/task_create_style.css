@@ -10,7 +10,8 @@
 }
 #startTimePopup,
 #stopTimePopup{
-    width: 30px;
+    width: 40px;
+    appearance: textfield;
 }
 .timeChoosePopup{
     margin-top: 10px;

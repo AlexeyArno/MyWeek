@@ -5,3 +5,7 @@
     left: calc(50vw - 150px);
     top: calc(50vh - 45px);
 }
+.copy_button{
+    display: inline-block;
+    float:right;
+}

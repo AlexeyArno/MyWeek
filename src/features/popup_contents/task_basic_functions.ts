@@ -16,7 +16,6 @@ function drawColor(colors:Array<string>, callback:Function,parent:HTMLElement):A
         // };
 
         now.onclick = ()=>callback(item);
-        console.log(now.onclick);
 
         final.push(now);
     });
