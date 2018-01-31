@@ -28,7 +28,7 @@ Install the dependencies and devDependencies and start the server.
 $ git clone https://github.com/AlexeyArno/MyWeek
 $ cd MyWeek
 $ npm install 
-$ electrone .
+$ electron .
 ```
 ### Build
 
@@ -47,7 +47,7 @@ Open your favorite Terminal and run these commands.
 
 Run electrone:
 ```sh
-$ electrone .
+$ electron .
 ```
 
 Run webpack watch:
