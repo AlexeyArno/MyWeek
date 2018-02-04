@@ -1,0 +1,11 @@
+.version_panel{
+    position: absolute;
+    bottom: 0px;
+    font-family: Helvetica-Regular;
+    opacity: 0.1;
+    font-weight: bold;
+    font-size: 12px;
+     /* float: right; */
+     margin-left: 10px;
+    margin-bottom: 10px;
+}

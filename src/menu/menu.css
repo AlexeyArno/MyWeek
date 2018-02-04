@@ -1,6 +1,9 @@
 
 /*wrapper*/
 .main_menu{
+    position: fixed;
+    z-index: 9999;
+    background: #fff;
     margin-right: 10px;
     margin-top: -10px;
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;

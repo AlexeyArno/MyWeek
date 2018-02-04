@@ -1,5 +1,6 @@
 import {createElement} from "../functions/functions";
 import TasksPanelComponent from './components/tasks_panel/tasks_panel'
+import VersionPanelComponent from './components/version_panel/version_panel'
 require("./menu.css");
 
 let MenuNative = (function(){
@@ -43,6 +44,7 @@ class Menu{
 
     menu_logo_click = function () {
         this.state = !this.state;
+        document.getElementById('content').style.paddingLeft =(this.state)?"240px":"70px";
         this.draw();
     }.bind(this);
 
@@ -193,9 +195,11 @@ class Menu{
            //  <div class="menu_line"></div>
             `
             <div class="task_panel" id="menu_task_panel"></div>
+            <div class="version_Panel" id="menu_version_panel"></div>
             `;
         document.getElementById('menu_logo').onclick = this.menu_logo_click;
         this.task_panel.create(document.getElementById('menu_task_panel'), this.state);
+        VersionPanelComponent.create(document.getElementById('menu_version_panel'), this.state);
     };
 
     clear(){

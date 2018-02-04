@@ -20,7 +20,7 @@ function createWeek(callback:Function){
     getWeeks(function(weeks:Array<number>){
         db.transaction(function(tx:any){
             tx.executeSql("INSERT INTO weeks (number) VALUES(?)", [weeks.length+1] ,function(transaction:any, result:any){
-                console.log(result);
+                // console.log(result);
                 callback(true);
             },function(transaction, error){
                 callback(false);
@@ -72,10 +72,10 @@ function createTask(task:Task, callback:Function){
 		 tx.executeSql("INSERT INTO tasks (text,start,stop,day,color,action_type,action_body, week_id) VALUES(?,?,?,?,?,?,?,?)",
 		 	[task.text,task.start,task.stop,task.day,task.color,task.action_type,task.action_body,task.week_id]
              ,function(transaction:any, result:any){
-                 console.log(result);
+                 // console.log(result);
                  callback(true);
              },function(transaction, error){
-                 console.log(error);
+                 // console.log(error);
                  callback(false);
              });
 	});
@@ -183,7 +183,7 @@ function deleteTask(task_id:number,  callback:Function){
         tx.executeSql("DELETE FROM tasks WHERE ID=?",[task_id],function(transaction:any, result:any){
             callback(true);
         },function(transaction, error){
-            console.log(error);
+            // console.log(error);
             callback(false);
         });
     });
@@ -191,7 +191,7 @@ function deleteTask(task_id:number,  callback:Function){
 }
 
 function changeTask(up_task:Task, callback:Function){
-	console.log(up_task.text, up_task.id);
+	// console.log(up_task.text, up_task.id);
     if (!db) throw new Error("DB is not init, use dbInit()");
     db.transaction(function(tx){
         tx.executeSql("update tasks set text=?, start=?, stop=?, day=?, color=?,action_type=?,action_body=?, week_id=? "+
@@ -200,10 +200,10 @@ function changeTask(up_task:Task, callback:Function){
 			up_task.day, up_task.color, up_task.action_type,
             up_task.action_body, up_task.week_id, up_task.id],
             function(transaction:any, result:any){
-                console.log(result);
+                // console.log(result);
                 callback(true);
 		},function(transaction, error){
-        	console.log(error);
+        	// console.log(error);
                 callback(false);
             });
     });

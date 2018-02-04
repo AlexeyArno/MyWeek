@@ -16,10 +16,18 @@ class Days{
         getWeeks(function(weeks:Array<weekData>){
             let data:timeData = getTimeDataSecond(weeks);
             this.nativeElement.innerHTML = "";
-            for(let i= 0;i<this.days.length;i++){
+            for(let i=0;i<this.days.length;i++){
                 let newEl = document.createElement("div");
                 newEl.innerHTML = this.days[i];
-                newEl.className = (i==data.currentDay-1)?"day active":"day";
+                if(data.currentDay!=0){
+                    newEl.className = (i==data.currentDay-1)?"day active":"day";
+                }else{
+                    if(i==this.days.length-1){
+                        newEl.className = "day active"
+                    }else{
+                        newEl.className = "day"
+                    }
+                }
                 this.nativeElement.appendChild(newEl);
             }
         }.bind(this))
